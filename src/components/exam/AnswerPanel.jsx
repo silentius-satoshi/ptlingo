@@ -1,4 +1,5 @@
 import ChoiceRow from './ChoiceRow'
+import RationalePanel from './RationalePanel'
 
 export default function AnswerPanel({
   question,
@@ -8,6 +9,7 @@ export default function AnswerPanel({
   onToggleEliminate,
   focusedChoice,
   onFocusChoice,
+  rationaleVisible = false,
 }) {
   if (!question) {
     return <div className="flex-[45] bg-slate-50 dark:bg-slate-900/50" />
@@ -25,26 +27,35 @@ export default function AnswerPanel({
         </span>
       </div>
 
-      {/* Choices */}
-      <div className="flex-1 overflow-y-auto px-8 py-5 space-y-3 scrollbar-thin">
-        {question.choices.map((choice, i) => (
-          <ChoiceRow
-            key={i}
-            index={i}
-            text={choice}
-            selected={selectedAnswer === i}
-            eliminated={(eliminated || []).includes(i)}
-            focused={focusedChoice === i}
-            onSelect={onSelect}
-            onToggleEliminate={onToggleEliminate}
-            onFocus={onFocusChoice}
-          />
-        ))}
+      {/* Scrollable area: choices + rationale */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
+        <div className="px-8 py-5 space-y-3">
+          {question.choices.map((choice, i) => (
+            <ChoiceRow
+              key={i}
+              index={i}
+              text={choice}
+              selected={selectedAnswer === i}
+              eliminated={(eliminated || []).includes(i)}
+              focused={rationaleVisible ? false : focusedChoice === i}
+              onSelect={onSelect}
+              onToggleEliminate={onToggleEliminate}
+              onFocus={rationaleVisible ? () => {} : onFocusChoice}
+              revealed={rationaleVisible}
+              correct={rationaleVisible && i === question.correct_index}
+            />
+          ))}
 
-        {/* Keyboard hint */}
-        <p className="text-xs text-slate-400 dark:text-slate-600 text-center pt-2">
-          Press 1–4 to select · E to eliminate · M to mark · ←→ to navigate
-        </p>
+          {!rationaleVisible && (
+            <p className="text-xs text-slate-400 dark:text-slate-600 text-center pt-2">
+              Press 1–4 to select · E to eliminate · M to mark · ←→ to navigate
+            </p>
+          )}
+        </div>
+
+        {rationaleVisible && (
+          <RationalePanel question={question} selectedAnswer={selectedAnswer} />
+        )}
       </div>
     </div>
   )

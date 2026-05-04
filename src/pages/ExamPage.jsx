@@ -17,7 +17,7 @@ import LoadingSpinner from '../components/shared/LoadingSpinner'
 import BreakScreen from '../components/exam/BreakScreen'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
-const SECTION_END = new Set([1, 3, 134, 179])
+const SECTION_END = new Set([44, 89, 134, 179])
 
 export default function ExamPage() {
   const { sessionId } = useParams()
@@ -178,11 +178,15 @@ export default function ExamPage() {
   const isMarked          = currentQuestionId != null && marked.includes(currentQuestionId)
 
   // ── Action handlers ────────────────────────────────────────────────────────
+  // In quiz mode the answer locks once selected (rationale immediately revealed)
+  const rationaleVisible = type === 'quiz' && selectedAnswer !== null
+
   const handleSelectAnswer = useCallback((i) => {
     if (!currentQuestionId) return
+    if (type === 'quiz' && selectedAnswer !== null) return  // locked after first pick
     setAnswer(currentQuestionId, i)
     scheduleSave()
-  }, [currentQuestionId, setAnswer, scheduleSave])
+  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave])
 
   const handleToggleEliminated = useCallback((i) => {
     if (!currentQuestionId) return
@@ -228,10 +232,8 @@ export default function ExamPage() {
   const goNext = useCallback(() => {
     if (currentIndex >= questions.length - 1) return
     // Trigger section breaks only in full mock-exam mode
-    if (type === 'exam' && SECTION_END.has(currentIndex)) {
-      // TEST mapping: Q2→sec1, Q4→sec2; production uses (currentIndex+1)/45
-      const SEC_MAP = { 1: 1, 3: 2, 134: 3, 179: 4 }
-      const sec = SEC_MAP[currentIndex]
+    if (type === 'exam' && questions.length === 225 && SECTION_END.has(currentIndex)) {
+      const sec = (currentIndex + 1) / 45  // 1 | 2 | 3 | 4
       breakResumeIndexRef.current = currentIndex + 1
       setBreakSection(sec)
       if (sec === 2) {
@@ -417,6 +419,7 @@ export default function ExamPage() {
               onToggleEliminate={handleToggleEliminated}
               focusedChoice={focusedChoice}
               onFocusChoice={setFocusedChoice}
+              rationaleVisible={rationaleVisible}
             />
 
             {toolbarPanel && (
