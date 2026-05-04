@@ -1,15 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { useTimer } from '../../hooks/useTimer'
 
-export default function ExamTopBar({ paused = false, onExpire, onToggleToolbar }) {
+export default function ExamTopBar({ onExpire, onToggleToolbar }) {
   const navigate = useNavigate()
-  const { formatted, timeRemaining } = useTimer({ paused, onExpire })
+  const { formatted, timeRemaining } = useTimer({ onExpire })
 
-  const isLow = timeRemaining > 0 && timeRemaining <= 300 // red at ≤5 min
+  const isLow = timeRemaining > 0 && timeRemaining <= 300
 
   return (
     <div className="h-14 flex items-center justify-between px-5 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0 z-10">
-      {/* Back */}
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -20,7 +19,6 @@ export default function ExamTopBar({ paused = false, onExpire, onToggleToolbar }
         Back
       </button>
 
-      {/* Timer */}
       <div className="flex items-center gap-2">
         <svg
           className={`w-4 h-4 ${isLow ? 'text-red-500' : 'text-slate-400'}`}
@@ -28,21 +26,13 @@ export default function ExamTopBar({ paused = false, onExpire, onToggleToolbar }
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span
-          className={`font-mono text-base font-semibold tabular-nums tracking-wide ${
-            isLow ? 'text-red-600 dark:text-red-400' : 'text-slate-800 dark:text-white'
-          }`}
-        >
+        <span className={`font-mono text-base font-semibold tabular-nums tracking-wide ${
+          isLow ? 'text-red-600 dark:text-red-400' : 'text-slate-800 dark:text-white'
+        }`}>
           {formatted}
         </span>
-        {paused && (
-          <span className="text-xs text-amber-600 dark:text-amber-400 font-medium ml-1">
-            PAUSED
-          </span>
-        )}
       </div>
 
-      {/* Toolbar toggle */}
       <button
         onClick={onToggleToolbar}
         className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors"

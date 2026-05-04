@@ -7,30 +7,55 @@ import ExamTopBar from '../components/layout/ExamTopBar'
 import QuestionPanel from '../components/exam/QuestionPanel'
 import AnswerPanel from '../components/exam/AnswerPanel'
 import QuestionNav from '../components/exam/QuestionNav'
+import ExamToolbar from '../components/toolbar/ExamToolbar'
+import ProgressGrid from '../components/toolbar/ProgressGrid'
+import Calculator from '../components/toolbar/Calculator'
+import NotesPanel from '../components/toolbar/NotesPanel'
+import Modal from '../components/shared/Modal'
+import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 
 export default function ExamPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  // ── Loading / error ────────────────────────────────────────────────────────
+  const [loading, setLoading]     = useState(true)
+  const [error, setError]         = useState('')
   const [questions, setQuestions] = useState([])
-  const [paused, setPaused] = useState(false)
-  const [focusedChoice, setFocusedChoice] = useState(null)
-  const [toolbarOpen, setToolbarOpen] = useState(true)
+
+  // ── Toolbar / UI ───────────────────────────────────────────────────────────
+  const [toolbarExpanded, setToolbarExpanded] = useState(true)
+  const [toolbarPanel, setToolbarPanel]       = useState(null)
+  const [highlightMode, setHighlightMode]     = useState(false)
+  const [focusedChoice, setFocusedChoice]     = useState(null)
+
+  // ── Modals ─────────────────────────────────────────────────────────────────
+  const [showPauseModal, setShowPauseModal]   = useState(false)
+  const [showSubmitModal, setShowSubmitModal] = useState(false)
+  const [showEndModal, setShowEndModal]       = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [submitting, setSubmitting]           = useState(false)
+  const [pausing, setPausing]                 = useState(false)
+
   const saveTimeoutRef = useRef(null)
 
+  // ── Store ──────────────────────────────────────────────────────────────────
   const {
     currentIndex,
     answers,
     marked,
     eliminated,
+    notes,
+    highlights,
+    timeRemaining,
     setSession,
     setCurrentIndex,
     setAnswer,
     toggleMarked,
     toggleEliminated,
+    setNote,
+    setHighlights,
     resetSession,
   } = useSessionStore()
 
@@ -51,6 +76,20 @@ export default function ExamPage() {
         if (sErr) throw sErr
         if (!session) throw new Error('Session not found.')
 
+        // Already submitted — send straight to results
+        if (session.status === 'submitted') {
+          navigate(`/results/${sessionId}`, { replace: true })
+          return
+        }
+
+        // Resuming a paused session — flip back to in_progress
+        if (session.status === 'paused') {
+          await supabase
+            .from('sessions')
+            .update({ status: 'in_progress' })
+            .eq('id', sessionId)
+        }
+
         if (session.question_ids?.length > 0) {
           const { data: qs, error: qErr } = await supabase
             .from('questions')
@@ -59,7 +98,6 @@ export default function ExamPage() {
 
           if (qErr) throw qErr
 
-          // Reorder to match the session's question_ids ordering
           const qMap = Object.fromEntries((qs || []).map((q) => [q.id, q]))
           const ordered = session.question_ids.map((id) => qMap[id]).filter(Boolean)
           setQuestions(ordered)
@@ -70,15 +108,15 @@ export default function ExamPage() {
           type:            session.type,
           mode:            session.mode,
           timeMultiplier:  session.time_multiplier,
-          currentIndex:    session.current_index ?? 0,
-          answers:         session.answers         ?? {},
-          marked:          session.marked           ?? [],
-          eliminated:      session.eliminated       ?? {},
-          highlights:      session.highlights       ?? {},
-          notes:           session.notes            ?? {},
-          timePerQuestion: session.time_per_question ?? {},
-          timeRemaining:   session.time_remaining   ?? 0,
-          status:          session.status,
+          currentIndex:    session.current_index    ?? 0,
+          answers:         session.answers           ?? {},
+          marked:          session.marked             ?? [],
+          eliminated:      session.eliminated         ?? {},
+          highlights:      session.highlights         ?? {},
+          notes:           session.notes              ?? {},
+          timePerQuestion: session.time_per_question  ?? {},
+          timeRemaining:   session.time_remaining     ?? 0,
+          status:          'in_progress',
         })
       } catch (err) {
         setError(err.message)
@@ -94,7 +132,7 @@ export default function ExamPage() {
     }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Debounced Supabase save ────────────────────────────────────────────────
+  // ── Debounced save ─────────────────────────────────────────────────────────
   const scheduleSave = useCallback((patch = {}) => {
     if (!sessionId) return
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
@@ -117,25 +155,27 @@ export default function ExamPage() {
     }, 1500)
   }, [sessionId])
 
-  // ── Derived state ─────────────────────────────────────────────────────────
+  // ── Derived state ──────────────────────────────────────────────────────────
   const currentQuestion   = questions[currentIndex]
   const currentQuestionId = currentQuestion?.id
-  const selectedAnswer    = currentQuestionId != null ? (answers[currentQuestionId] ?? null) : null
-  const currentEliminated = currentQuestionId != null ? (eliminated[currentQuestionId] || []) : []
+  const selectedAnswer    = currentQuestionId != null ? (answers[currentQuestionId]    ?? null) : null
+  const currentEliminated = currentQuestionId != null ? (eliminated[currentQuestionId] || [])   : []
+  const currentNote       = currentQuestionId != null ? (notes[currentQuestionId]      || '')   : ''
   const isMarked          = currentQuestionId != null && marked.includes(currentQuestionId)
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleSelectAnswer = useCallback((choiceIndex) => {
+  // ── Action handlers ────────────────────────────────────────────────────────
+  const handleSelectAnswer = useCallback((i) => {
     if (!currentQuestionId) return
-    setAnswer(currentQuestionId, choiceIndex)
+    setAnswer(currentQuestionId, i)
     scheduleSave()
   }, [currentQuestionId, setAnswer, scheduleSave])
 
-  const handleToggleEliminated = useCallback((choiceIndex) => {
+  const handleToggleEliminated = useCallback((i) => {
     if (!currentQuestionId) return
-    toggleEliminated(currentQuestionId, choiceIndex)
+    if (i === selectedAnswer) return
+    toggleEliminated(currentQuestionId, i)
     scheduleSave()
-  }, [currentQuestionId, toggleEliminated, scheduleSave])
+  }, [currentQuestionId, selectedAnswer, toggleEliminated, scheduleSave])
 
   const handleMark = useCallback(() => {
     if (!currentQuestionId) return
@@ -143,29 +183,108 @@ export default function ExamPage() {
     scheduleSave()
   }, [currentQuestionId, toggleMarked, scheduleSave])
 
+  const handleNoteChange = useCallback((text) => {
+    if (!currentQuestionId) return
+    setNote(currentQuestionId, text)
+    scheduleSave()
+  }, [currentQuestionId, setNote, scheduleSave])
+
+  const handleAddHighlight = useCallback(({ start, end }) => {
+    if (!currentQuestionId) return
+    const current = highlights[currentQuestionId] || []
+    setHighlights(currentQuestionId, [...current, { start, end }])
+    scheduleSave()
+  }, [currentQuestionId, highlights, setHighlights, scheduleSave])
+
+  const handleRemoveHighlight = useCallback((idx) => {
+    if (!currentQuestionId) return
+    const current = highlights[currentQuestionId] || []
+    const updated = idx === 'all' ? [] : current.filter((_, i) => i !== idx)
+    setHighlights(currentQuestionId, updated)
+    scheduleSave()
+  }, [currentQuestionId, highlights, setHighlights, scheduleSave])
+
+  const goTo = useCallback((index) => {
+    setCurrentIndex(index)
+    scheduleSave({ current_index: index })
+    setFocusedChoice(null)
+    setToolbarPanel((p) => p === 'progress' ? null : p)
+  }, [setCurrentIndex, scheduleSave])
+
   const goNext = useCallback(() => {
-    if (currentIndex < questions.length - 1) {
-      const next = currentIndex + 1
-      setCurrentIndex(next)
-      scheduleSave({ current_index: next })
-      setFocusedChoice(null)
-    }
-  }, [currentIndex, questions.length, setCurrentIndex, scheduleSave])
+    if (currentIndex < questions.length - 1) goTo(currentIndex + 1)
+  }, [currentIndex, questions.length, goTo])
 
   const goPrev = useCallback(() => {
-    if (currentIndex > 0) {
-      const prev = currentIndex - 1
-      setCurrentIndex(prev)
-      scheduleSave({ current_index: prev })
-      setFocusedChoice(null)
+    if (currentIndex > 0) goTo(currentIndex - 1)
+  }, [currentIndex, goTo])
+
+  // ── Pause: save state + redirect to submissions ────────────────────────────
+  const handleConfirmPause = useCallback(async () => {
+    setPausing(true)
+    try {
+      // Flush any pending debounced save immediately
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+      const s = useSessionStore.getState()
+      await supabase
+        .from('sessions')
+        .update({
+          status:            'paused',
+          answers:           s.answers,
+          marked:            s.marked,
+          eliminated:        s.eliminated,
+          notes:             s.notes,
+          highlights:        s.highlights,
+          time_per_question: s.timePerQuestion,
+          time_remaining:    s.timeRemaining,   // snapshot live timer value
+          current_index:     s.currentIndex,
+        })
+        .eq('id', sessionId)
+
+      navigate('/submissions')
+    } catch (err) {
+      console.error('Pause error:', err)
+      setPausing(false)
     }
-  }, [currentIndex, setCurrentIndex, scheduleSave])
+  }, [sessionId, navigate])
 
-  const handleExpire = useCallback(() => {
-    // Timer ran out — auto-submit (wired fully in later steps)
-    navigate(`/results/${sessionId}`)
-  }, [navigate, sessionId])
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true)
+    try {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+      const s = useSessionStore.getState()
+      const correct = questions.filter((q) => s.answers[q.id] === q.correct_index).length
+      const score   = questions.length > 0 ? correct / questions.length : 0
 
+      await supabase
+        .from('sessions')
+        .update({
+          status:            'submitted',
+          score,
+          submitted_at:      new Date().toISOString(),
+          answers:           s.answers,
+          marked:            s.marked,
+          eliminated:        s.eliminated,
+          notes:             s.notes,
+          highlights:        s.highlights,
+          time_per_question: s.timePerQuestion,
+          time_remaining:    s.timeRemaining,
+          current_index:     s.currentIndex,
+        })
+        .eq('id', sessionId)
+
+      navigate(`/results/${sessionId}`)
+    } catch (err) {
+      console.error('Submit error:', err)
+    } finally {
+      setSubmitting(false)
+    }
+  }, [questions, sessionId, navigate])
+
+  const handleExpire = useCallback(() => handleSubmit(), [handleSubmit])
+
+  // ── Keyboard shortcuts ─────────────────────────────────────────────────────
   useKeyboardShortcuts({
     onSelectAnswer:    handleSelectAnswer,
     onToggleEliminate: handleToggleEliminated,
@@ -177,7 +296,17 @@ export default function ExamPage() {
     disabled:          loading,
   })
 
-  // ── Render states ─────────────────────────────────────────────────────────
+  const answeredCount = questions.filter((q) => answers[q.id] !== undefined).length
+
+  const formattedTime = (() => {
+    const t = Math.max(0, timeRemaining)
+    const h = Math.floor(t / 3600)
+    const m = Math.floor((t % 3600) / 60)
+    const s = t % 60
+    return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':')
+  })()
+
+  // ── Render ─────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center bg-white dark:bg-slate-900">
@@ -193,10 +322,7 @@ export default function ExamPage() {
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-900 gap-4 px-4">
         <p className="text-red-600 dark:text-red-400 text-sm text-center max-w-sm">{error}</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="text-teal-600 dark:text-teal-400 text-sm hover:underline"
-        >
+        <button onClick={() => navigate(-1)} className="text-teal-600 dark:text-teal-400 text-sm hover:underline">
           ← Go back
         </button>
       </div>
@@ -206,18 +332,20 @@ export default function ExamPage() {
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
       <ExamTopBar
-        paused={paused}
         onExpire={handleExpire}
-        onToggleToolbar={() => setToolbarOpen((v) => !v)}
+        onToggleToolbar={() => setToolbarExpanded((v) => !v)}
       />
 
-      {/* Split panel */}
       <div className="flex-1 flex overflow-hidden min-h-0">
         <QuestionPanel
           question={currentQuestion}
           questionNumber={currentIndex + 1}
           totalQuestions={questions.length}
           isMarked={isMarked}
+          highlightMode={highlightMode}
+          highlights={highlights[currentQuestionId] || []}
+          onAddHighlight={handleAddHighlight}
+          onRemoveHighlight={handleRemoveHighlight}
         />
         <AnswerPanel
           question={currentQuestion}
@@ -228,7 +356,42 @@ export default function ExamPage() {
           focusedChoice={focusedChoice}
           onFocusChoice={setFocusedChoice}
         />
-        {/* Toolbar placeholder — wired in Step 6 */}
+
+        {toolbarPanel && (
+          <div className="flex-shrink-0 w-80 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+            {toolbarPanel === 'progress' && (
+              <ProgressGrid
+                questions={questions}
+                answers={answers}
+                marked={marked}
+                currentIndex={currentIndex}
+                onJump={goTo}
+              />
+            )}
+            {toolbarPanel === 'calculator' && <Calculator />}
+            {toolbarPanel === 'notes' && (
+              <NotesPanel
+                questionNumber={currentIndex + 1}
+                note={currentNote}
+                onChange={handleNoteChange}
+              />
+            )}
+          </div>
+        )}
+
+        <ExamToolbar
+          expanded={toolbarExpanded}
+          activePanel={toolbarPanel}
+          onSetPanel={setToolbarPanel}
+          isMarked={isMarked}
+          onMark={handleMark}
+          highlightMode={highlightMode}
+          onToggleHighlight={() => setHighlightMode((v) => !v)}
+          onPause={() => setShowPauseModal(true)}
+          onSubmit={() => setShowSubmitModal(true)}
+          onEnd={() => setShowEndModal(true)}
+          onReport={() => setShowReportModal(true)}
+        />
       </div>
 
       <QuestionNav
@@ -237,6 +400,106 @@ export default function ExamPage() {
         onPrev={goPrev}
         onNext={goNext}
       />
+
+      {/* ── Pause confirmation — timer keeps running while this is open ── */}
+      <Modal
+        open={showPauseModal}
+        onClose={() => !pausing && setShowPauseModal(false)}
+        title="Pause Session?"
+      >
+        <div className="flex items-center justify-center py-4 mb-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+          <span className="font-mono text-2xl font-bold tabular-nums text-amber-600 dark:text-amber-400 tracking-wide">
+            {formattedTime}
+          </span>
+        </div>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+          Once you confirm, your progress will be saved and you'll be redirected
+          to your Submissions page.
+        </p>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
+          Resume any time from{' '}
+          <span className="font-semibold text-slate-800 dark:text-white">Submissions</span>
+          {' '}— the exam will pick up exactly where you left off.
+        </p>
+        <div className="flex gap-3 justify-center">
+          <Button variant="secondary" onClick={() => setShowPauseModal(false)} disabled={pausing}>
+            Keep Going
+          </Button>
+          <Button
+            onClick={handleConfirmPause}
+            disabled={pausing}
+            className="bg-amber-600 hover:bg-amber-700 text-white focus:ring-amber-500"
+          >
+            {pausing ? 'Saving…' : 'Pause Exam'}
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Submit confirmation */}
+      <Modal
+        open={showSubmitModal}
+        onClose={() => !submitting && setShowSubmitModal(false)}
+        title="Submit Exam?"
+      >
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
+          You've answered{' '}
+          <span className="font-semibold text-slate-800 dark:text-white">{answeredCount}</span>
+          {' '}of{' '}
+          <span className="font-semibold text-slate-800 dark:text-white">{questions.length}</span>
+          {' '}questions.
+        </p>
+        {marked.length > 0 && (
+          <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
+            {marked.length} question{marked.length > 1 ? 's are' : ' is'} marked for review.
+          </p>
+        )}
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5 mt-3">
+          This action cannot be undone. Your score will be calculated immediately.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setShowSubmitModal(false)} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={submitting}>
+            {submitting ? 'Submitting…' : 'Submit Exam'}
+          </Button>
+        </div>
+      </Modal>
+
+      {/* End session */}
+      <Modal
+        open={showEndModal}
+        onClose={() => setShowEndModal(false)}
+        title="End Session?"
+      >
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-5">
+          Your progress will be saved and you can resume from Submissions later.
+          The session will remain in progress.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setShowEndModal(false)}>
+            Keep Going
+          </Button>
+          <Button variant="danger" onClick={() => navigate('/')}>
+            End Session
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Report question */}
+      <Modal
+        open={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        title="Report Question"
+      >
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
+          Flag question {currentIndex + 1} for review by the content team. Reports are anonymous.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setShowReportModal(false)}>Cancel</Button>
+          <Button onClick={() => setShowReportModal(false)}>Submit Report</Button>
+        </div>
+      </Modal>
     </div>
   )
 }

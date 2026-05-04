@@ -60,10 +60,12 @@ export default function ChoiceRow({
         {text}
       </span>
 
-      {/* Eliminate button — always reserve space so layout doesn't shift */}
+      {/* Eliminate button — hidden on the selected choice */}
       <button
         className={`flex-shrink-0 p-1.5 rounded-lg transition-all ${
-          eliminated
+          selected
+            ? 'invisible'
+            : eliminated
             ? 'opacity-100 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
             : 'opacity-0 group-hover:opacity-100 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600'
         }`}
