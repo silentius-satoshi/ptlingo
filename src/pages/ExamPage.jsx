@@ -29,7 +29,7 @@ export default function ExamPage() {
   const [questions, setQuestions] = useState([])
 
   // ── Toolbar / UI ───────────────────────────────────────────────────────────
-  const [toolbarExpanded, setToolbarExpanded] = useState(true)
+  const [toolbarExpanded, setToolbarExpanded] = useState(false)
   const [toolbarPanel, setToolbarPanel]       = useState(null)
   const [highlightMode, setHighlightMode]     = useState(false)
   const [focusedChoice, setFocusedChoice]     = useState(null)

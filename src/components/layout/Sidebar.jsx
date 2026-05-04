@@ -128,7 +128,7 @@ export default function Sidebar() {
               {MOCK_EXAMS.map((name, i) => (
                 <NavLink
                   key={i}
-                  to={`/mock-exam/${i + 1}`}
+                  to={`/exam/${i + 1}/start`}
                   className={({ isActive }) =>
                     `block px-3 py-1.5 rounded-lg text-sm transition-colors ${
                       isActive

@@ -59,7 +59,7 @@ export default function ChoiceRow({
 
   return (
     <div
-      className={`group relative flex items-start gap-3 p-4 rounded-xl border-2 select-none transition-all ${containerClass}`}
+      className={`group relative flex items-start gap-3 p-4 rounded-xl border-2 select-none transition-colors ${containerClass}`}
       onClick={handleClick}
       onMouseEnter={() => !revealed && onFocus(index)}
       onMouseLeave={() => !revealed && onFocus(null)}

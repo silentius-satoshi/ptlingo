@@ -32,7 +32,7 @@ export default function AnswerPanel({
         <div className="px-8 py-5 space-y-3">
           {question.choices.map((choice, i) => (
             <ChoiceRow
-              key={i}
+              key={`${question.id}-${i}`}
               index={i}
               text={choice}
               selected={selectedAnswer === i}

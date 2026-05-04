@@ -1,3 +1,5 @@
+import { useUiStore } from '../../store/uiStore'
+
 // Icons kept inline so the toolbar file is self-contained
 const Icon = ({ d, filled = false }) => (
   <svg
@@ -22,6 +24,8 @@ const ICONS = {
   mark:        <Icon d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />,
   report:      <Icon d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />,
   end:         <Icon d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />,
+  sun:         <Icon d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />,
+  moon:        <Icon d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />,
 }
 
 function ToolItem({ icon, label, active, danger, expanded, onClick, kbd }) {
@@ -66,6 +70,7 @@ export default function ExamToolbar({
   onEnd,
   onReport,
 }) {
+  const { darkMode, toggleDarkMode } = useUiStore()
   const togglePanel = (panel) =>
     onSetPanel(activePanel === panel ? null : panel)
 
@@ -141,8 +146,14 @@ export default function ExamToolbar({
         />
       </nav>
 
-      {/* End Session — pinned bottom */}
-      <div className="px-1.5 pb-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+      {/* Dark mode + End Session — pinned bottom */}
+      <div className="px-1.5 pb-3 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-0.5">
+        <ToolItem
+          icon={darkMode ? ICONS.sun : ICONS.moon}
+          label={darkMode ? 'Light Mode' : 'Dark Mode'}
+          expanded={expanded}
+          onClick={toggleDarkMode}
+        />
         <ToolItem
           icon={ICONS.end}
           label="End Session"

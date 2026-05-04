@@ -11,11 +11,18 @@ const MULTIPLIERS = [
   { value: 2,   label: '2×',   minutes: 600 },
 ]
 
+// TEMPORARY — remove in Step 13 when Quiz Builder handles mode selection
+const MODES = [
+  { value: 'exam', label: 'Exam',  sub: 'no rationale until results' },
+  { value: 'quiz', label: 'Quiz',  sub: 'rationale after each answer' },
+]
+
 export default function MockExamStartPage() {
   const { examId } = useParams()
   const { user } = useAuthStore()
   const navigate = useNavigate()
   const [multiplier, setMultiplier] = useState(1)
+  const [sessionMode, setSessionMode] = useState('exam') // TEMPORARY
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -47,15 +54,16 @@ export default function MockExamStartPage() {
         .from('sessions')
         .insert({
           user_id: user.id,
-          type: 'exam',
-          mode: 'timed',
+          type: sessionMode,
+          mode: sessionMode === 'exam' ? 'timed' : 'practice',
           time_multiplier: multiplier,
           subjects: [],
           difficulty: [],
           exam_number: parseInt(examId),
           question_ids: questionIds,
           total_questions: questionIds.length,
-          time_remaining: totalSeconds,
+          // Quiz mode gets a 9-hour ceiling so the timer never expires during practice
+          time_remaining: sessionMode === 'exam' ? totalSeconds : 9 * 3600,
           current_index: 0,
           status: 'in_progress',
         })
@@ -135,6 +143,35 @@ export default function MockExamStartPage() {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {m.minutes} min
               </p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* TEMPORARY — Mode selector (remove in Step 13) */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 mb-5">
+        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">
+          Mode <span className="normal-case font-normal text-amber-500 dark:text-amber-400">(temp — Step 13 moves this to Quiz Builder)</span>
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          {MODES.map((m) => (
+            <button
+              key={m.value}
+              onClick={() => setSessionMode(m.value)}
+              className={`p-4 rounded-xl border-2 text-center transition-all ${
+                sessionMode === m.value
+                  ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20'
+                  : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
+              }`}
+            >
+              <p className={`text-base font-bold ${
+                sessionMode === m.value
+                  ? 'text-teal-700 dark:text-teal-400'
+                  : 'text-slate-700 dark:text-slate-300'
+              }`}>
+                {m.label}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{m.sub}</p>
             </button>
           ))}
         </div>

@@ -67,7 +67,7 @@ export default function App() {
           <Route path="notes" element={<NotesPage />} />
           <Route path="question-bank" element={<QuestionBankPage />} />
           <Route path="diagnostic" element={<DiagnosticPage />} />
-          <Route path="mock-exam/:examId" element={<MockExamStartPage />} />
+          <Route path="exam/:examId/start" element={<MockExamStartPage />} />
         </Route>
 
         {/* Full-screen routes — auth required, no sidebar */}
