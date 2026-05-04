@@ -9,7 +9,7 @@
 - **Supabase JS v2** — auth + Postgres (RLS enabled)
 - **Recharts** — installed, not yet wired up (Step 15)
 
-Build: `npm run build` → `dist/` (122 modules, ~443 kB JS gzip ~124 kB). Clean as of last session.
+Build: `npm run build` → `dist/` (123 modules, ~479 kB JS gzip ~131 kB). Clean as of last session.
 
 ---
 
@@ -96,10 +96,6 @@ submitted_at     timestamptz
 
 ---
 
-## Temporary / Dev Flags
-
-- **Mode pill toggle on `MockExamStartPage`** — marked `// TEMPORARY`. Allows switching between `'exam'` and `'quiz'` mode from the start screen. Will be removed in Step 13 when the Question Bank / Quiz Builder handles mode selection.
-
 ---
 
 ## Build Steps — Status
@@ -115,12 +111,11 @@ submitted_at     timestamptz
 - **Step 8** — Quiz vs Exam mode rationale gating (`rationaleVisible = type === 'quiz' && selectedAnswer !== null`, answer lock, `ChoiceRow` revealed styling with checkmark/X SVGs, eliminate button hidden when revealed)
 - **Step 9** — Rationale panel (`RationalePanel`: Explanation header, Correct Answer section, Incorrect Answers section with red badge for selected-wrong, Tags chips; per-question time tracking)
 - **Layout refactor (post Step 9)** — Single-scroll architecture; `QuestionNav` always visible (except during breaks); Next Question button moved from `AnswerPanel` into the `QuestionNav` bottom bar; center label changed to "Question X of Y"
+- **Step 10** — Break screen circular countdown ring (`CountdownRing` SVG component; mandatory 15-min teal ring; optional amber pill)
+- **Step 11** — Review screen (`ReviewPage`): summary strip, marked + unanswered cards, jump-to-question, timer continuity, auto-submit on expiry
+- **Step 12** — Results screen (`ResultsPage`): score ring animation, stat cards, collapsible subject breakdown, per-question filter/sort/expand table, read-only ExamPage review mode
+- **Step 13** — Question Bank / Quiz Builder (`QuestionBankPage`): mode toggle (Practice/Timed), subject chips, difficulty chips, count presets + custom input, summary card; removed temp mode toggle from `MockExamStartPage`
 
-### In Progress / Not Started
-- **Step 10** — Break screen polish (circular countdown progress ring)
-- **Step 11** — Review screen (marked questions list, jump-to-question, submit from review)
-- **Step 12** — Results screen (score %, stat cards, per-question filter table, review answers button)
-- **Step 13** — Question Bank / Quiz Builder (Timed/Practice toggle, subject chips, difficulty filter, count selector, summary card); **removes temporary mode toggle from `MockExamStartPage`**
 - **Step 14** — Submissions history (full columns: date, type, score, status, time, 3-dot menu for resume/review/delete)
 - **Step 15** — Dashboard + Recharts (stat cards, line chart, radar chart, bar chart)
 - **Step 16** — Markdown import script refinement
@@ -131,8 +126,8 @@ submitted_at     timestamptz
 
 ## Known Issues / Decisions
 
-- `ReviewPage` and `ResultsPage` exist as placeholder stubs — not yet implemented.
-- `DashboardPage`, `QuestionBankPage`, `SubmissionsPage`, `NotesPage`, `DiagnosticPage` are placeholder stubs.
+- `DashboardPage`, `SubmissionsPage`, `NotesPage`, `DiagnosticPage` are placeholder stubs.
 - `ProgressGrid` in the toolbar has its own internal scroll — this is intentional (utility panel, not part of main content).
 - `QuestionNav` is hidden during break screens (`!breakState` condition) since the user cannot navigate mid-break.
 - The `SECTION_END` set uses real boundaries (44, 89, 134, 179). To test breaks locally, temporarily change to e.g. `new Set([1, 3])` and restore after.
+- Quiz sessions created by `QuestionBankPage` use `time_multiplier: 1` and no `exam_number`. `ResultsPage` skips "time used" display for quiz sessions since there is no stored `time_allotted` to diff against.

@@ -69,6 +69,7 @@ export default function ExamToolbar({
   onSubmit,
   onEnd,
   onReport,
+  readOnly = false,
 }) {
   const { darkMode, toggleDarkMode } = useUiStore()
   const togglePanel = (panel) =>
@@ -82,21 +83,13 @@ export default function ExamToolbar({
     >
       {/* Main actions */}
       <nav className="flex-1 px-1.5 py-3 space-y-0.5 overflow-y-auto scrollbar-thin">
-        <ToolItem
-          icon={ICONS.submit}
-          label="Submit Session"
-          expanded={expanded}
-          onClick={onSubmit}
-        />
-        <ToolItem
-          icon={ICONS.pause}
-          label="Pause Session"
-          expanded={expanded}
-          onClick={onPause}
-        />
-
-        {/* Divider */}
-        <div className="h-px bg-slate-100 dark:bg-slate-800 my-1.5 mx-1" />
+        {!readOnly && (
+          <>
+            <ToolItem icon={ICONS.submit} label="Submit Session" expanded={expanded} onClick={onSubmit} />
+            <ToolItem icon={ICONS.pause}  label="Pause Session"  expanded={expanded} onClick={onPause} />
+            <div className="h-px bg-slate-100 dark:bg-slate-800 my-1.5 mx-1" />
+          </>
+        )}
 
         <ToolItem
           icon={ICONS.progress}
@@ -127,25 +120,16 @@ export default function ExamToolbar({
           onClick={() => togglePanel('notes')}
         />
 
-        {/* Divider */}
-        <div className="h-px bg-slate-100 dark:bg-slate-800 my-1.5 mx-1" />
-
-        <ToolItem
-          icon={ICONS.mark}
-          label="Mark for Review"
-          active={isMarked}
-          expanded={expanded}
-          onClick={onMark}
-        />
-        <ToolItem
-          icon={ICONS.report}
-          label="Report Question"
-          expanded={expanded}
-          onClick={onReport}
-        />
+        {!readOnly && (
+          <>
+            <div className="h-px bg-slate-100 dark:bg-slate-800 my-1.5 mx-1" />
+            <ToolItem icon={ICONS.mark}   label="Mark for Review"  active={isMarked} expanded={expanded} onClick={onMark} />
+            <ToolItem icon={ICONS.report} label="Report Question"  expanded={expanded} onClick={onReport} />
+          </>
+        )}
       </nav>
 
-      {/* Dark mode + End Session — pinned bottom */}
+      {/* Dark mode (+ End Session in live mode) — pinned bottom */}
       <div className="px-1.5 pb-3 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-0.5">
         <ToolItem
           icon={darkMode ? ICONS.sun : ICONS.moon}
@@ -153,13 +137,9 @@ export default function ExamToolbar({
           expanded={expanded}
           onClick={toggleDarkMode}
         />
-        <ToolItem
-          icon={ICONS.end}
-          label="End Session"
-          danger
-          expanded={expanded}
-          onClick={onEnd}
-        />
+        {!readOnly && (
+          <ToolItem icon={ICONS.end} label="End Session" danger expanded={expanded} onClick={onEnd} />
+        )}
       </div>
     </div>
   )

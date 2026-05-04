@@ -24,6 +24,7 @@ export default function ExamPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const readOnly  = location.state?.readOnly ?? false
 
   // ── Loading / error ────────────────────────────────────────────────────────
   const [loading, setLoading]     = useState(true)
@@ -95,14 +96,14 @@ export default function ExamPage() {
         if (sErr) throw sErr
         if (!session) throw new Error('Session not found.')
 
-        // Already submitted — send straight to results
-        if (session.status === 'submitted') {
+        // Already submitted — send straight to results (skip in readOnly review mode)
+        if (session.status === 'submitted' && !readOnly) {
           navigate(`/results/${sessionId}`, { replace: true })
           return
         }
 
-        // Resuming a paused session — flip back to in_progress
-        if (session.status === 'paused') {
+        // Resuming a paused session — flip back to in_progress (skip in readOnly)
+        if (session.status === 'paused' && !readOnly) {
           await supabase
             .from('sessions')
             .update({ status: 'in_progress' })
@@ -184,10 +185,11 @@ export default function ExamPage() {
 
   // ── Action handlers ────────────────────────────────────────────────────────
   // In quiz mode the answer locks once selected (rationale immediately revealed)
-  const rationaleVisible = type === 'quiz' && selectedAnswer !== null
+  const rationaleVisible = readOnly || (type === 'quiz' && selectedAnswer !== null)
 
   const handleSelectAnswer = useCallback((i) => {
     if (!currentQuestionId) return
+    if (readOnly) return
     if (type === 'quiz' && selectedAnswer !== null) return  // locked after first pick
     setAnswer(currentQuestionId, i)
     // In quiz mode: snapshot elapsed time immediately so the rationale panel
@@ -245,7 +247,7 @@ export default function ExamPage() {
   const goNext = useCallback(() => {
     if (currentIndex >= questions.length - 1) return
     // Trigger section breaks only in full mock-exam mode
-    if (type === 'exam' && questions.length === 225 && SECTION_END.has(currentIndex)) {
+    if (!readOnly && type === 'exam' && questions.length === 225 && SECTION_END.has(currentIndex)) {
       const sec = (currentIndex + 1) / 45  // 1 | 2 | 3 | 4
       breakResumeIndexRef.current = currentIndex + 1
       setBreakSection(sec)
@@ -437,7 +439,8 @@ export default function ExamPage() {
       <ExamTopBar
         onExpire={handleExpire}
         onToggleToolbar={() => setToolbarExpanded((v) => !v)}
-        paused={breakState === 'mandatory'}
+        paused={breakState === 'mandatory' || readOnly}
+        readOnly={readOnly}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -539,6 +542,7 @@ export default function ExamPage() {
               onPause={() => setShowPauseModal(true)}
               onSubmit={type === 'exam' ? handleGoToReview : () => setShowSubmitModal(true)}
               onEnd={() => setShowEndModal(true)}
+              readOnly={readOnly}
               onReport={() => setShowReportModal(true)}
             />
           </>

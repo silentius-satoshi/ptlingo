@@ -14,9 +14,10 @@ export default function CountdownRing({
 
   const trackClass = 'stroke-slate-200 dark:stroke-slate-700 fill-none'
   const progressClass =
-    color === 'teal'
-      ? 'stroke-teal-600 dark:stroke-teal-500 fill-none'
-      : 'stroke-amber-500 dark:stroke-amber-400 fill-none'
+    color === 'teal'  ? 'stroke-teal-600 dark:stroke-teal-500 fill-none' :
+    color === 'amber' ? 'stroke-amber-500 dark:stroke-amber-400 fill-none' :
+    color === 'red'   ? 'stroke-red-500 dark:stroke-red-400 fill-none' :
+                        'stroke-slate-400 dark:stroke-slate-500 fill-none'
 
   return (
     <div
