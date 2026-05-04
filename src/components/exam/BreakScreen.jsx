@@ -1,3 +1,7 @@
+import CountdownRing from './CountdownRing'
+
+const BREAK_TOTAL = 15 * 60  // 900 seconds
+
 function formatMMSS(seconds) {
   const t = Math.max(0, seconds)
   const m = Math.floor(t / 60)
@@ -21,33 +25,48 @@ export default function BreakScreen({ section, mandatory, breakTimeLeft, examFor
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
           {mandatory ? 'Scheduled Break' : "You're on a Break"}
         </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-10">
           {mandatory
             ? 'Rest up — the exam will resume automatically when the break ends.'
             : 'Take a moment. Your exam timer is still running.'}
         </p>
 
-        {/* Timer card */}
-        <div className={`rounded-2xl px-8 py-8 mb-8 ${
-          mandatory
-            ? 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
-            : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40'
-        }`}>
-          <p className={`text-xs font-semibold uppercase tracking-widest mb-3 ${
-            mandatory
-              ? 'text-slate-400 dark:text-slate-500'
-              : 'text-amber-600 dark:text-amber-400'
-          }`}>
-            {mandatory ? 'Break time remaining' : 'Exam time remaining'}
-          </p>
-          <p className={`font-mono text-5xl font-bold tabular-nums tracking-wide ${
-            mandatory
-              ? 'text-slate-800 dark:text-white'
-              : 'text-amber-600 dark:text-amber-400'
-          }`}>
-            {mandatory ? formatMMSS(breakTimeLeft) : examFormatted}
-          </p>
-        </div>
+        {mandatory ? (
+          /* ── Mandatory break — circular countdown ring ─────────────────────── */
+          <>
+            <div className="flex justify-center mb-4">
+              <CountdownRing
+                total={BREAK_TOTAL}
+                remaining={breakTimeLeft}
+                color="teal"
+                size={192}
+                strokeWidth={10}
+              >
+                <span className="font-mono text-[2rem] font-bold leading-none text-slate-800 dark:text-white tabular-nums tracking-wide">
+                  {formatMMSS(breakTimeLeft)}
+                </span>
+              </CountdownRing>
+            </div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-10">
+              Break time remaining
+            </p>
+          </>
+        ) : (
+          /* ── Optional break — amber pill showing live exam clock ───────────── */
+          <>
+            <div className="flex justify-center mb-4">
+              <div className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40">
+                <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse" />
+                <span className="font-mono text-3xl font-bold tabular-nums text-amber-600 dark:text-amber-400 leading-none tracking-wide">
+                  {examFormatted}
+                </span>
+              </div>
+            </div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-10">
+              Exam time running
+            </p>
+          </>
+        )}
 
         <button
           onClick={onResume}
