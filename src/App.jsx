@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import { useAuthStore } from './store/authStore'
 import { useUiStore } from './store/uiStore'
@@ -60,19 +60,18 @@ export default function App() {
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
 
-        <Route
-          element={
-            <RequireAuth>
-              <AppLayout />
-            </RequireAuth>
-          }
-        >
+        {/* Sidebar app layout */}
+        <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
           <Route index element={<DashboardPage />} />
           <Route path="submissions" element={<SubmissionsPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="question-bank" element={<QuestionBankPage />} />
           <Route path="diagnostic" element={<DiagnosticPage />} />
           <Route path="mock-exam/:examId" element={<MockExamStartPage />} />
+        </Route>
+
+        {/* Full-screen routes — auth required, no sidebar */}
+        <Route element={<RequireAuth><Outlet /></RequireAuth>}>
           <Route path="exam/:sessionId" element={<ExamPage />} />
           <Route path="review/:sessionId" element={<ReviewPage />} />
           <Route path="results/:sessionId" element={<ResultsPage />} />
