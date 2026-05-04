@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useSessionStore } from '../store/sessionStore'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
@@ -23,6 +23,7 @@ const SECTION_END = new Set([44, 89, 134, 179])
 export default function ExamPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
 
   // ── Loading / error ────────────────────────────────────────────────────────
   const [loading, setLoading]     = useState(true)
@@ -126,7 +127,7 @@ export default function ExamPage() {
           type:            session.type,
           mode:            session.mode,
           timeMultiplier:  session.time_multiplier,
-          currentIndex:    session.current_index    ?? 0,
+          currentIndex:    location.state?.goToIndex ?? (session.current_index ?? 0),
           answers:         session.answers           ?? {},
           marked:          session.marked             ?? [],
           eliminated:      session.eliminated         ?? {},
@@ -366,6 +367,26 @@ export default function ExamPage() {
 
   const handleExpire = useCallback(() => handleSubmit(), [handleSubmit])
 
+  // ── Navigate to review screen (exam mode) — flush save first ───────────────
+  const handleGoToReview = useCallback(async () => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    const s = useSessionStore.getState()
+    await supabase
+      .from('sessions')
+      .update({
+        answers:           s.answers,
+        marked:            s.marked,
+        eliminated:        s.eliminated,
+        notes:             s.notes,
+        highlights:        s.highlights,
+        time_per_question: s.timePerQuestion,
+        time_remaining:    s.timeRemaining,
+        current_index:     s.currentIndex,
+      })
+      .eq('id', sessionId)
+    navigate(`/review/${sessionId}`)
+  }, [sessionId, navigate])
+
   // ── Keyboard shortcuts ─────────────────────────────────────────────────────
   useKeyboardShortcuts({
     onSelectAnswer:    handleSelectAnswer,
@@ -516,7 +537,7 @@ export default function ExamPage() {
               highlightMode={highlightMode}
               onToggleHighlight={() => setHighlightMode((v) => !v)}
               onPause={() => setShowPauseModal(true)}
-              onSubmit={() => setShowSubmitModal(true)}
+              onSubmit={type === 'exam' ? handleGoToReview : () => setShowSubmitModal(true)}
               onEnd={() => setShowEndModal(true)}
               onReport={() => setShowReportModal(true)}
             />
