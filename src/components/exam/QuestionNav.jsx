@@ -14,15 +14,12 @@ export default function QuestionNav({ currentIndex, total, onPrev, onNext }) {
         Previous
       </button>
 
-      <div className="flex items-center gap-1.5 min-w-[90px] justify-center">
-        <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">
-          {questionNumber}
-        </span>
-        <span className="text-slate-300 dark:text-slate-600">/</span>
-        <span className="text-sm text-slate-500 dark:text-slate-400 tabular-nums">
-          {total}
-        </span>
-      </div>
+      <span className="text-sm text-slate-600 dark:text-slate-400">
+        Question{' '}
+        <span className="font-bold text-slate-900 dark:text-white tabular-nums">{questionNumber}</span>
+        {' '}of{' '}
+        <span className="tabular-nums">{total}</span>
+      </span>
 
       <button
         onClick={onNext}

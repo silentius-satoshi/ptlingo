@@ -15,6 +15,7 @@ import Modal from '../components/shared/Modal'
 import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import BreakScreen from '../components/exam/BreakScreen'
+import RationalePanel from '../components/exam/RationalePanel'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -418,7 +419,7 @@ export default function ExamPage() {
         paused={breakState === 'mandatory'}
       />
 
-      <div className="flex-1 flex overflow-hidden min-h-0">
+      <div className="flex-1 flex overflow-hidden">
         {breakState === 'mandatory' || breakState === 'optional' ? (
           <BreakScreen
             section={breakSection}
@@ -429,28 +430,61 @@ export default function ExamPage() {
           />
         ) : (
           <>
-            <QuestionPanel
-              question={currentQuestion}
-              questionNumber={currentIndex + 1}
-              totalQuestions={questions.length}
-              isMarked={isMarked}
-              highlightMode={highlightMode}
-              highlights={highlights[currentQuestionId] || []}
-              onAddHighlight={handleAddHighlight}
-              onRemoveHighlight={handleRemoveHighlight}
-            />
-            <AnswerPanel
-              question={currentQuestion}
-              selectedAnswer={selectedAnswer}
-              eliminated={currentEliminated}
-              onSelect={handleSelectAnswer}
-              onToggleEliminate={handleToggleEliminated}
-              focusedChoice={focusedChoice}
-              onFocusChoice={setFocusedChoice}
-              rationaleVisible={rationaleVisible}
-              timeSpent={timePerQuestion[currentQuestionId] || 0}
-            />
+            {/* Single scrollable center column */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin">
+              {rationaleVisible ? (
+                <>
+                  <div className="flex border-b border-slate-200 dark:border-slate-700">
+                    <QuestionPanel
+                      question={currentQuestion}
+                      questionNumber={currentIndex + 1}
+                      totalQuestions={questions.length}
+                      isMarked={isMarked}
+                      highlightMode={highlightMode}
+                      highlights={highlights[currentQuestionId] || []}
+                      onAddHighlight={handleAddHighlight}
+                      onRemoveHighlight={handleRemoveHighlight}
+                    />
+                    <AnswerPanel
+                      question={currentQuestion}
+                      selectedAnswer={selectedAnswer}
+                      eliminated={currentEliminated}
+                      onSelect={handleSelectAnswer}
+                      onToggleEliminate={handleToggleEliminated}
+                      focusedChoice={focusedChoice}
+                      onFocusChoice={setFocusedChoice}
+                      rationaleVisible={rationaleVisible}
+                    />
+                  </div>
+                  <RationalePanel question={currentQuestion} selectedAnswer={selectedAnswer} />
+                </>
+              ) : (
+                <div className="flex min-h-full">
+                  <QuestionPanel
+                    question={currentQuestion}
+                    questionNumber={currentIndex + 1}
+                    totalQuestions={questions.length}
+                    isMarked={isMarked}
+                    highlightMode={highlightMode}
+                    highlights={highlights[currentQuestionId] || []}
+                    onAddHighlight={handleAddHighlight}
+                    onRemoveHighlight={handleRemoveHighlight}
+                  />
+                  <AnswerPanel
+                    question={currentQuestion}
+                    selectedAnswer={selectedAnswer}
+                    eliminated={currentEliminated}
+                    onSelect={handleSelectAnswer}
+                    onToggleEliminate={handleToggleEliminated}
+                    focusedChoice={focusedChoice}
+                    onFocusChoice={setFocusedChoice}
+                    rationaleVisible={false}
+                  />
+                </div>
+              )}
+            </div>
 
+            {/* Toolbar panel (progress / calculator / notes) */}
             {toolbarPanel && (
               <div className="flex-shrink-0 w-80 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
                 {toolbarPanel === 'progress' && (

@@ -81,7 +81,7 @@ export default function QuestionPanel({
   const segments = buildSegments(question.stem, highlights)
 
   return (
-    <div className="flex-[55] flex flex-col overflow-hidden border-r border-slate-200 dark:border-slate-700">
+    <div className="flex-[55] flex flex-col border-r border-slate-200 dark:border-slate-700">
       {/* Panel header */}
       <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function QuestionPanel({
       </div>
 
       {/* Stem */}
-      <div className="flex-1 overflow-y-auto px-8 py-4 scrollbar-thin">
+      <div className="px-8 py-4">
         <p
           ref={stemRef}
           onMouseUp={handleMouseUp}
