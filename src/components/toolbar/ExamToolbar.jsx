@@ -136,7 +136,6 @@ export default function ExamToolbar({
           active={isMarked}
           expanded={expanded}
           onClick={onMark}
-          kbd="M"
         />
         <ToolItem
           icon={ICONS.report}
