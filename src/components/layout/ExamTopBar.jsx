@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { useTimer } from '../../hooks/useTimer'
 
-export default function ExamTopBar({ onExpire, onToggleToolbar }) {
+export default function ExamTopBar({ onExpire, onToggleToolbar, paused = false }) {
   const navigate = useNavigate()
-  const { formatted, timeRemaining } = useTimer({ onExpire })
+  const { formatted, timeRemaining } = useTimer({ onExpire, paused })
 
   const isLow = timeRemaining > 0 && timeRemaining <= 300
 

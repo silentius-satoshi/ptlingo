@@ -14,6 +14,10 @@ import NotesPanel from '../components/toolbar/NotesPanel'
 import Modal from '../components/shared/Modal'
 import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
+import BreakScreen from '../components/exam/BreakScreen'
+
+// 0-indexed last-question indices for each of the 5 sections in a 225-question exam
+const SECTION_END = new Set([1, 3, 134, 179])
 
 export default function ExamPage() {
   const { sessionId } = useParams()
@@ -40,6 +44,15 @@ export default function ExamPage() {
 
   const saveTimeoutRef = useRef(null)
 
+  // ── Break state ────────────────────────────────────────────────────────────
+  // 'offer'     → optional break offer modal (sections 1, 3, 4)
+  // 'optional'  → on optional break screen (exam timer still runs)
+  // 'mandatory' → on mandatory break screen (exam timer paused)
+  const [breakState, setBreakState]       = useState(null)
+  const [breakSection, setBreakSection]   = useState(null)
+  const [breakTimeLeft, setBreakTimeLeft] = useState(0)
+  const breakResumeIndexRef               = useRef(null)
+
   // ── Store ──────────────────────────────────────────────────────────────────
   const {
     currentIndex,
@@ -49,6 +62,7 @@ export default function ExamPage() {
     notes,
     highlights,
     timeRemaining,
+    type,
     setSession,
     setCurrentIndex,
     setAnswer,
@@ -212,12 +226,49 @@ export default function ExamPage() {
   }, [setCurrentIndex, scheduleSave])
 
   const goNext = useCallback(() => {
-    if (currentIndex < questions.length - 1) goTo(currentIndex + 1)
-  }, [currentIndex, questions.length, goTo])
+    if (currentIndex >= questions.length - 1) return
+    // Trigger section breaks only in full mock-exam mode
+    if (type === 'exam' && SECTION_END.has(currentIndex)) {
+      // TEST mapping: Q2→sec1, Q4→sec2; production uses (currentIndex+1)/45
+      const SEC_MAP = { 1: 1, 3: 2, 134: 3, 179: 4 }
+      const sec = SEC_MAP[currentIndex]
+      breakResumeIndexRef.current = currentIndex + 1
+      setBreakSection(sec)
+      if (sec === 2) {
+        setBreakTimeLeft(15 * 60)
+        setBreakState('mandatory')
+      } else {
+        setBreakState('offer')
+      }
+      return
+    }
+    goTo(currentIndex + 1)
+  }, [currentIndex, questions.length, type, goTo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const goPrev = useCallback(() => {
     if (currentIndex > 0) goTo(currentIndex - 1)
   }, [currentIndex, goTo])
+
+  // ── Break helpers ──────────────────────────────────────────────────────────
+  const resumeFromBreak = useCallback(() => {
+    setBreakState(null)
+    setBreakSection(null)
+    const idx = breakResumeIndexRef.current
+    breakResumeIndexRef.current = null
+    if (idx != null) goTo(idx)
+  }, [goTo])
+
+  // Tick the mandatory break countdown
+  useEffect(() => {
+    if (breakState !== 'mandatory') return
+    const id = setInterval(() => setBreakTimeLeft((t) => Math.max(0, t - 1)), 1000)
+    return () => clearInterval(id)
+  }, [breakState])
+
+  // Auto-resume when mandatory break countdown expires
+  useEffect(() => {
+    if (breakState === 'mandatory' && breakTimeLeft === 0) resumeFromBreak()
+  }, [breakState, breakTimeLeft, resumeFromBreak])
 
   // ── Pause: save state + redirect to submissions ────────────────────────────
   const handleConfirmPause = useCallback(async () => {
@@ -293,7 +344,7 @@ export default function ExamPage() {
     onPrev:            goPrev,
     onConfirm:         goNext,
     focusedChoice,
-    disabled:          loading,
+    disabled:          loading || breakState !== null,
   })
 
   const answeredCount = questions.filter((q) => answers[q.id] !== undefined).length
@@ -334,72 +385,125 @@ export default function ExamPage() {
       <ExamTopBar
         onExpire={handleExpire}
         onToggleToolbar={() => setToolbarExpanded((v) => !v)}
+        paused={breakState === 'mandatory'}
       />
 
       <div className="flex-1 flex overflow-hidden min-h-0">
-        <QuestionPanel
-          question={currentQuestion}
-          questionNumber={currentIndex + 1}
-          totalQuestions={questions.length}
-          isMarked={isMarked}
-          highlightMode={highlightMode}
-          highlights={highlights[currentQuestionId] || []}
-          onAddHighlight={handleAddHighlight}
-          onRemoveHighlight={handleRemoveHighlight}
-        />
-        <AnswerPanel
-          question={currentQuestion}
-          selectedAnswer={selectedAnswer}
-          eliminated={currentEliminated}
-          onSelect={handleSelectAnswer}
-          onToggleEliminate={handleToggleEliminated}
-          focusedChoice={focusedChoice}
-          onFocusChoice={setFocusedChoice}
-        />
+        {breakState === 'mandatory' || breakState === 'optional' ? (
+          <BreakScreen
+            section={breakSection}
+            mandatory={breakState === 'mandatory'}
+            breakTimeLeft={breakTimeLeft}
+            examFormatted={formattedTime}
+            onResume={resumeFromBreak}
+          />
+        ) : (
+          <>
+            <QuestionPanel
+              question={currentQuestion}
+              questionNumber={currentIndex + 1}
+              totalQuestions={questions.length}
+              isMarked={isMarked}
+              highlightMode={highlightMode}
+              highlights={highlights[currentQuestionId] || []}
+              onAddHighlight={handleAddHighlight}
+              onRemoveHighlight={handleRemoveHighlight}
+            />
+            <AnswerPanel
+              question={currentQuestion}
+              selectedAnswer={selectedAnswer}
+              eliminated={currentEliminated}
+              onSelect={handleSelectAnswer}
+              onToggleEliminate={handleToggleEliminated}
+              focusedChoice={focusedChoice}
+              onFocusChoice={setFocusedChoice}
+            />
 
-        {toolbarPanel && (
-          <div className="flex-shrink-0 w-80 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
-            {toolbarPanel === 'progress' && (
-              <ProgressGrid
-                questions={questions}
-                answers={answers}
-                marked={marked}
-                currentIndex={currentIndex}
-                onJump={goTo}
-              />
+            {toolbarPanel && (
+              <div className="flex-shrink-0 w-80 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+                {toolbarPanel === 'progress' && (
+                  <ProgressGrid
+                    questions={questions}
+                    answers={answers}
+                    marked={marked}
+                    currentIndex={currentIndex}
+                    onJump={goTo}
+                  />
+                )}
+                {toolbarPanel === 'calculator' && <Calculator />}
+                {toolbarPanel === 'notes' && (
+                  <NotesPanel
+                    questionNumber={currentIndex + 1}
+                    note={currentNote}
+                    onChange={handleNoteChange}
+                  />
+                )}
+              </div>
             )}
-            {toolbarPanel === 'calculator' && <Calculator />}
-            {toolbarPanel === 'notes' && (
-              <NotesPanel
-                questionNumber={currentIndex + 1}
-                note={currentNote}
-                onChange={handleNoteChange}
-              />
-            )}
-          </div>
+
+            <ExamToolbar
+              expanded={toolbarExpanded}
+              activePanel={toolbarPanel}
+              onSetPanel={setToolbarPanel}
+              isMarked={isMarked}
+              onMark={handleMark}
+              highlightMode={highlightMode}
+              onToggleHighlight={() => setHighlightMode((v) => !v)}
+              onPause={() => setShowPauseModal(true)}
+              onSubmit={() => setShowSubmitModal(true)}
+              onEnd={() => setShowEndModal(true)}
+              onReport={() => setShowReportModal(true)}
+            />
+          </>
         )}
-
-        <ExamToolbar
-          expanded={toolbarExpanded}
-          activePanel={toolbarPanel}
-          onSetPanel={setToolbarPanel}
-          isMarked={isMarked}
-          onMark={handleMark}
-          highlightMode={highlightMode}
-          onToggleHighlight={() => setHighlightMode((v) => !v)}
-          onPause={() => setShowPauseModal(true)}
-          onSubmit={() => setShowSubmitModal(true)}
-          onEnd={() => setShowEndModal(true)}
-          onReport={() => setShowReportModal(true)}
-        />
       </div>
 
-      <QuestionNav
-        currentIndex={currentIndex}
-        total={questions.length}
-        onPrev={goPrev}
-        onNext={goNext}
-      />
+      {!breakState && (
+        <QuestionNav
+          currentIndex={currentIndex}
+          total={questions.length}
+          onPrev={goPrev}
+          onNext={goNext}
+        />
+      )}
+
+      {/* ── Section complete — optional break offer ── */}
+      <Modal
+        open={breakState === 'offer'}
+        onClose={() => {}}
+        title={`Section ${breakSection} of 5 Complete`}
+      >
+        <div className="flex items-center justify-center py-4 mb-3 rounded-xl bg-slate-50 dark:bg-slate-800">
+          <span className="font-mono text-2xl font-bold tabular-nums text-amber-600 dark:text-amber-400 tracking-wide">
+            {formattedTime}
+          </span>
+        </div>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+          You may take a short break before continuing to Section {breakSection + 1}.
+        </p>
+        <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mb-5">
+          The exam timer will keep running during any break.
+        </p>
+        <div className="flex gap-3 justify-center">
+          <Button
+            variant="secondary"
+            onClick={() => setBreakState('optional')}
+          >
+            Take a Break
+          </Button>
+          <Button
+            onClick={() => {
+              setBreakState(null)
+              setBreakSection(null)
+              const idx = breakResumeIndexRef.current
+              breakResumeIndexRef.current = null
+              if (idx != null) goTo(idx)
+            }}
+          >
+            Continue Exam
+          </Button>
+        </div>
+      </Modal>
 
       {/* ── Pause confirmation — timer keeps running while this is open ── */}
       <Modal
