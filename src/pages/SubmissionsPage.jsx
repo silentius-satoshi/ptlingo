@@ -1,148 +1,349 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import Badge from '../components/shared/Badge'
-import LoadingSpinner from '../components/shared/LoadingSpinner'
+import Button from '../components/shared/Button'
 
-function formatDate(ts) {
-  if (!ts) return '—'
-  return new Date(ts).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+function fmtDate(ts) {
+  if (!ts) return { date: '—', time: '' }
+  const d = new Date(ts)
+  return {
+    date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+  }
 }
 
-function formatDuration(seconds) {
-  if (!seconds && seconds !== 0) return '—'
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
+function fmtDuration(seconds) {
+  if (seconds == null) return '—'
+  const s = Math.max(0, Math.round(seconds))
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = s % 60
   if (h > 0) return `${h}h ${m}m`
-  return `${m}m`
+  if (m > 0) return `${m}m ${sec}s`
+  return `${sec}s`
+}
+
+function getTimeUsed(session) {
+  const remaining = session.time_remaining ?? 0
+  if (session.type === 'exam') return Math.max(0, 5 * 3600 * (session.time_multiplier || 1) - remaining)
+  if (session.mode === 'practice') return Math.max(0, 9 * 3600 - remaining)
+  return Math.max(0, (session.question_ids?.length || 0) * 90 - remaining)
+}
+
+function scoreColor(pct) {
+  if (pct >= 75) return 'text-green-600 dark:text-green-400'
+  if (pct >= 60) return 'text-amber-600 dark:text-amber-400'
+  return 'text-red-600 dark:text-red-400'
+}
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+function SkeletonRow({ cols }) {
+  const widths = [55, 40, 35, 30, 45, 50, 20]
+  return (
+    <tr className="border-b border-slate-100 dark:border-slate-800">
+      {widths.slice(0, cols).map((w, i) => (
+        <td key={i} className={`px-4 py-4 ${i === 4 ? 'hidden md:table-cell' : ''}`}>
+          <div
+            className="h-4 rounded-md bg-slate-100 dark:bg-slate-800 animate-pulse"
+            style={{ width: `${w}%` }}
+          />
+          {i <= 1 && (
+            <div className="h-3 rounded-md bg-slate-100 dark:bg-slate-800 animate-pulse mt-1.5" style={{ width: `${w * 0.6}%` }} />
+          )}
+        </td>
+      ))}
+    </tr>
+  )
+}
+
+function TypeBadge({ type, mode, examNumber }) {
+  if (type === 'exam') return (
+    <div>
+      <Badge color="purple">Exam {examNumber ? `#${examNumber}` : ''}</Badge>
+      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Timed</p>
+    </div>
+  )
+  return (
+    <div>
+      <Badge color="teal">Quiz</Badge>
+      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+        {mode === 'timed' ? 'Timed' : 'Practice'}
+      </p>
+    </div>
+  )
 }
 
 function StatusBadge({ status }) {
   if (status === 'submitted') return <Badge color="green">Submitted</Badge>
   if (status === 'paused')    return <Badge color="amber">Paused</Badge>
-  return <Badge color="purple">In Progress</Badge>
+  return <Badge color="blue">In Progress</Badge>
 }
 
-function TypeBadge({ type, examNumber }) {
-  if (type === 'exam') {
-    return <Badge color="blue">Mock Exam {examNumber}</Badge>
-  }
-  return <Badge color="gray">Quiz</Badge>
+function MenuItem({ children, onClick, danger = false }) {
+  return (
+    <button
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={onClick}
+      className={`w-full text-left px-4 py-2 text-sm font-medium transition-colors ${
+        danger
+          ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
+          : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60'
+      }`}
+    >
+      {children}
+    </button>
+  )
 }
+
+// ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function SubmissionsPage() {
-  const { user } = useAuthStore()
-  const navigate = useNavigate()
-  const [sessions, setSessions] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { user }   = useAuthStore()
+  const navigate   = useNavigate()
+
+  const [sessions, setSessions]     = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [openMenuId, setOpenMenuId] = useState(null)
+  const menuRef = useRef(null)
 
   useEffect(() => {
     const load = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('sessions')
-        .select('id, type, exam_number, total_questions, score, time_remaining, status, started_at, submitted_at, time_multiplier')
+        .select('id, type, mode, exam_number, question_ids, answers, score, time_remaining, time_multiplier, status, started_at, submitted_at')
         .eq('user_id', user.id)
         .order('started_at', { ascending: false })
-
-      if (!error) setSessions(data || [])
+      setSessions(data || [])
       setLoading(false)
     }
     load()
   }, [user.id])
 
-  if (loading) {
-    return (
-      <div className="p-8 flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    )
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpenMenuId(null)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const toggleMenu = (id, e) => {
+    e.stopPropagation()
+    setOpenMenuId((cur) => (cur === id ? null : id))
   }
 
+  const handleRowClick = (s) => {
+    if (s.status === 'submitted') navigate(`/results/${s.id}`)
+    else navigate(`/exam/${s.id}`)
+  }
+
+  const handleDelete = async (id, e) => {
+    e.stopPropagation()
+    setOpenMenuId(null)
+    if (!confirm('Delete this session? This cannot be undone.')) return
+    await supabase.from('sessions').delete().eq('id', id)
+    setSessions((prev) => prev.filter((s) => s.id !== id))
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+
   return (
-    <div className="p-8 max-w-6xl">
-      <div className="mb-8">
+    <div className="px-6 py-8">
+
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Submissions</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          All your exam and quiz sessions
+          Your past and in-progress sessions
         </p>
       </div>
 
-      {sessions.length === 0 ? (
-        <div className="text-center py-20 text-slate-400 dark:text-slate-500">
-          <p className="text-lg font-medium mb-1">No sessions yet</p>
-          <p className="text-sm">Start a Mock Exam or Question Bank session to see it here.</p>
+      {/* Empty state */}
+      {!loading && sessions.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <svg
+            className="w-12 h-12 text-slate-300 dark:text-slate-600"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <div className="text-center">
+            <p className="text-base font-semibold text-slate-700 dark:text-slate-300">No submissions yet</p>
+            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
+              Start a session from the Question Bank or Mock Exams
+            </p>
+          </div>
+          <Button onClick={() => navigate('/question-bank')}>Go to Question Bank</Button>
         </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      )}
+
+      {/* Table — overflow-visible so the dropdown menu isn't clipped */}
+      {(loading || sessions.length > 0) && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">#</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Type</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Score</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Questions</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Started</th>
-                <th className="px-5 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Status</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Actions</th>
+                {[
+                  { label: 'Date' },
+                  { label: 'Type' },
+                  { label: 'Questions' },
+                  { label: 'Score' },
+                  { label: 'Time Spent', narrow: true },
+                  { label: 'Status' },
+                  { label: '', w: 'w-10' },
+                ].map(({ label, narrow, w }, i) => (
+                  <th
+                    key={i}
+                    className={`px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 ${narrow ? 'hidden md:table-cell' : ''} ${w || ''}`}
+                  >
+                    {label}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {sessions.map((s, i) => (
-                <tr
-                  key={s.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
-                >
-                  <td className="px-5 py-4 text-slate-400 dark:text-slate-500 tabular-nums">
-                    {sessions.length - i}
-                  </td>
-                  <td className="px-5 py-4">
-                    <TypeBadge type={s.type} examNumber={s.exam_number} />
-                  </td>
-                  <td className="px-5 py-4 font-semibold tabular-nums">
-                    {s.score != null
-                      ? <span className="text-teal-600 dark:text-teal-400">{Math.round(s.score * 100)}%</span>
-                      : <span className="text-slate-400">—</span>
-                    }
-                  </td>
-                  <td className="px-5 py-4 text-slate-600 dark:text-slate-400 tabular-nums">
-                    {s.total_questions}
-                  </td>
-                  <td className="px-5 py-4 text-slate-500 dark:text-slate-400">
-                    {formatDate(s.started_at)}
-                  </td>
-                  <td className="px-5 py-4">
-                    <StatusBadge status={s.status} />
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    {s.status === 'submitted' ? (
-                      <button
-                        onClick={() => navigate(`/results/${s.id}`)}
-                        className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline"
+
+            <tbody>
+              {loading
+                ? Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} cols={7} />)
+                : sessions.map((s, ri) => {
+                    const { date, time } = fmtDate(s.started_at)
+                    const scorePercent   = s.score != null ? Math.round(s.score * 100) : null
+                    const answeredCount  = Object.keys(s.answers || {}).length
+                    const totalQ         = s.question_ids?.length ?? 0
+                    const timeUsed       = s.status === 'submitted' ? getTimeUsed(s) : null
+                    const isMenuOpen     = openMenuId === s.id
+
+                    return (
+                      <tr
+                        key={s.id}
+                        onClick={() => handleRowClick(s)}
+                        className={`group cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors ${
+                          ri % 2 === 1
+                            ? 'bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100/70 dark:hover:bg-slate-700/30'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'
+                        }`}
                       >
-                        View Results
-                      </button>
-                    ) : (
-                      <div className="flex items-center justify-end gap-4">
-                        {s.status === 'paused' && (
-                          <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                            {formatDuration(s.time_remaining)} left
-                          </span>
-                        )}
-                        <button
-                          onClick={() => navigate(`/exam/${s.id}`)}
-                          className="text-sm font-medium text-teal-600 dark:text-teal-400 hover:underline"
+                        {/* Date */}
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <p className="font-medium text-slate-700 dark:text-slate-200">{date}</p>
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{time}</p>
+                        </td>
+
+                        {/* Type */}
+                        <td className="px-4 py-3.5">
+                          <TypeBadge type={s.type} mode={s.mode} examNumber={s.exam_number} />
+                        </td>
+
+                        {/* Questions */}
+                        <td className="px-4 py-3.5">
+                          <p className="font-medium text-slate-700 dark:text-slate-200 tabular-nums">{totalQ}</p>
+                          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tabular-nums">
+                            {answeredCount} answered
+                          </p>
+                        </td>
+
+                        {/* Score */}
+                        <td className="px-4 py-3.5">
+                          {scorePercent != null
+                            ? <span className={`text-base font-bold tabular-nums ${scoreColor(scorePercent)}`}>{scorePercent}%</span>
+                            : <span className="text-slate-300 dark:text-slate-600 font-semibold text-base">—</span>
+                          }
+                        </td>
+
+                        {/* Time Spent — hidden on narrow viewports */}
+                        <td className="px-4 py-3.5 hidden md:table-cell">
+                          {timeUsed != null
+                            ? <span className="text-slate-600 dark:text-slate-300 tabular-nums">{fmtDuration(timeUsed)}</span>
+                            : s.time_remaining != null
+                            ? <span className="text-xs font-medium text-amber-600 dark:text-amber-400 tabular-nums">
+                                {fmtDuration(s.time_remaining)} left
+                              </span>
+                            : <span className="text-slate-300 dark:text-slate-600">—</span>
+                          }
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-4 py-3.5">
+                          <StatusBadge status={s.status} />
+                        </td>
+
+                        {/* Actions */}
+                        <td
+                          className="px-4 py-3.5 relative"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          {s.status === 'paused' ? 'Resume' : 'Continue'}
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                          <button
+                            onClick={(e) => toggleMenu(s.id, e)}
+                            aria-label="Open menu"
+                            className={`p-1.5 rounded-md transition-colors ${
+                              isMenuOpen
+                                ? 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
+                                : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-500 dark:group-hover:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </button>
+
+                          {isMenuOpen && (
+                            <div
+                              ref={menuRef}
+                              className="absolute right-0 top-full mt-1 z-50 min-w-[160px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg py-1 overflow-hidden"
+                            >
+                              {s.status === 'submitted' ? (
+                                <>
+                                  <MenuItem
+                                    onClick={() => {
+                                      setOpenMenuId(null)
+                                      navigate(`/exam/${s.id}`, { state: { readOnly: true } })
+                                    }}
+                                  >
+                                    Review Answers
+                                  </MenuItem>
+                                  <MenuItem
+                                    onClick={() => {
+                                      setOpenMenuId(null)
+                                      navigate(`/results/${s.id}`)
+                                    }}
+                                  >
+                                    View Results
+                                  </MenuItem>
+                                  <div className="h-px bg-slate-100 dark:bg-slate-700 my-1" />
+                                  <MenuItem danger onClick={(e) => handleDelete(s.id, e)}>
+                                    Delete
+                                  </MenuItem>
+                                </>
+                              ) : (
+                                <>
+                                  <MenuItem
+                                    onClick={() => {
+                                      setOpenMenuId(null)
+                                      navigate(`/exam/${s.id}`)
+                                    }}
+                                  >
+                                    {s.status === 'paused' ? 'Resume' : 'Continue'}
+                                  </MenuItem>
+                                  <div className="h-px bg-slate-100 dark:bg-slate-700 my-1" />
+                                  <MenuItem danger onClick={(e) => handleDelete(s.id, e)}>
+                                    Delete
+                                  </MenuItem>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )
+                  })
+              }
             </tbody>
           </table>
         </div>
