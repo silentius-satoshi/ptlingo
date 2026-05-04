@@ -10,6 +10,7 @@ export default function AnswerPanel({
   focusedChoice,
   onFocusChoice,
   rationaleVisible = false,
+  timeSpent = 0,
 }) {
   if (!question) {
     return <div className="flex-[45] bg-slate-50 dark:bg-slate-900/50" />
@@ -54,7 +55,7 @@ export default function AnswerPanel({
         </div>
 
         {rationaleVisible && (
-          <RationalePanel question={question} selectedAnswer={selectedAnswer} />
+          <RationalePanel question={question} selectedAnswer={selectedAnswer} timeSpent={timeSpent} />
         )}
       </div>
     </div>

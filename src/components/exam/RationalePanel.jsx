@@ -1,13 +1,27 @@
+import { useState } from 'react'
+
 const LETTERS = ['A', 'B', 'C', 'D']
 
-export default function RationalePanel({ question, selectedAnswer }) {
-  const correct = question.correct_index
-  const isCorrect = selectedAnswer === correct
+function formatTimeSpent(seconds) {
+  if (!seconds || seconds <= 0) return '—'
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  if (m === 0) return `${s}s`
+  if (s === 0) return `${m}m`
+  return `${m}m ${s}s`
+}
+
+export default function RationalePanel({ question, selectedAnswer, timeSpent = 0 }) {
+  const [refsOpen, setRefsOpen] = useState(false)
+  const correct    = question.correct_index
+  const isCorrect  = selectedAnswer === correct
+  const hasRefs    = question.references?.length > 0
 
   return (
     <div className="border-t border-slate-200 dark:border-slate-700">
-      {/* Result banner */}
-      <div className={`px-8 py-3 flex items-center gap-2.5 flex-shrink-0 ${
+
+      {/* ── Result banner ───────────────────────────────────────────────────── */}
+      <div className={`px-8 py-3 flex items-center gap-2.5 ${
         isCorrect
           ? 'bg-teal-50 dark:bg-teal-900/20 border-b border-teal-100 dark:border-teal-800'
           : 'bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900'
@@ -33,7 +47,58 @@ export default function RationalePanel({ question, selectedAnswer }) {
         )}
       </div>
 
-      {/* Per-choice rationale */}
+      {/* ── Question Summary ─────────────────────────────────────────────────── */}
+      <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
+        <div className={`grid gap-4 ${isCorrect ? 'grid-cols-2' : 'grid-cols-3'}`}>
+
+          {/* Your answer */}
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">
+              Your Answer
+            </p>
+            <div className="flex items-start gap-2">
+              <span className={`flex-shrink-0 w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center ${
+                isCorrect ? 'bg-teal-600 text-white' : 'bg-red-500 text-white'
+              }`}>
+                {LETTERS[selectedAnswer]}
+              </span>
+              <span className="text-xs text-slate-700 dark:text-slate-300 leading-snug line-clamp-2">
+                {question.choices[selectedAnswer]}
+              </span>
+            </div>
+          </div>
+
+          {/* Correct answer — only shown when wrong */}
+          {!isCorrect && (
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">
+                Correct Answer
+              </p>
+              <div className="flex items-start gap-2">
+                <span className="flex-shrink-0 w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center bg-teal-600 text-white">
+                  {LETTERS[correct]}
+                </span>
+                <span className="text-xs text-slate-700 dark:text-slate-300 leading-snug line-clamp-2">
+                  {question.choices[correct]}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Time spent */}
+          <div>
+            <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5">
+              Time Spent
+            </p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 tabular-nums">
+              {formatTimeSpent(timeSpent)}
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Per-choice rationale ─────────────────────────────────────────────── */}
       <div className="px-8 py-5 space-y-4">
         {question.rationale.map((text, i) => (
           <div key={i} className="flex items-start gap-3">
@@ -53,21 +118,36 @@ export default function RationalePanel({ question, selectedAnswer }) {
         ))}
       </div>
 
-      {/* References */}
-      {question.references?.length > 0 && (
-        <div className="px-8 pb-6 pt-1">
-          <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">
-            References
-          </p>
-          <ul className="space-y-1">
-            {question.references.map((ref, i) => (
-              <li key={i} className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                {ref}
-              </li>
-            ))}
-          </ul>
+      {/* ── References (collapsible) ─────────────────────────────────────────── */}
+      {hasRefs && (
+        <div className="border-t border-slate-100 dark:border-slate-800 mb-2">
+          <button
+            onClick={() => setRefsOpen((v) => !v)}
+            className="w-full flex items-center justify-between px-8 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors"
+          >
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              References
+            </span>
+            <svg
+              className={`w-3.5 h-3.5 text-slate-400 transition-transform ${refsOpen ? 'rotate-180' : ''}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {refsOpen && (
+            <ul className="px-8 pb-5 space-y-1.5">
+              {question.references.map((ref, i) => (
+                <li key={i} className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {ref}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
+
     </div>
   )
 }

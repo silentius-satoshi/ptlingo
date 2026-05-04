@@ -42,7 +42,9 @@ export default function ExamPage() {
   const [submitting, setSubmitting]           = useState(false)
   const [pausing, setPausing]                 = useState(false)
 
-  const saveTimeoutRef = useRef(null)
+  const saveTimeoutRef     = useRef(null)
+  const prevQuestionIdRef  = useRef(null)
+  const questionStartRef   = useRef(null)
 
   // ── Break state ────────────────────────────────────────────────────────────
   // 'offer'     → optional break offer modal (sections 1, 3, 4)
@@ -62,6 +64,7 @@ export default function ExamPage() {
     notes,
     highlights,
     timeRemaining,
+    timePerQuestion,
     type,
     setSession,
     setCurrentIndex,
@@ -185,6 +188,14 @@ export default function ExamPage() {
     if (!currentQuestionId) return
     if (type === 'quiz' && selectedAnswer !== null) return  // locked after first pick
     setAnswer(currentQuestionId, i)
+    // In quiz mode: snapshot elapsed time immediately so the rationale panel
+    // can show "time spent" without waiting for navigation away.
+    if (type === 'quiz' && questionStartRef.current !== null) {
+      const elapsed = Math.round((Date.now() - questionStartRef.current) / 1000)
+      const s = useSessionStore.getState()
+      s.setTimePerQuestion(currentQuestionId, (s.timePerQuestion[currentQuestionId] || 0) + elapsed)
+      questionStartRef.current = Date.now() // reset so navigation doesn't double-count
+    }
     scheduleSave()
   }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave])
 
@@ -271,6 +282,23 @@ export default function ExamPage() {
   useEffect(() => {
     if (breakState === 'mandatory' && breakTimeLeft === 0) resumeFromBreak()
   }, [breakState, breakTimeLeft, resumeFromBreak])
+
+  // ── Per-question time tracking ─────────────────────────────────────────────
+  // Fires when the visible question changes: saves elapsed time for the previous
+  // question and starts the clock for the new one.
+  useEffect(() => {
+    if (loading || !currentQuestionId) return
+    if (prevQuestionIdRef.current && questionStartRef.current) {
+      const elapsed = Math.round((Date.now() - questionStartRef.current) / 1000)
+      const s = useSessionStore.getState()
+      s.setTimePerQuestion(
+        prevQuestionIdRef.current,
+        (s.timePerQuestion[prevQuestionIdRef.current] || 0) + elapsed,
+      )
+    }
+    prevQuestionIdRef.current = currentQuestionId
+    questionStartRef.current  = Date.now()
+  }, [currentQuestionId, loading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Pause: save state + redirect to submissions ────────────────────────────
   const handleConfirmPause = useCallback(async () => {
@@ -420,6 +448,7 @@ export default function ExamPage() {
               focusedChoice={focusedChoice}
               onFocusChoice={setFocusedChoice}
               rationaleVisible={rationaleVisible}
+              timeSpent={timePerQuestion[currentQuestionId] || 0}
             />
 
             {toolbarPanel && (
