@@ -105,7 +105,7 @@ export default function ResultsPage() {
         if (sess.question_ids?.length > 0) {
           const { data: qs, error: qErr } = await supabase
             .from('questions')
-            .select('id, stem, choices, subject, difficulty, correct_index, rationale')
+            .select('id, stem, choices, subject, difficulty, correct_index, rationale, rationale_map')
             .in('id', sess.question_ids)
           if (qErr) throw qErr
 

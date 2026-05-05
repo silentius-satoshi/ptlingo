@@ -30,7 +30,7 @@ export default function RationalePanel({ question, selectedAnswer }) {
                 {question.choices[correct]}
               </p>
               <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                {question.rationale[correct]}
+                {question.rationale_map?.[String(correct)] || question.rationale || ''}
               </p>
             </div>
           </div>
@@ -58,7 +58,7 @@ export default function RationalePanel({ question, selectedAnswer }) {
                       {choice}
                     </p>
                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                      {question.rationale[i]}
+                      {question.rationale_map?.[String(i)] || ''}
                     </p>
                   </div>
                 </div>
