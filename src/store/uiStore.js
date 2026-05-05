@@ -2,7 +2,9 @@ import { create } from 'zustand'
 
 const getInitialDarkMode = () => {
   try {
-    return localStorage.getItem('darkMode') === 'true'
+    const dark = localStorage.getItem('darkMode') === 'true'
+    if (dark) document.documentElement.classList.add('dark')
+    return dark
   } catch {
     return false
   }

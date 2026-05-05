@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
+import { useUiStore } from '../store/uiStore'
 import Badge from '../components/shared/Badge'
 import Button from '../components/shared/Button'
 import {
@@ -402,6 +403,7 @@ function DateRangePicker({ dateRange, onChange }) {
 
 export default function DashboardPage() {
   const { user } = useAuthStore()
+  const { darkMode } = useUiStore()
   const navigate = useNavigate()
 
   const [sessions, setSessions] = useState([])
@@ -550,7 +552,8 @@ export default function DashboardPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
-  const axisStyle = { fontSize: 11, fill: '#94a3b8' }
+  const axisStyle = { fontSize: 11, fill: darkMode ? '#94a3b8' : '#64748b' }
+  const gridStroke = darkMode ? '#334155' : '#e2e8f0'
 
   return (
     <div className="px-6 py-8">
@@ -714,7 +717,7 @@ export default function DashboardPage() {
                 {historyMode === 'overall' ? (
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={chartData.overallData} margin={{ top: 8, right: 24, bottom: 0, left: -8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} horizontal vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.3} horizontal vertical={false} />
                       <XAxis dataKey="date" tick={axisStyle} />
                       <YAxis domain={[dataMin => Math.max(0, Math.floor(dataMin / 10) * 10 - 10), 100]} tick={axisStyle} />
                       <Tooltip content={<OverallTooltip />} />
@@ -735,7 +738,7 @@ export default function DashboardPage() {
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={chartData.splitData} margin={{ top: 8, right: 24, bottom: 0, left: -8 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} horizontal vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.3} horizontal vertical={false} />
                       <XAxis dataKey="date" tick={axisStyle} />
                       <YAxis domain={[dataMin => Math.max(0, Math.floor(dataMin / 10) * 10 - 10), 100]} tick={axisStyle} />
                       <Tooltip content={<SplitTooltip />} />
@@ -785,8 +788,8 @@ export default function DashboardPage() {
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
                   <RadarChart data={subjectData} margin={{ top: 8, right: 24, bottom: 8, left: 24 }}>
-                    <PolarGrid stroke="#334155" opacity={0.4} />
-                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: '#94a3b8' }} />
+                    <PolarGrid stroke={gridStroke} opacity={0.4} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: axisStyle.fill }} />
                     <Radar
                       dataKey="value"
                       stroke="#14b8a6"
@@ -810,7 +813,7 @@ export default function DashboardPage() {
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={distData} margin={{ top: 8, right: 16, bottom: 0, left: -8 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} opacity={0.3} />
                     <XAxis dataKey="label" tick={axisStyle} />
                     <YAxis allowDecimals={false} tick={axisStyle} />
                     <Tooltip content={<BarTooltip />} />
