@@ -26,3 +26,29 @@
     scrollbar-color: theme('colors.slate.600') transparent;
   }
 }
+
+/* Tiptap / ProseMirror rich text editor */
+.tiptap-editor .ProseMirror {
+  outline: none;
+  min-height: 100%;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: theme('colors.slate.800');
+}
+.dark .tiptap-editor .ProseMirror { color: theme('colors.slate.100'); }
+.tiptap-editor .ProseMirror p { margin-bottom: 0.375rem; }
+.tiptap-editor .ProseMirror p:last-child { margin-bottom: 0; }
+.tiptap-editor .ProseMirror ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.375rem; }
+.tiptap-editor .ProseMirror li { margin-bottom: 0.15rem; }
+.tiptap-editor .ProseMirror strong { font-weight: 700; }
+.tiptap-editor .ProseMirror em { font-style: italic; }
+.tiptap-editor .ProseMirror u { text-decoration: underline; }
+.tiptap-editor .ProseMirror mark { background-color: #fef08a; border-radius: 2px; padding: 0 2px; }
+.dark .tiptap-editor .ProseMirror mark { background-color: #713f12; color: #fef9c3; }
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: theme('colors.slate.400');
+  pointer-events: none;
+  float: left;
+  height: 0;
+}

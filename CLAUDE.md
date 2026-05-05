@@ -7,9 +7,9 @@
 - **React Router v6** — `BrowserRouter`, `Routes/Route`
 - **Zustand** — `sessionStore`, `authStore`, `uiStore`
 - **Supabase JS v2** — auth + Postgres (RLS enabled)
-- **Recharts** — installed, not yet wired up (Step 15)
+- **Recharts** — wired up (Steps 15, 18)
 
-Build: `npm run build` → `dist/` (123 modules, ~479 kB JS gzip ~131 kB). Clean as of last session.
+Build: `npm run build` → clean, 921 modules.
 
 ---
 
@@ -22,7 +22,7 @@ Build: `npm run build` → `dist/` (123 modules, ~479 kB JS gzip ~131 kB). Clean
 | `/submissions` | `SubmissionsPage` | `AppLayout` |
 | `/notes` | `NotesPage` | `AppLayout` |
 | `/question-bank` | `QuestionBankPage` | `AppLayout` |
-| `/diagnostic` | `DiagnosticPage` | `AppLayout` |
+| `/performance` | `PerformancePage` | `AppLayout` |
 | `/exam/:examId/start` | `MockExamStartPage` | `AppLayout` |
 | `/exam/:sessionId` | `ExamPage` | Full-screen (no sidebar) |
 | `/review/:sessionId` | `ReviewPage` | Full-screen |
@@ -116,17 +116,21 @@ submitted_at     timestamptz
 - **Step 12** — Results screen (`ResultsPage`): score ring animation, stat cards, collapsible subject breakdown, per-question filter/sort/expand table, read-only ExamPage review mode
 - **Step 13** — Question Bank / Quiz Builder (`QuestionBankPage`): mode toggle (Practice/Timed), subject chips, difficulty chips, count presets + custom input, summary card; removed temp mode toggle from `MockExamStartPage`
 
-- **Step 14** — Submissions history (full columns: date, type, score, status, time, 3-dot menu for resume/review/delete)
-- **Step 15** — Dashboard + Recharts (stat cards, line chart, radar chart, bar chart)
-- **Step 16** — Markdown import script refinement
-- **Step 17** — Dark mode full audit
-- **Step 18** — Polish + responsive
+- **Step 14** — Submissions history (full columns: date, type, score, status, time, 3-dot menu for resume/review/delete; bulk delete with confirmation)
+- **Step 15** — Dashboard + Recharts (stat cards, line chart, radar chart, bar chart, date-range picker)
+- **Step 16** — Markdown import script (`scripts/importQuestions.js`), difficulty classifier (`scripts/classifyDifficulty.js`)
+- **Step 17** — Dark mode full audit (FOUC fix in `index.html` + `uiStore`, spinner, button focus ring, chart axis colors)
+- **Step 18** — My Notes page + Performance page:
+  - `supabase/step18_notes.sql` — notes table (user_id, question_id, content, timestamps; RLS)
+  - `NotesPage` — two-panel + list: folder/tag sidebar, note list, contenteditable rich text editor (Bold/Italic/Underline/Bullets/Highlight via `document.execCommand`)
+  - ExamPage notepad now also upserts to `notes` table (debounced 1s, keyed by question_id); loads merged notes on session start
+  - `PerformancePage` at `/performance` (renamed from `/diagnostic`) — 6 Recharts charts: accuracy by subject/section/difficulty/tag (10 weakest), score trend, flagged-for-review table with question modal
 
 ---
 
 ## Known Issues / Decisions
 
-- `DashboardPage`, `SubmissionsPage`, `NotesPage`, `DiagnosticPage` are placeholder stubs.
+- `ProgressGrid` in the toolbar has its own internal scroll — this is intentional (utility panel, not part of main content).
 - `ProgressGrid` in the toolbar has its own internal scroll — this is intentional (utility panel, not part of main content).
 - `QuestionNav` is hidden during break screens (`!breakState` condition) since the user cannot navigate mid-break.
 - The `SECTION_END` set uses real boundaries (44, 89, 134, 179). To test breaks locally, temporarily change to e.g. `new Set([1, 3])` and restore after.

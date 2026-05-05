@@ -13,7 +13,7 @@ import ReviewPage from './pages/ReviewPage'
 import ResultsPage from './pages/ResultsPage'
 import SubmissionsPage from './pages/SubmissionsPage'
 import NotesPage from './pages/NotesPage'
-import DiagnosticPage from './pages/DiagnosticPage'
+import PerformancePage from './pages/PerformancePage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 
 function RequireAuth({ children }) {
@@ -66,7 +66,7 @@ export default function App() {
           <Route path="submissions" element={<SubmissionsPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="question-bank" element={<QuestionBankPage />} />
-          <Route path="diagnostic" element={<DiagnosticPage />} />
+          <Route path="performance" element={<PerformancePage />} />
           <Route path="exam/:examId/start" element={<MockExamStartPage />} />
         </Route>
 

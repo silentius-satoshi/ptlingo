@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useSessionStore } from '../store/sessionStore'
+import { useAuthStore } from '../store/authStore'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import ExamTopBar from '../components/layout/ExamTopBar'
 import QuestionPanel from '../components/exam/QuestionPanel'
@@ -25,6 +26,7 @@ export default function ExamPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const readOnly  = location.state?.readOnly ?? false
+  const { user } = useAuthStore()
 
   // ── Loading / error ────────────────────────────────────────────────────────
   const [loading, setLoading]     = useState(true)
@@ -46,6 +48,7 @@ export default function ExamPage() {
   const [pausing, setPausing]                 = useState(false)
 
   const saveTimeoutRef     = useRef(null)
+  const notesSaveRef       = useRef({})
   const prevQuestionIdRef  = useRef(null)
   const questionStartRef   = useRef(null)
 
@@ -123,6 +126,20 @@ export default function ExamPage() {
           setQuestions(ordered)
         }
 
+        // Merge notes table entries (more up-to-date than session JSONB)
+        let mergedNotes = session.notes ?? {}
+        if (session.question_ids?.length > 0 && user?.id) {
+          const { data: notesRows } = await supabase
+            .from('notes')
+            .select('question_id, content')
+            .eq('user_id', user.id)
+            .in('question_id', session.question_ids)
+          if (notesRows?.length > 0) {
+            mergedNotes = { ...mergedNotes }
+            notesRows.forEach((r) => { if (r.content) mergedNotes[r.question_id] = r.content })
+          }
+        }
+
         setSession({
           sessionId:       session.id,
           type:            session.type,
@@ -133,7 +150,7 @@ export default function ExamPage() {
           marked:          session.marked             ?? [],
           eliminated:      session.eliminated         ?? {},
           highlights:      session.highlights         ?? {},
-          notes:           session.notes              ?? {},
+          notes:           mergedNotes,
           timePerQuestion: session.time_per_question  ?? {},
           timeRemaining:   session.time_remaining     ?? 0,
           status:          'in_progress',
@@ -149,6 +166,8 @@ export default function ExamPage() {
     return () => {
       resetSession()
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+      Object.values(notesSaveRef.current).forEach(clearTimeout)
+      notesSaveRef.current = {}
     }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -174,6 +193,21 @@ export default function ExamPage() {
         .eq('id', sessionId)
     }, 1500)
   }, [sessionId])
+
+  // ── Debounced notes-table upsert ───────────────────────────────────────────
+  const scheduleNoteSave = useCallback((questionId, text) => {
+    if (!user?.id || !questionId) return
+    if (notesSaveRef.current[questionId]) clearTimeout(notesSaveRef.current[questionId])
+    notesSaveRef.current[questionId] = setTimeout(async () => {
+      await supabase
+        .from('notes')
+        .upsert(
+          { user_id: user.id, question_id: questionId, content: text },
+          { onConflict: 'user_id,question_id' },
+        )
+      delete notesSaveRef.current[questionId]
+    }, 1000)
+  }, [user?.id])
 
   // ── Derived state ──────────────────────────────────────────────────────────
   const currentQuestion   = questions[currentIndex]
@@ -220,7 +254,8 @@ export default function ExamPage() {
     if (!currentQuestionId) return
     setNote(currentQuestionId, text)
     scheduleSave()
-  }, [currentQuestionId, setNote, scheduleSave])
+    scheduleNoteSave(currentQuestionId, text)
+  }, [currentQuestionId, setNote, scheduleSave, scheduleNoteSave])
 
   const handleAddHighlight = useCallback(({ start, end }) => {
     if (!currentQuestionId) return
