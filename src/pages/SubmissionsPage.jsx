@@ -42,17 +42,20 @@ function scoreColor(pct) {
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-function SkeletonRow({ cols }) {
-  const widths = [55, 40, 35, 30, 45, 50, 20]
+function SkeletonRow() {
+  // 8 cols: checkbox, date, type, questions, score, time (hidden), status, actions
+  const widths = [0, 55, 40, 35, 30, 45, 50, 20]
   return (
     <tr className="border-b border-slate-100 dark:border-slate-800">
-      {widths.slice(0, cols).map((w, i) => (
-        <td key={i} className={`px-4 py-4 ${i === 4 ? 'hidden md:table-cell' : ''}`}>
-          <div
-            className="h-4 rounded-md bg-slate-100 dark:bg-slate-800 animate-pulse"
-            style={{ width: `${w}%` }}
-          />
-          {i <= 1 && (
+      {widths.map((w, i) => (
+        <td key={i} className={`px-4 py-4 ${i === 5 ? 'hidden md:table-cell' : ''}`}>
+          {w > 0 && (
+            <div
+              className="h-4 rounded-md bg-slate-100 dark:bg-slate-800 animate-pulse"
+              style={{ width: `${w}%` }}
+            />
+          )}
+          {(i === 1 || i === 2) && (
             <div className="h-3 rounded-md bg-slate-100 dark:bg-slate-800 animate-pulse mt-1.5" style={{ width: `${w * 0.6}%` }} />
           )}
         </td>
@@ -106,10 +109,15 @@ export default function SubmissionsPage() {
   const { user }   = useAuthStore()
   const navigate   = useNavigate()
 
-  const [sessions, setSessions]     = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [openMenuId, setOpenMenuId] = useState(null)
-  const menuRef = useRef(null)
+  const [sessions, setSessions]           = useState([])
+  const [loading, setLoading]             = useState(true)
+  const [openMenuId, setOpenMenuId]       = useState(null)
+  const [selectedIds, setSelectedIds]     = useState(new Set())
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false)
+  const [bulkDeleting, setBulkDeleting]   = useState(false)
+
+  const menuRef        = useRef(null)
+  const selectAllRef   = useRef(null)
 
   useEffect(() => {
     const load = async () => {
@@ -133,6 +141,36 @@ export default function SubmissionsPage() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  // Keep select-all checkbox indeterminate state in sync
+  useEffect(() => {
+    if (!selectAllRef.current || sessions.length === 0) return
+    const allChecked  = sessions.every((s) => selectedIds.has(s.id))
+    const someChecked = sessions.some((s) => selectedIds.has(s.id))
+    selectAllRef.current.indeterminate = someChecked && !allChecked
+    selectAllRef.current.checked       = allChecked
+  }, [selectedIds, sessions])
+
+  // ── Selection helpers ───────────────────────────────────────────────────────
+
+  const handleSelectAll = () => {
+    const allChecked = sessions.every((s) => selectedIds.has(s.id))
+    if (allChecked) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(sessions.map((s) => s.id)))
+    }
+  }
+
+  const handleSelectRow = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  // ── Action handlers ─────────────────────────────────────────────────────────
+
   const toggleMenu = (id, e) => {
     e.stopPropagation()
     setOpenMenuId((cur) => (cur === id ? null : id))
@@ -149,18 +187,45 @@ export default function SubmissionsPage() {
     if (!confirm('Delete this session? This cannot be undone.')) return
     await supabase.from('sessions').delete().eq('id', id)
     setSessions((prev) => prev.filter((s) => s.id !== id))
+    setSelectedIds((prev) => { const next = new Set(prev); next.delete(id); return next })
+  }
+
+  const handleBulkDelete = async () => {
+    setBulkDeleting(true)
+    const ids = [...selectedIds]
+    const { error } = await supabase.from('sessions').delete().in('id', ids)
+    if (!error) {
+      setSessions((prev) => prev.filter((s) => !selectedIds.has(s.id)))
+      setSelectedIds(new Set())
+    }
+    setConfirmBulkDelete(false)
+    setBulkDeleting(false)
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
+  const selectionCount = selectedIds.size
+
   return (
     <div className="px-6 py-8">
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Submissions</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Your past and in-progress sessions
-        </p>
+      {/* Page header */}
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Submissions</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Your past and in-progress sessions
+          </p>
+        </div>
+
+        {selectionCount > 0 && (
+          <button
+            onClick={() => setConfirmBulkDelete(true)}
+            className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-semibold bg-red-600 hover:bg-red-700 active:bg-red-800 text-white transition-colors"
+          >
+            Delete Selected ({selectionCount})
+          </button>
+        )}
       </div>
 
       {/* Empty state */}
@@ -184,12 +249,24 @@ export default function SubmissionsPage() {
         </div>
       )}
 
-      {/* Table — overflow-visible so the dropdown menu isn't clipped */}
+      {/* Table */}
       {(loading || sessions.length > 0) && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                {/* Select-all checkbox */}
+                <th className="pl-4 pr-2 py-3 w-8">
+                  {!loading && sessions.length > 0 && (
+                    <input
+                      ref={selectAllRef}
+                      type="checkbox"
+                      aria-label="Select all"
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-teal-600 accent-teal-600 cursor-pointer"
+                    />
+                  )}
+                </th>
                 {[
                   { label: 'Date' },
                   { label: 'Type' },
@@ -211,7 +288,7 @@ export default function SubmissionsPage() {
 
             <tbody>
               {loading
-                ? Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} cols={7} />)
+                ? Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)
                 : sessions.map((s, ri) => {
                     const { date, time } = fmtDate(s.started_at)
                     const scorePercent   = s.score != null ? Math.round(s.score * 100) : null
@@ -219,17 +296,33 @@ export default function SubmissionsPage() {
                     const totalQ         = s.question_ids?.length ?? 0
                     const timeUsed       = s.status === 'submitted' ? getTimeUsed(s) : null
                     const isMenuOpen     = openMenuId === s.id
+                    const isSelected     = selectedIds.has(s.id)
 
                     return (
                       <tr
                         key={s.id}
                         onClick={() => handleRowClick(s)}
                         className={`group cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-0 transition-colors ${
-                          ri % 2 === 1
+                          isSelected
+                            ? 'bg-teal-50/60 dark:bg-teal-900/10'
+                            : ri % 2 === 1
                             ? 'bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100/70 dark:hover:bg-slate-700/30'
                             : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'
                         }`}
                       >
+                        {/* Checkbox */}
+                        <td
+                          className="pl-4 pr-2 py-3.5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleSelectRow(s.id)}
+                            className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-teal-600 accent-teal-600 cursor-pointer"
+                          />
+                        </td>
+
                         {/* Date */}
                         <td className="px-4 py-3.5 whitespace-nowrap">
                           <p className="font-medium text-slate-700 dark:text-slate-200">{date}</p>
@@ -346,6 +439,36 @@ export default function SubmissionsPage() {
               }
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Bulk-delete confirmation dialog */}
+      {confirmBulkDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-sm mx-4 p-6">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-2">
+              Delete {selectionCount} submission{selectionCount !== 1 ? 's' : ''}?
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+              This cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmBulkDelete(false)}
+                disabled={bulkDeleting}
+                className="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkDeleting}
+                className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+              >
+                {bulkDeleting ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
