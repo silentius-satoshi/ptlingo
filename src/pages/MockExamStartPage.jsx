@@ -11,6 +11,12 @@ const MULTIPLIERS = [
   { value: 2,   label: '2×',   minutes: 600 },
 ]
 
+// Maps sidebar exam ID (URL param) to the exam_series value used in the questions table.
+const EXAM_SERIES = {
+  '1': 'Series 3 Form A',
+  '2': 'Mock Exam B',
+}
+
 export default function MockExamStartPage() {
   const { examId } = useParams()
   const { user } = useAuthStore()
@@ -25,18 +31,21 @@ export default function MockExamStartPage() {
     setLoading(true)
     setError('')
     try {
-      // Fetch questions for this mock exam series, ordered by section
+      const series = EXAM_SERIES[examId]
+      if (!series) throw new Error(`No exam configured for ID ${examId}.`)
+
+      // Fetch questions for this exam series, ordered by section
       const { data: questions, error: qErr } = await supabase
         .from('questions')
         .select('id, section')
-        .eq('exam_number', parseInt(examId))
+        .eq('exam_series', series)
         .order('section', { ascending: true })
 
       if (qErr) throw qErr
 
       if (!questions || questions.length === 0) {
         throw new Error(
-          `No questions found for Mock Exam ${examId}. Import questions first using the Node.js import script.`
+          `No questions found for "${series}". Import questions first using the Node.js import script.`
         )
       }
 

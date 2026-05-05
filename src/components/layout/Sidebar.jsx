@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import DarkModeToggle from '../shared/DarkModeToggle'
 
-const MOCK_EXAMS = ['Mock Exam 1', 'Mock Exam 2', 'Mock Exam 3']
+const MOCK_EXAMS = ['Mock Exam 1', 'Mock Exam 2']
 
 function NavItem({ to, icon, label, end = false }) {
   return (
