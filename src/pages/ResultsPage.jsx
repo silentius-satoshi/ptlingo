@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback, Fragment } from 'react'
+import { useEffect, useState, useCallback, Fragment, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useUiStore } from '../store/uiStore'
 import CountdownRing from '../components/exam/CountdownRing'
 import RationalePanel from '../components/exam/RationalePanel'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
+import useGamificationStore from '../stores/gamificationStore'
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -75,6 +76,8 @@ export default function ResultsPage() {
   const { sessionId } = useParams()
   const navigate      = useNavigate()
   const { darkMode, toggleDarkMode } = useUiStore()
+  const { awardXP, unlockAchievement } = useGamificationStore()
+  const xpAwardedRef = useRef(false)
 
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState('')
@@ -128,6 +131,24 @@ export default function ResultsPage() {
       return () => clearTimeout(t)
     }
   }, [loading, session])
+
+  // Award pass bonus XP + exam achievements (runs once per results load)
+  useEffect(() => {
+    if (!session || xpAwardedRef.current) return
+    xpAwardedRef.current = true
+
+    if (session.type === 'exam') {
+      // Exam done achievement
+      if (session.exam_number === 1) unlockAchievement('exam1_done')
+
+      // Pass bonus: ≥ 75% score
+      const pct = Math.round((session.score || 0) * 100)
+      if (pct >= 75) {
+        awardXP(100, 'Mock Exam passed!')
+        unlockAchievement('exam1_pass')
+      }
+    }
+  }, [session, awardXP, unlockAchievement])
 
   // Reset page when filter/sort changes
   useEffect(() => { setPage(0) }, [filter, sortField, sortDir])

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import DarkModeToggle from '../shared/DarkModeToggle'
+import SidebarFooter from '../gamification/SidebarFooter'
 
 const MOCK_EXAMS = ['Mock Exam 1', 'Mock Exam 2']
 
@@ -102,6 +103,15 @@ export default function Sidebar() {
             </svg>
           }
         />
+        <NavItem
+          to="/achievements"
+          label="Achievements"
+          icon={
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+          }
+        />
 
         {/* Mock Exams expandable */}
         <div>
@@ -144,6 +154,9 @@ export default function Sidebar() {
           )}
         </div>
       </nav>
+
+      {/* Gamification footer strip */}
+      <SidebarFooter />
 
       {/* Footer */}
       <div className="px-3 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center gap-2">

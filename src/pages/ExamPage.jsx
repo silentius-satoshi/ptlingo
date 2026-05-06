@@ -17,6 +17,9 @@ import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import BreakScreen from '../components/exam/BreakScreen'
 import RationalePanel from '../components/exam/RationalePanel'
+import HeartBar from '../components/gamification/HeartBar'
+import HeartEmptyModal from '../components/gamification/HeartEmptyModal'
+import useGamificationStore from '../stores/gamificationStore'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -27,6 +30,11 @@ export default function ExamPage() {
   const location = useLocation()
   const readOnly  = location.state?.readOnly ?? false
   const { user } = useAuthStore()
+
+  // ── Gamification ──────────────────────────────────────────────────────────
+  const { awardXP, deductHeart, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, hearts } = useGamificationStore()
+  const [showHeartEmpty, setShowHeartEmpty] = useState(false)
+  const recentWrongIdsRef = useRef([])
 
   // ── Loading / error ────────────────────────────────────────────────────────
   const [loading, setLoading]     = useState(true)
@@ -234,8 +242,24 @@ export default function ExamPage() {
       s.setTimePerQuestion(currentQuestionId, (s.timePerQuestion[currentQuestionId] || 0) + elapsed)
       questionStartRef.current = Date.now() // reset so navigation doesn't double-count
     }
+    // Quiz-mode gamification: XP for correct, heart deduction for wrong
+    if (type === 'quiz' && !readOnly) {
+      const q = questions.find((q) => q.id === currentQuestionId)
+      if (q) {
+        if (i === q.correct_index) {
+          awardXP(10, 'Correct answer')
+          advanceMission('questions', q.subject)
+        } else {
+          // Track recent wrong IDs for HeartEmptyModal
+          recentWrongIdsRef.current = [currentQuestionId, ...recentWrongIdsRef.current].slice(0, 3)
+          const newHearts = useGamificationStore.getState().hearts - 1
+          deductHeart()
+          if (newHearts <= 0) setShowHeartEmpty(true)
+        }
+      }
+    }
     scheduleSave()
-  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave])
+  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductHeart])
 
   const handleToggleEliminated = useCallback((i) => {
     if (!currentQuestionId) return
@@ -394,13 +418,21 @@ export default function ExamPage() {
         })
         .eq('id', sessionId)
 
+      // Award XP for completing session
+      const xpAmount = type === 'exam' ? 100 : 25
+      await awardXP(xpAmount, type === 'exam' ? 'Mock Exam complete' : 'Quiz complete')
+
+      // Refresh mastery + check question count achievements
+      await refreshSubjectMastery()
+      await checkQuestionCountAchievements()
+
       navigate(`/results/${sessionId}`)
     } catch (err) {
       console.error('Submit error:', err)
     } finally {
       setSubmitting(false)
     }
-  }, [questions, sessionId, navigate])
+  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements])
 
   const handleExpire = useCallback(() => handleSubmit(), [handleSubmit])
 
@@ -471,6 +503,14 @@ export default function ExamPage() {
 
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
+      {/* HeartEmpty modal — quiz mode only */}
+      {showHeartEmpty && type === 'quiz' && !readOnly && (
+        <HeartEmptyModal
+          wrongQuestionIds={recentWrongIdsRef.current}
+          onEndSession={() => { setShowHeartEmpty(false); handleSubmit() }}
+        />
+      )}
+
       <ExamTopBar
         onExpire={handleExpire}
         onToggleToolbar={() => setToolbarExpanded((v) => !v)}
@@ -591,6 +631,13 @@ export default function ExamPage() {
           onPrev={goPrev}
           onNext={goNext}
         />
+      )}
+
+      {/* Hearts display — quiz mode only */}
+      {type === 'quiz' && !readOnly && !breakState && (
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          <HeartBar count={hearts} />
+        </div>
       )}
 
       {/* ── Section complete — optional break offer ── */}

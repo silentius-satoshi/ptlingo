@@ -9,6 +9,8 @@ import {
 } from 'recharts'
 import NpteHistory from '../components/performance/NpteHistory'
 import StudyPlanTab from '../components/performance/StudyPlanTab'
+import MasteryRing from '../components/gamification/MasteryRing'
+import useGamificationStore from '../stores/gamificationStore'
 
 const TABS = ['Practice Analytics', 'NPTE History', 'Study Plan']
 
@@ -87,9 +89,38 @@ function TrendTooltip({ active, payload }) {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 
+const SUBJECT_ABBR = {
+  'Musculoskeletal':            'MSK',
+  'Neuromuscular':              'Neuro',
+  'Cardiovascular and Pulmonary': 'Cardio',
+  'Integumentary':              'Integ',
+  'Pediatrics':                 'Peds',
+  'Other':                      'Other',
+}
+
+function MasteryRingsRow({ subjectMastery }) {
+  if (!Object.keys(subjectMastery).length) return null
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
+      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Subject Mastery</p>
+      <div className="flex flex-wrap justify-center gap-6">
+        {SUBJECTS.map((s) => (
+          <MasteryRing
+            key={s}
+            pct={subjectMastery[s] ?? 0}
+            size={64}
+            label={SUBJECT_ABBR[s] ?? s}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function PerformancePage() {
   const { user } = useAuthStore()
   const { darkMode } = useUiStore()
+  const { subjectMastery } = useGamificationStore()
 
   const [activeTab, setActiveTab] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -276,6 +307,9 @@ export default function PerformancePage() {
             Practice analytics, NPTE history, and AI-powered study planning
           </p>
         </div>
+
+        {/* Mastery rings */}
+        <MasteryRingsRow subjectMastery={subjectMastery} />
 
         {/* Tab bar */}
         <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 self-start">

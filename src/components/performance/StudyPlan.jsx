@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import StudyPlanHeader from './StudyPlanHeader'
 import { getDaysRemaining } from '../../lib/studyPlanAI'
+import useGamificationStore from '../../stores/gamificationStore'
+import MissionCard from '../gamification/MissionCard'
 
 const DAY_TYPE_BADGE = {
   study:         'bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400',
@@ -177,6 +179,27 @@ function currentWeekIndex(weeks) {
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
+function DailyMissionsStrip() {
+  const { dailyMissions } = useGamificationStore()
+  const missions = dailyMissions?.missions ?? []
+  if (!missions.length) return null
+  const completed = missions.filter((m) => m.completed).length
+
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Today's Missions</p>
+        <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums">{completed}/{missions.length} complete</span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {missions.map((m) => (
+          <MissionCard key={m.id} mission={m} compact />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function StudyPlan({ activePlan, onRegenerate }) {
   const plan = activePlan?.plan
   if (!plan) return null
@@ -186,6 +209,7 @@ export default function StudyPlan({ activePlan, onRegenerate }) {
 
   return (
     <div className="flex flex-col gap-6">
+      <DailyMissionsStrip />
       <StudyPlanHeader plan={activePlan} onRegenerate={onRegenerate} />
 
       {/* Urgency banner */}
