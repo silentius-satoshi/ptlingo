@@ -7,6 +7,10 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
   LineChart, Line, ReferenceLine,
 } from 'recharts'
+import NpteHistory from '../components/performance/NpteHistory'
+import StudyPlanTab from '../components/performance/StudyPlanTab'
+
+const TABS = ['Practice Analytics', 'NPTE History', 'Study Plan']
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -87,6 +91,7 @@ export default function PerformancePage() {
   const { user } = useAuthStore()
   const { darkMode } = useUiStore()
 
+  const [activeTab, setActiveTab] = useState(0)
   const [loading, setLoading] = useState(true)
   const [sessions, setSessions] = useState([])
   const [questions, setQuestions] = useState([])  // { id, stem, choices, subject, difficulty, tags, correct_index, section, rationale, rationale_map }
@@ -242,6 +247,20 @@ export default function PerformancePage() {
     [answerHistory, qMap],
   )
 
+  // Practice accuracy per subject — passed to NPTE History + Study Plan tabs
+  const practiceAccuracy = useMemo(() => {
+    const acc = {}
+    Object.entries(answerHistory).forEach(([qId, h]) => {
+      const subj = qMap[qId]?.subject || 'Other'
+      if (!acc[subj]) acc[subj] = { correct: 0, total: 0 }
+      acc[subj].correct += h.correct
+      acc[subj].total   += h.correct + h.wrong
+    })
+    return Object.entries(acc)
+      .filter(([, v]) => v.total > 0)
+      .map(([subject, v]) => ({ subject, accuracy: v.correct / v.total }))
+  }, [answerHistory, qMap])
+
   const hasData = sessions.length > 0
 
   // ── Bar color helper ───────────────────────────────────────────────────────
@@ -254,9 +273,35 @@ export default function PerformancePage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Performance</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Analytics across all your submitted sessions
+            Practice analytics, NPTE history, and AI-powered study planning
           </p>
         </div>
+
+        {/* Tab bar */}
+        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 self-start">
+          {TABS.map((tab, i) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(i)}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                activeTab === i
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* NPTE History tab */}
+        {activeTab === 1 && <NpteHistory practiceAccuracy={practiceAccuracy} />}
+
+        {/* Study Plan tab */}
+        {activeTab === 2 && <StudyPlanTab practiceAccuracy={practiceAccuracy} />}
+
+        {/* Practice Analytics tab */}
+        {activeTab === 0 && (<>
 
         {!loading && !hasData && (
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-12 flex flex-col items-center gap-3 text-center">
@@ -456,6 +501,7 @@ export default function PerformancePage() {
             )}
           </div>
         )}
+        </>)}
       </div>
 
       {/* Flagged question modal */}
