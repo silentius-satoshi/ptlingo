@@ -133,6 +133,12 @@ const useGamificationStore = create((set, get) => ({
     get().checkAchievements()
   },
 
+  refreshHeartsForNewDay: async () => {
+    const { userId } = get()
+    const row = await fetchOrCreateGamification(userId)
+    if (row) get().resetHeartsIfNewDay(userId, row.hearts_last_reset)
+  },
+
   // ── Subject Mastery ───────────────────────────────────────────────────────
   updateSubjectMastery: async (subject, data) => {
     const { userId, subjectMastery } = get()
@@ -189,7 +195,7 @@ const useGamificationStore = create((set, get) => ({
     })
 
     if (all_complete && !dailyMissions.all_complete) {
-      await get().awardXP(100, 'All missions complete')
+      await get().awardXP(50, 'all_missions_complete')
       await get().advanceStreak()
     }
   },

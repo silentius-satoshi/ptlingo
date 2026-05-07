@@ -11,7 +11,8 @@ function Toast({ toast, onDone }) {
     return () => { clearTimeout(show); clearTimeout(hide) }
   }, [onDone])
 
-  const isLevelUp = toast.levelUp
+  const isLevelUp    = toast.levelUp
+  const isAllMissions = toast.source === 'all_missions_complete'
   const bg = isLevelUp ? 'bg-teal-600' : 'bg-amber-500'
 
   return (
@@ -27,6 +28,8 @@ function Toast({ toast, onDone }) {
             {getLevelTitle(toast.oldLevel).title} → {getLevelTitle(toast.newLevel).title}
           </p>
         </>
+      ) : isAllMissions ? (
+        <p className="font-bold text-base">+50 XP — All missions complete! 🔥</p>
       ) : (
         <>
           <p className="font-bold">+{toast.amount} XP ⚡</p>
