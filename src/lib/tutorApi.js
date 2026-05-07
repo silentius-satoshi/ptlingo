@@ -1,9 +1,10 @@
-export async function streamTutorResponse({ messages, systemPrompt, onChunk, onDone, onError }) {
+export async function streamTutorResponse({ messages, systemPrompt, onChunk, onDone, onError, signal }) {
   try {
     const response = await fetch(
       'https://openrouter.ai/api/v1/chat/completions',
       {
         method: 'POST',
+        signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
@@ -55,6 +56,7 @@ export async function streamTutorResponse({ messages, systemPrompt, onChunk, onD
     }
     onDone()
   } catch (err) {
+    if (err.name === 'AbortError') return // cancelled — not an error
     onError(err)
   }
 }

@@ -13,6 +13,9 @@ const CHOICE_LETTERS = ['A', 'B', 'C', 'D', 'E']
 let msgCounter = 0
 function mkId() { return ++msgCounter }
 
+// Module-scope flag survives StrictMode's remount cycle
+let tutorInitialized = false
+
 export default function TutorPage() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
@@ -32,6 +35,7 @@ export default function TutorPage() {
   const systemPromptRef = useRef('')
   const contextRef = useRef(null)
   const modeRef = useRef(sessionMode)
+  const abortControllerRef = useRef(null)
 
   // Read Ask Max params
   const askMaxQuestion = searchParams.get('question')
@@ -43,6 +47,8 @@ export default function TutorPage() {
   // ── Boot ───────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) return
+    if (tutorInitialized) return
+    tutorInitialized = true
     buildTutorContext(user.id).then((ctx) => {
       setContext(ctx)
       contextRef.current = ctx
@@ -64,6 +70,14 @@ export default function TutorPage() {
       }
     })
   }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset flag on unmount so navigating away and back re-initializes
+  useEffect(() => {
+    return () => {
+      tutorInitialized = false
+      abortControllerRef.current?.abort()
+    }
+  }, [])
 
   // ── Welcome message ────────────────────────────────────────────────────────
   function fireWelcome(ctx, prompt) {
@@ -107,14 +121,19 @@ export default function TutorPage() {
 
   // ── Send message ───────────────────────────────────────────────────────────
   const sendMessage = useCallback((text) => {
+    if (isStreaming) return
     if (text === '__reset__') { resetSession(); return }
-    if (!text.trim() || isStreaming) return
+    if (!text.trim()) return
 
     const userMsg = { id: mkId(), role: 'user', content: text }
     const asstMsg = { id: mkId(), role: 'assistant', content: '' }
 
     setMessages((prev) => [...prev, userMsg, asstMsg])
     setIsStreaming(true)
+
+    abortControllerRef.current?.abort()
+    const controller = new AbortController()
+    abortControllerRef.current = controller
 
     // Build trimmed history for the API (no drill/rationale card entries)
     setMessages((prev) => {
@@ -125,6 +144,7 @@ export default function TutorPage() {
       streamTutorResponse({
         messages: [...history, userMsg],
         systemPrompt: systemPromptRef.current,
+        signal: controller.signal,
         onChunk: (chunk) => {
           setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, content: m.content + chunk } : m))
         },
