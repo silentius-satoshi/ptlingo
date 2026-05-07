@@ -16,6 +16,7 @@ import SubmissionsPage from './pages/SubmissionsPage'
 import NotesPage from './pages/NotesPage'
 import PerformancePage from './pages/PerformancePage'
 import AchievementsPage from './pages/AchievementsPage'
+import TutorPage from './pages/TutorPage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
 
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="question-bank" element={<QuestionBankPage />} />
           <Route path="performance" element={<PerformancePage />} />
           <Route path="achievements" element={<AchievementsPage />} />
+          <Route path="tutor" element={<TutorPage />} />
           <Route path="exam/:examId/start" element={<MockExamStartPage />} />
         </Route>
 
