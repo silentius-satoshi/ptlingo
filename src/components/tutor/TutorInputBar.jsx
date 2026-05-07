@@ -28,7 +28,7 @@ export default function TutorInputBar({ onSend, isStreaming, context, injectedTe
   }, [value, isStreaming, onSend])
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.repeat) {
       e.preventDefault()
       handleSend()
     }
@@ -85,6 +85,7 @@ export default function TutorInputBar({ onSend, isStreaming, context, injectedTe
           style={{ minHeight: 40, maxHeight: 120 }}
         />
         <button
+          type="button"
           onClick={handleSend}
           disabled={!value.trim() || isStreaming}
           className="w-9 h-9 flex-shrink-0 rounded-xl bg-teal-600 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-teal-700 transition-colors"

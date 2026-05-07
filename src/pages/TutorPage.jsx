@@ -36,6 +36,7 @@ export default function TutorPage() {
   const contextRef = useRef(null)
   const modeRef = useRef(sessionMode)
   const abortControllerRef = useRef(null)
+  const isSendingRef = useRef(false)
 
   // Read Ask Max params
   const askMaxQuestion = searchParams.get('question')
@@ -121,55 +122,63 @@ export default function TutorPage() {
 
   // ── Send message ───────────────────────────────────────────────────────────
   const sendMessage = useCallback((text) => {
-    if (isStreaming) return
-    if (text === '__reset__') { resetSession(); return }
     if (!text.trim()) return
+    if (text === '__reset__') { resetSession(); return }
+    if (isSendingRef.current) return   // synchronous ref — can't be bypassed by async setState
+    isSendingRef.current = true
 
-    const userMsg = { id: mkId(), role: 'user', content: text }
-    const asstMsg = { id: mkId(), role: 'assistant', content: '' }
+    try {
+      const userMsg = { id: mkId(), role: 'user', content: text }
+      const asstMsg = { id: mkId(), role: 'assistant', content: '' }
 
-    setMessages((prev) => [...prev, userMsg, asstMsg])
-    setIsStreaming(true)
+      setMessages((prev) => [...prev, userMsg, asstMsg])
+      setIsStreaming(true)
 
-    abortControllerRef.current?.abort()
-    const controller = new AbortController()
-    abortControllerRef.current = controller
+      abortControllerRef.current?.abort()
+      const controller = new AbortController()
+      abortControllerRef.current = controller
 
-    // Build trimmed history for the API (no drill/rationale card entries)
-    setMessages((prev) => {
-      const history = prev
-        .filter((m) => m.role === 'user' || (m.role === 'assistant' && m.content && !m.type))
-        .slice(-30)
+      // Build trimmed history for the API (no drill/rationale card entries)
+      setMessages((prev) => {
+        const history = prev
+          .filter((m) => m.role === 'user' || (m.role === 'assistant' && m.content && !m.type))
+          .slice(-30)
 
-      streamTutorResponse({
-        messages: [...history, userMsg],
-        systemPrompt: systemPromptRef.current,
-        signal: controller.signal,
-        onChunk: (chunk) => {
-          setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, content: m.content + chunk } : m))
-        },
-        onDone: () => {
-          setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, type: undefined } : m))
-          setIsStreaming(false)
-          if (modeRef.current === 'drill') {
-            setDrillIndex((idx) => {
-              injectNextDrillQuestion(idx + 1)
-              return idx + 1
-            })
-          }
-        },
-        onError: (err) => {
-          setMessages((p) => p.map((m) => m.id === asstMsg.id
-            ? { ...m, content: `Error: ${err.message}`, type: 'error' }
-            : m
-          ))
-          setIsStreaming(false)
-        },
+        streamTutorResponse({
+          messages: [...history, userMsg],
+          systemPrompt: systemPromptRef.current,
+          signal: controller.signal,
+          onChunk: (chunk) => {
+            setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, content: m.content + chunk } : m))
+          },
+          onDone: () => {
+            setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, type: undefined } : m))
+            setIsStreaming(false)
+            isSendingRef.current = false
+            if (modeRef.current === 'drill') {
+              setDrillIndex((idx) => {
+                injectNextDrillQuestion(idx + 1)
+                return idx + 1
+              })
+            }
+          },
+          onError: (err) => {
+            setMessages((p) => p.map((m) => m.id === asstMsg.id
+              ? { ...m, content: `Error: ${err.message}`, type: 'error' }
+              : m
+            ))
+            setIsStreaming(false)
+            isSendingRef.current = false
+          },
+        })
+
+        return prev
       })
-
-      return prev
-    })
-  }, [isStreaming]) // eslint-disable-line react-hooks/exhaustive-deps
+    } catch {
+      isSendingRef.current = false
+      setIsStreaming(false)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Drill injection ────────────────────────────────────────────────────────
   function injectNextDrillQuestion(idx) {
