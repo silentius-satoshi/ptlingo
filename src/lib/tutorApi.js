@@ -1,37 +1,36 @@
 export async function streamTutorResponse({ messages, systemPrompt, onChunk, onDone, onError }) {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
-  if (!apiKey) {
-    onError(new Error('VITE_ANTHROPIC_API_KEY is not set in .env.local'))
-    return
-  }
-
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type':                              'application/json',
-        'x-api-key':                                 apiKey,
-        'anthropic-version':                         '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model:      'claude-sonnet-4-6',
-        max_tokens: 1500,
-        stream:     true,
-        system:     systemPrompt,
-        messages:   messages
-          .filter((m) => m.role === 'user' || m.role === 'assistant')
-          .filter((m) => m.content)
-          .map((m) => ({ role: m.role, content: m.content })),
-      }),
-    })
+    const response = await fetch(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'NPTE Prep AI Tutor',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-3-flash-preview',
+          max_tokens: 1500,
+          stream: true,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages
+              .filter((m) => m.role === 'user' || m.role === 'assistant')
+              .filter((m) => m.content)
+              .map((m) => ({ role: m.role, content: m.content })),
+          ],
+        }),
+      }
+    )
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error(err?.error?.message || `API error ${res.status}`)
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}))
+      throw new Error(err.error?.message || `OpenRouter error ${response.status}`)
     }
 
-    const reader = res.body.getReader()
+    const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
 
@@ -49,10 +48,8 @@ export async function streamTutorResponse({ messages, systemPrompt, onChunk, onD
         if (data === '[DONE]') { onDone(); return }
         try {
           const parsed = JSON.parse(data)
-          if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
-            onChunk(parsed.delta.text)
-          }
-          if (parsed.type === 'message_stop') { onDone(); return }
+          const chunk = parsed.choices?.[0]?.delta?.content
+          if (chunk) onChunk(chunk)
         } catch { /* skip malformed SSE lines */ }
       }
     }
