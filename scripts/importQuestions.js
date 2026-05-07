@@ -85,9 +85,21 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
   process.exit(1)
 }
 
-const [,, mdPath] = process.argv
+// Parse CLI args — file path + optional --subject override
+const rawArgs = process.argv.slice(2)
+let subjectOverride = null
+const positional = []
+for (let i = 0; i < rawArgs.length; i++) {
+  if (rawArgs[i] === '--subject') {
+    subjectOverride = rawArgs[++i] ?? null
+  } else if (!rawArgs[i].startsWith('--')) {
+    positional.push(rawArgs[i])
+  }
+}
+const mdPath = positional[0]
+
 if (!mdPath) {
-  console.error('Usage: node scripts/importQuestions.js <path-to-markdown>')
+  console.error('Usage: node scripts/importQuestions.js <path-to-markdown> [--subject <Subject>]')
   process.exit(1)
 }
 
@@ -397,6 +409,11 @@ async function main() {
   const { examSeries, hasSectionHeaders, questions } = parsed
   const fmt = hasSectionHeaders ? 'Format B (section headers)' : 'Format A (continuous)'
   console.log(`Parsed ${questions.length} question(s) — "${examSeries}" [${fmt}]`)
+
+  if (subjectOverride) {
+    console.log(`Subject override: "${subjectOverride}" (applied to all rows)`)
+    for (const q of questions) q.subject = subjectOverride
+  }
 
   if (questions.length === 0) {
     console.error('No questions parsed — check your markdown format.')
