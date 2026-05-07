@@ -37,6 +37,9 @@ export default function TutorPage() {
   const modeRef = useRef(sessionMode)
   const abortControllerRef = useRef(null)
   const isSendingRef = useRef(false)
+  const messagesRef = useRef([])
+  // Keep ref in sync every render so sendMessage can read current messages without a closure
+  messagesRef.current = messages
 
   // Read Ask Max params
   const askMaxQuestion = searchParams.get('question')
@@ -131,6 +134,12 @@ export default function TutorPage() {
       const userMsg = { id: mkId(), role: 'user', content: text }
       const asstMsg = { id: mkId(), role: 'assistant', content: '' }
 
+      // Snapshot history BEFORE adding the new messages — outside any setMessages updater
+      // to prevent React StrictMode from double-invoking the streamTutorResponse side effect
+      const history = messagesRef.current
+        .filter((m) => m.role === 'user' || (m.role === 'assistant' && m.content && !m.type))
+        .slice(-30)
+
       setMessages((prev) => [...prev, userMsg, asstMsg])
       setIsStreaming(true)
 
@@ -138,41 +147,32 @@ export default function TutorPage() {
       const controller = new AbortController()
       abortControllerRef.current = controller
 
-      // Build trimmed history for the API (no drill/rationale card entries)
-      setMessages((prev) => {
-        const history = prev
-          .filter((m) => m.role === 'user' || (m.role === 'assistant' && m.content && !m.type))
-          .slice(-30)
-
-        streamTutorResponse({
-          messages: [...history, userMsg],
-          systemPrompt: systemPromptRef.current,
-          signal: controller.signal,
-          onChunk: (chunk) => {
-            setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, content: m.content + chunk } : m))
-          },
-          onDone: () => {
-            setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, type: undefined } : m))
-            setIsStreaming(false)
-            isSendingRef.current = false
-            if (modeRef.current === 'drill') {
-              setDrillIndex((idx) => {
-                injectNextDrillQuestion(idx + 1)
-                return idx + 1
-              })
-            }
-          },
-          onError: (err) => {
-            setMessages((p) => p.map((m) => m.id === asstMsg.id
-              ? { ...m, content: `Error: ${err.message}`, type: 'error' }
-              : m
-            ))
-            setIsStreaming(false)
-            isSendingRef.current = false
-          },
-        })
-
-        return prev
+      streamTutorResponse({
+        messages: [...history, userMsg],
+        systemPrompt: systemPromptRef.current,
+        signal: controller.signal,
+        onChunk: (chunk) => {
+          setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, content: m.content + chunk } : m))
+        },
+        onDone: () => {
+          setMessages((p) => p.map((m) => m.id === asstMsg.id ? { ...m, type: undefined } : m))
+          setIsStreaming(false)
+          isSendingRef.current = false
+          if (modeRef.current === 'drill') {
+            setDrillIndex((idx) => {
+              injectNextDrillQuestion(idx + 1)
+              return idx + 1
+            })
+          }
+        },
+        onError: (err) => {
+          setMessages((p) => p.map((m) => m.id === asstMsg.id
+            ? { ...m, content: `Error: ${err.message}`, type: 'error' }
+            : m
+          ))
+          setIsStreaming(false)
+          isSendingRef.current = false
+        },
       })
     } catch {
       isSendingRef.current = false
