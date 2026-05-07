@@ -1,5 +1,5 @@
 const MODES = [
-  { id: 'free',      label: 'Free Chat',           sub: 'Ask anything, no structure' },
+  { id: 'free',      label: 'Open Chat',           sub: 'Ask anything, no structure' },
   { id: 'drill',     label: 'Drill Mode',           sub: 'Quiz on weak questions' },
   { id: 'rationale', label: 'Rationale Deep Dive',  sub: 'Review missed questions' },
   { id: 'concept',   label: 'Concept Explainer',    sub: 'Learn any PT concept' },

@@ -46,7 +46,7 @@ const useGamificationStore = create((set, get) => ({
         streak:         row.streak          ?? 0,
         longestStreak:  row.longest_streak  ?? 0,
         hearts:         row.hearts          ?? 5,
-        subjectMastery: row.subject_mastery ?? {},
+        subjectMastery: coerceMastery(row.subject_mastery),
         dailyMissions:  missions,
         achievements:   row.achievements    ?? [],
         loaded: true,
@@ -134,9 +134,10 @@ const useGamificationStore = create((set, get) => ({
   },
 
   // ── Subject Mastery ───────────────────────────────────────────────────────
-  updateSubjectMastery: async (subject, pct) => {
+  updateSubjectMastery: async (subject, data) => {
     const { userId, subjectMastery } = get()
-    const updated = { ...subjectMastery, [subject]: pct }
+    const entry = typeof data === 'number' ? { pct: data, correct: 0, total: 0 } : data
+    const updated = { ...subjectMastery, [subject]: entry }
     set({ subjectMastery: updated })
     await upsertGamification(userId, { subject_mastery: updated })
     get().checkAchievements()
@@ -217,9 +218,10 @@ const useGamificationStore = create((set, get) => ({
     if (streak >= 30) earn('streak_30')
 
     // Mastery
-    const msk   = subjectMastery['Musculoskeletal']         ?? 0
-    const neuro = subjectMastery['Neuromuscular']           ?? 0
-    const vals  = Object.values(subjectMastery)
+    const getPct = (v) => typeof v === 'number' ? v : (v?.pct ?? 0)
+    const msk   = getPct(subjectMastery['Musculoskeletal'])
+    const neuro = getPct(subjectMastery['Neuromuscular'])
+    const vals  = Object.values(subjectMastery).map(getPct)
     const allAbove60 = vals.length >= 5 && vals.every((v) => v >= 60)
     const allAbove70 = vals.length >= 5 && vals.every((v) => v >= 70)
 
@@ -237,6 +239,14 @@ const useGamificationStore = create((set, get) => ({
     if (total >= 1000) get().unlockAchievement('q1000')
   },
 }))
+
+function coerceMastery(raw) {
+  const out = {}
+  Object.entries(raw ?? {}).forEach(([subj, val]) => {
+    out[subj] = typeof val === 'number' ? { pct: val, correct: 0, total: 0 } : val
+  })
+  return out
+}
 
 function getPreviousDay() {
   const d = new Date()

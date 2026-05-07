@@ -85,7 +85,11 @@ export async function fetchAccuracyBySubject(userId) {
 
   const result = {}
   Object.entries(acc).forEach(([subj, v]) => {
-    result[subj] = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0
+    result[subj] = {
+      pct: v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0,
+      correct: v.correct,
+      total: v.total,
+    }
   })
   return result
 }

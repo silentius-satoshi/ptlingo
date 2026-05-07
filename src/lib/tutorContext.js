@@ -155,7 +155,7 @@ export function formatSystemPrompt(context, sessionMode) {
   }
 
   const modeDesc = {
-    free:      'Free Chat — answer any question, no rigid structure.',
+    free:      'Open Chat — answer any question, no rigid structure.',
     drill:     'Drill Mode — present one multiple-choice question at a time. Wait for the student to answer before explaining rationale. Never reveal the answer early.',
     rationale: 'Rationale Deep Dive — walk through missed questions together. Ask what their reasoning was, then address the specific misconception.',
     concept:   'Concept Explainer — teach any PT concept from scratch using mnemonics, clinical examples, and analogies.',

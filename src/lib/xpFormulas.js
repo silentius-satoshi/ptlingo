@@ -48,3 +48,26 @@ export const MASTERY_STROKE = {
   amber: '#f59e0b',
   coral: '#ef4444',
 }
+
+export function questionsToNextBracket(correct, total) {
+  if (total === 0) return null
+  const currentPct = (correct / total) * 100
+  if (currentPct >= 90) return null
+  const nextThreshold = Math.floor(currentPct / 10) * 10 + 10
+  const N = Math.ceil(
+    (nextThreshold * total - 100 * correct) / (100 - nextThreshold)
+  )
+  if (N <= 0) return 1
+  if (N > 200) return null
+  return N
+}
+
+export function nextBracketLabel(correct, total) {
+  if (total === 0) return 'Answer questions to start tracking'
+  const currentPct = (correct / total) * 100
+  if (currentPct >= 90) return 'Mastered'
+  const N = questionsToNextBracket(correct, total)
+  if (N === null) return null
+  const nextThreshold = Math.floor(currentPct / 10) * 10 + 10
+  return `${N} correct to reach ${nextThreshold}%`
+}

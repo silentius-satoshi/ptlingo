@@ -1,14 +1,31 @@
 import { useNavigate } from 'react-router-dom'
 
-const MISSION_ROUTES = {
-  questions: '/question-bank',
-  tutor:     '/tutor',
-  review:    '/performance',
-}
-
 export default function MissionCard({ mission, compact = false }) {
   const navigate = useNavigate()
   const pct = mission.target > 0 ? Math.min(100, Math.round((mission.progress / mission.target) * 100)) : 0
+
+  function handleClick() {
+    if (mission.completed) return
+    switch (mission.type) {
+      case 'questions': {
+        const p = new URLSearchParams()
+        if (mission.subject) p.set('subject', mission.subject)
+        p.set('mode', 'practice')
+        p.set('count', String(mission.target))
+        p.set('difficulty', 'all')
+        navigate(`/question-bank?${p.toString()}`)
+        break
+      }
+      case 'tutor':
+        navigate('/tutor')
+        break
+      case 'review':
+        navigate('/tutor?mode=drill')
+        break
+      default:
+        break
+    }
+  }
 
   if (compact) {
     return (
@@ -30,11 +47,11 @@ export default function MissionCard({ mission, compact = false }) {
 
   return (
     <button
-      onClick={() => navigate(MISSION_ROUTES[mission.type] ?? '/')}
-      className={`flex flex-col gap-3 p-4 rounded-2xl border-2 text-left transition-all hover:shadow-md ${
+      onClick={handleClick}
+      className={`flex flex-col gap-3 p-4 rounded-2xl border-2 text-left transition-all ${
         mission.completed
-          ? 'border-teal-300 bg-teal-50 dark:border-teal-700 dark:bg-teal-900/10'
-          : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 hover:border-teal-300 dark:hover:border-teal-700'
+          ? 'border-teal-300 bg-teal-50 dark:border-teal-700 dark:bg-teal-900/10 cursor-not-allowed opacity-70'
+          : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md cursor-pointer'
       }`}
     >
       {/* Header */}

@@ -42,7 +42,7 @@ export default function ThePathPage() {
 
   // Lock logic: Mock Exam 1 unlocks when all subjects ≥ 60%
   const allAbove60 = PATH_SUBJECTS.slice(0, 5).every(
-    (s) => (subjectMastery[s] ?? 0) >= 60,
+    (s) => ((subjectMastery[s]?.pct ?? subjectMastery[s] ?? 0)) >= 60,
   )
 
   return (
@@ -97,7 +97,9 @@ export default function ThePathPage() {
             <div key={subject}>
               <PathNode
                 subject={subject}
-                masteryPct={subjectMastery[subject] ?? 0}
+                masteryPct={subjectMastery[subject]?.pct ?? subjectMastery[subject] ?? 0}
+                correct={subjectMastery[subject]?.correct ?? 0}
+                total={subjectMastery[subject]?.total ?? 0}
                 onClick={() => navigate(`/question-bank?subject=${encodeURIComponent(subject)}`)}
               />
               {i < PATH_SUBJECTS.length - 1 && (

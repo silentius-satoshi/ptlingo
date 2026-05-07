@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import Button from '../components/shared/Button'
@@ -43,6 +43,12 @@ function Chip({ label, selected, onClick }) {
 export default function QuestionBankPage() {
   const { user } = useAuthStore()
   const navigate  = useNavigate()
+  const [searchParams] = useSearchParams()
+  const prefilledSubject    = searchParams.get('subject')
+  const prefilledMode       = searchParams.get('mode')
+  const prefilledCount      = searchParams.get('count')
+  const prefilledDifficulty = searchParams.get('difficulty')
+  const filtersRef = useRef(null)
 
   const [allQuestions, setAllQuestions] = useState([])
   const [loadingQ, setLoadingQ]         = useState(true)
@@ -54,6 +60,8 @@ export default function QuestionBankPage() {
   const [useCustom, setUseCustom]       = useState(false)
   const [starting, setStarting]         = useState(false)
   const [error, setError]               = useState('')
+  const [filterHighlight, setFilterHighlight] = useState(false)
+  const [missionBanner, setMissionBanner] = useState(null)
 
   useEffect(() => {
     supabase
@@ -69,6 +77,48 @@ export default function QuestionBankPage() {
     () => [...new Set(allQuestions.map((q) => q.subject).filter(Boolean))].sort(),
     [allQuestions],
   )
+
+  // Apply prefilled params from URL once questions are loaded
+  useEffect(() => {
+    if (loadingQ) return
+    const timers = []
+
+    if (prefilledMode === 'practice' || prefilledMode === 'timed') {
+      setMode(prefilledMode)
+    }
+
+    if (prefilledSubject && subjects.includes(prefilledSubject)) {
+      setSelectedSubjects([prefilledSubject])
+      setFilterHighlight(true)
+      filtersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      timers.push(setTimeout(() => setFilterHighlight(false), 1400))
+    }
+
+    if (prefilledDifficulty && prefilledDifficulty !== 'all') {
+      const cap = prefilledDifficulty.charAt(0).toUpperCase() + prefilledDifficulty.slice(1)
+      if (DIFFICULTIES.includes(cap)) setSelectedDiffs([cap])
+    }
+
+    if (prefilledCount) {
+      const n = parseInt(prefilledCount)
+      if (!isNaN(n) && n > 0) {
+        if (COUNT_PRESETS.includes(n)) {
+          setCountPreset(n)
+          setUseCustom(false)
+        } else {
+          setCustomCount(String(n))
+          setUseCustom(true)
+        }
+      }
+    }
+
+    if (prefilledCount && prefilledSubject) {
+      setMissionBanner(`Mission: Answer ${prefilledCount} ${prefilledSubject} questions`)
+      timers.push(setTimeout(() => setMissionBanner(null), 4000))
+    }
+
+    return () => timers.forEach(clearTimeout)
+  }, [loadingQ]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const matchingQuestions = useMemo(
     () =>
@@ -153,6 +203,20 @@ export default function QuestionBankPage() {
         </p>
       </div>
 
+      {missionBanner && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{missionBanner}</p>
+          <button
+            onClick={() => setMissionBanner(null)}
+            className="flex-shrink-0 text-amber-500 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-200 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Mode */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">
@@ -175,7 +239,14 @@ export default function QuestionBankPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 mb-5 space-y-5">
+      <div
+        ref={filtersRef}
+        className={`bg-white dark:bg-slate-900 rounded-2xl border p-6 mb-5 space-y-5 transition-all duration-300 ${
+          filterHighlight
+            ? 'border-teal-400 dark:border-teal-500 ring-2 ring-teal-300 dark:ring-teal-700'
+            : 'border-slate-200 dark:border-slate-700'
+        }`}
+      >
         <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
           Filters
         </p>

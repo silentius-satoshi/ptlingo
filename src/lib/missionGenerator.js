@@ -6,7 +6,9 @@ function todayStr() {
 
 export async function generateDailyMissions(userId, subjectMastery) {
   const plan   = await fetchActiveStudyPlan(userId)
-  const sorted = Object.entries(subjectMastery).sort((a, b) => a[1] - b[1])
+  const sorted = Object.entries(subjectMastery)
+    .map(([s, v]) => [s, typeof v === 'number' ? v : (v?.pct ?? 0)])
+    .sort((a, b) => a[1] - b[1])
 
   const weakest       = sorted[0]       ?? ['Musculoskeletal', 0]
   const secondWeakest = sorted[1]       ?? ['Neuromuscular', 0]

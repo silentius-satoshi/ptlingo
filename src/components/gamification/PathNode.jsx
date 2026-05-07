@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-import { masteryColor, MASTERY_STROKE } from '../../lib/xpFormulas'
+import { masteryColor, MASTERY_STROKE, nextBracketLabel } from '../../lib/xpFormulas'
 
 const SIZE = 64
 const R    = (SIZE - 8) / 2
 const CIRC = 2 * Math.PI * R
 
-export default function PathNode({ subject, masteryPct = 0, isFocus = false, isLocked = false, onClick }) {
-  const color  = isLocked ? 'slate' : masteryColor(masteryPct)
-  const stroke = isLocked ? '#94a3b8' : MASTERY_STROKE[color]
-  const filled = CIRC * (masteryPct / 100)
-  const abbr   = subject.split(/[\s/]/)[0].slice(0, 3).toUpperCase()
+export default function PathNode({ subject, masteryPct = 0, correct = 0, total = 0, isFocus = false, isLocked = false, onClick }) {
+  const color        = isLocked ? 'slate' : masteryColor(masteryPct)
+  const stroke       = isLocked ? '#94a3b8' : MASTERY_STROKE[color]
+  const filled       = CIRC * (masteryPct / 100)
+  const abbr         = subject.split(/[\s/]/)[0].slice(0, 3).toUpperCase()
+  const bracketLabel = nextBracketLabel(correct, total)
 
   return (
     <button
@@ -66,10 +67,8 @@ export default function PathNode({ subject, masteryPct = 0, isFocus = false, isL
               </div>
               <span className="text-xs font-medium text-slate-500 dark:text-slate-400 tabular-nums">{masteryPct}%</span>
             </div>
-            {masteryPct < 100 && (
-              <p className="text-[10px] text-slate-400 dark:text-slate-500">
-                {Math.ceil((100 - masteryPct) / 10) * 10 - (100 - masteryPct)} questions to next 10%
-              </p>
+            {bracketLabel && (
+              <p className="text-[10px] text-slate-400 dark:text-slate-500">{bracketLabel}</p>
             )}
           </>
         )}
