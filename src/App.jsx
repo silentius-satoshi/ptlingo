@@ -17,6 +17,7 @@ import NotesPage from './pages/NotesPage'
 import PerformancePage from './pages/PerformancePage'
 import AchievementsPage from './pages/AchievementsPage'
 import TutorPage from './pages/TutorPage'
+import ProfilePage from './pages/ProfilePage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
 import IosInstallHint from './components/IosInstallHint'
@@ -78,6 +79,7 @@ export default function App() {
           <Route path="achievements" element={<AchievementsPage />} />
           <Route path="tutor" element={<TutorPage />} />
           <Route path="exam/:examId/start" element={<MockExamStartPage />} />
+          <Route path="profile" element={<ProfilePage />} />
         </Route>
 
         {/* Full-screen routes — auth required, no sidebar */}

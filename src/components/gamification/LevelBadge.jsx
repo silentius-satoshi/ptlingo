@@ -38,7 +38,7 @@ export default function LevelBadge({ level, xp, compact = false }) {
         <span className={`text-[10px] font-semibold ${titleColor}`}>{titleInfo.title}</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="flex-1 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+        <div className="flex-1 h-2 rounded-full bg-slate-700 overflow-hidden">
           <div
             className={`h-full rounded-full ${barColor} transition-all duration-500`}
             style={{ width: `${pct}%` }}

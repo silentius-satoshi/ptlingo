@@ -2,7 +2,10 @@ import { create } from 'zustand'
 
 const getInitialDarkMode = () => {
   try {
-    const dark = localStorage.getItem('darkMode') === 'true'
+    const stored = localStorage.getItem('darkMode')
+    const dark = stored !== null
+      ? stored === 'true'
+      : window.matchMedia('(prefers-color-scheme: dark)').matches
     if (dark) document.documentElement.classList.add('dark')
     return dark
   } catch {

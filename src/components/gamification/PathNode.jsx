@@ -1,15 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-import { masteryColor, MASTERY_STROKE, nextBracketLabel } from '../../lib/xpFormulas'
+import { nextBracketLabel } from '../../lib/xpFormulas'
+import { getSystemColors } from '../../lib/bodySystemColors'
 
 const SIZE = 64
 const R    = (SIZE - 8) / 2
 const CIRC = 2 * Math.PI * R
 
 export default function PathNode({ subject, masteryPct = 0, correct = 0, total = 0, isFocus = false, isLocked = false, onClick }) {
-  const color        = isLocked ? 'slate' : masteryColor(masteryPct)
-  const stroke       = isLocked ? '#94a3b8' : MASTERY_STROKE[color]
-  const filled       = CIRC * (masteryPct / 100)
-  const abbr         = subject.split(/[\s/]/)[0].slice(0, 3).toUpperCase()
+  const sys    = getSystemColors(subject)
+  const stroke = isLocked ? '#94a3b8' : sys.hex
+  const filled = CIRC * (masteryPct / 100)
+  const abbr   = subject.split(/[\s/]/)[0].slice(0, 3).toUpperCase()
   const bracketLabel = nextBracketLabel(correct, total)
 
   return (
@@ -59,7 +60,7 @@ export default function PathNode({ subject, masteryPct = 0, correct = 0, total =
         ) : (
           <>
             <div className="flex items-center gap-2 mb-1">
-              <div className="flex-1 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+              <div className="flex-1 h-2 rounded-full bg-slate-700 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{ width: `${masteryPct}%`, backgroundColor: stroke }}

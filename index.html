@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-title" content="NPTE" />
     <meta name="theme-color" content="#080d18" />
     <meta name="mobile-web-app-capable" content="yes" />
-  <script>try{if(localStorage.getItem('darkMode')==='true')document.documentElement.classList.add('dark')}catch{}</script>
+  <script>try{const s=localStorage.getItem('darkMode');const d=s!==null?s==='true':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch{}</script>
   </head>
   <body>
     <div id="root"></div>
