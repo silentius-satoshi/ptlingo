@@ -19,6 +19,7 @@ import AchievementsPage from './pages/AchievementsPage'
 import TutorPage from './pages/TutorPage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
+import IosInstallHint from './components/IosInstallHint'
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuthStore()
@@ -89,6 +90,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <XPToast />
+      <IosInstallHint />
     </BrowserRouter>
   )
 }
