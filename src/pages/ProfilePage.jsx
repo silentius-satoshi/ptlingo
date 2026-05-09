@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Trophy, Flame, Zap, Heart, ShieldCheck, ShieldOff } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trophy, Flame, Zap, Heart, ShieldCheck, ShieldOff, KeyRound, Fingerprint, Trash2 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import useGamificationStore from '../stores/gamificationStore'
 import { supabase } from '../lib/supabase'
 import { getActivePlan } from '../lib/studyPlanStorage'
 import { useMFA } from '../hooks/useMFA'
+import { usePasskey } from '../hooks/usePasskey'
+import { useBiometricLock } from '../hooks/useBiometricLock'
 import MFAEnrollModal from '../components/auth/MFAEnrollModal'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -196,6 +198,8 @@ export default function ProfilePage() {
   const { user } = useAuthStore()
   const { streak, xp, hearts, achievements } = useGamificationStore()
   const { listFactors, unenroll } = useMFA()
+  const { passkeys, loading: passkeyLoading, error: passkeyError, register: registerPasskey, remove: removePasskey } = usePasskey()
+  const { enabled: bioEnabled, setEnabled: setBioEnabled, timeoutMinutes: bioTimeout, setTimeoutMinutes: setBioTimeout } = useBiometricLock()
   const [activePlan, setActivePlan] = useState(null)
   const [planLoading, setPlanLoading] = useState(true)
   const [mfaEnabled, setMfaEnabled] = useState(false)
@@ -357,6 +361,99 @@ export default function ProfilePage() {
                         Set Up
                       </button>
                     )}
+                  </div>
+                </div>
+
+                {/* Passkeys row */}
+                <div className="px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      <KeyRound className={`w-5 h-5 ${passkeys.length > 0 ? 'text-teal-400' : 'text-slate-500'}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-white">Passkeys</p>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {passkeys.length === 0
+                          ? 'Sign in with Face ID or Touch ID — no password needed.'
+                          : `${passkeys.length} passkey${passkeys.length > 1 ? 's' : ''} registered.`}
+                      </p>
+                      {passkeyError && (
+                        <p className="text-xs text-red-400 mt-1">{passkeyError}</p>
+                      )}
+                    </div>
+                    <div className="flex-shrink-0">
+                      <button
+                        onClick={registerPasskey}
+                        disabled={passkeyLoading}
+                        className="text-xs text-teal-400 hover:text-teal-300 font-medium disabled:opacity-50 transition-colors"
+                      >
+                        {passkeyLoading ? 'Working…' : 'Add Passkey'}
+                      </button>
+                    </div>
+                  </div>
+                  {passkeys.length > 0 && (
+                    <ul className="mt-3 space-y-1.5 pl-8">
+                      {passkeys.map((p) => (
+                        <li key={p.id} className="flex items-center justify-between text-xs">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-slate-300 truncate">{p.friendly_name || 'Passkey'}</p>
+                            <p className="text-slate-500">
+                              Added {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removePasskey(p.id)}
+                            disabled={passkeyLoading}
+                            className="text-slate-500 hover:text-red-400 transition-colors disabled:opacity-50 ml-2"
+                            aria-label="Remove passkey"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {/* Biometric Lock row */}
+                <div className="px-4 py-4 flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Fingerprint className={`w-5 h-5 ${bioEnabled ? 'text-teal-400' : 'text-slate-500'}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white">Biometric App Lock</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {bioEnabled
+                        ? `App locks after ${bioTimeout} min of inactivity.`
+                        : passkeys.length === 0
+                          ? 'Register a passkey first to enable.'
+                          : 'Lock the app automatically when idle.'}
+                    </p>
+                    {bioEnabled && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <label className="text-xs text-slate-400">Timeout:</label>
+                        <select
+                          value={bioTimeout}
+                          onChange={(e) => setBioTimeout(Number(e.target.value))}
+                          className="text-xs bg-slate-700 text-white rounded px-2 py-1 border border-slate-600 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                        >
+                          {[1, 2, 5, 10, 15, 30].map((m) => (
+                            <option key={m} value={m}>{m} min</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0">
+                    <button
+                      onClick={() => setBioEnabled(!bioEnabled)}
+                      disabled={!bioEnabled && passkeys.length === 0}
+                      className={`text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${
+                        bioEnabled ? 'text-red-400 hover:text-red-300' : 'text-teal-400 hover:text-teal-300'
+                      }`}
+                    >
+                      {bioEnabled ? 'Disable' : 'Enable'}
+                    </button>
                   </div>
                 </div>
               </div>

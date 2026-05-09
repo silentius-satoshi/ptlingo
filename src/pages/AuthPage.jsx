@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import Button from '../components/shared/Button'
 import GoogleSignInButton from '../components/auth/GoogleSignInButton'
+import PasskeyLoginButton from '../components/auth/PasskeyLoginButton'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
@@ -52,6 +53,9 @@ export default function AuthPage() {
 
         {/* Card */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
+          {/* Passkey login — signin mode only, hidden on unsupported browsers */}
+          {mode === 'signin' && <PasskeyLoginButton email={email} />}
+
           {/* Google OAuth */}
           <div className="mb-5">
             <GoogleSignInButton />

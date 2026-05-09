@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.93.0",
+    "@simplewebauthn/browser": "^9.0.1",
     "@supabase/supabase-js": "^2.43.4",
     "@tiptap/extension-highlight": "^3.22.5",
     "@tiptap/extension-placeholder": "^3.22.5",
