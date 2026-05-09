@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import Button from '../components/shared/Button'
+import GoogleSignInButton from '../components/auth/GoogleSignInButton'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
@@ -51,6 +52,19 @@ export default function AuthPage() {
 
         {/* Card */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-8">
+          {/* Google OAuth */}
+          <div className="mb-5">
+            <GoogleSignInButton />
+            <div className="relative mt-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-slate-700" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white dark:bg-slate-900 px-3 text-xs text-slate-400">or</span>
+              </div>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">

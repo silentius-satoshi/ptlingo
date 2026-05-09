@@ -7,6 +7,7 @@ import useGamificationStore from './stores/gamificationStore'
 import AppLayout from './components/layout/AppLayout'
 import AuthPage from './pages/AuthPage'
 import MFAChallenge from './components/auth/MFAChallenge'
+import AuthCallback from './pages/AuthCallback'
 import ThePathPage from './pages/ThePathPage'
 import QuestionBankPage from './pages/QuestionBankPage'
 import MockExamStartPage from './pages/MockExamStartPage'
@@ -91,6 +92,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* MFA challenge — requires auth but not yet AAL2 */}
         <Route path="/mfa-challenge" element={<RequireAuth><MFAChallenge /></RequireAuth>} />
