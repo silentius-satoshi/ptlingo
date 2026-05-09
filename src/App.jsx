@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import { useAuthStore } from './store/authStore'
@@ -6,6 +6,7 @@ import { useUiStore } from './store/uiStore'
 import useGamificationStore from './stores/gamificationStore'
 import AppLayout from './components/layout/AppLayout'
 import AuthPage from './pages/AuthPage'
+import MFAChallenge from './components/auth/MFAChallenge'
 import ThePathPage from './pages/ThePathPage'
 import QuestionBankPage from './pages/QuestionBankPage'
 import MockExamStartPage from './pages/MockExamStartPage'
@@ -22,11 +23,33 @@ import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
 import IosInstallHint from './components/IosInstallHint'
 
+// Checks user only — used for /mfa-challenge (user exists but may not be AAL2)
 function RequireAuth({ children }) {
   const { user, loading } = useAuthStore()
   const location = useLocation()
   if (loading) return <LoadingSpinner size="lg" className="h-screen" />
   if (!user) return <Navigate to="/auth" state={{ from: location }} replace />
+  return children
+}
+
+// Checks user + MFA assurance level — used for all app routes
+function RequireFullAuth({ children }) {
+  const { user, loading } = useAuthStore()
+  const location = useLocation()
+  const [mfaOk, setMfaOk] = useState(null) // null=checking, true=ok, false=needs-mfa
+
+  useEffect(() => {
+    if (!user || !supabase) { setMfaOk(true); return }
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data, error }) => {
+      if (error || !data) { setMfaOk(true); return } // fail open
+      setMfaOk(data.currentLevel === data.nextLevel)
+    })
+  }, [user])
+
+  if (loading) return <LoadingSpinner size="lg" className="h-screen" />
+  if (!user) return <Navigate to="/auth" state={{ from: location }} replace />
+  if (mfaOk === null) return <LoadingSpinner size="lg" className="h-screen" />
+  if (!mfaOk) return <Navigate to="/mfa-challenge" replace />
   return children
 }
 
@@ -69,8 +92,11 @@ export default function App() {
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
 
+        {/* MFA challenge — requires auth but not yet AAL2 */}
+        <Route path="/mfa-challenge" element={<RequireAuth><MFAChallenge /></RequireAuth>} />
+
         {/* Sidebar app layout */}
-        <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
+        <Route element={<RequireFullAuth><AppLayout /></RequireFullAuth>}>
           <Route index element={<ThePathPage />} />
           <Route path="submissions" element={<SubmissionsPage />} />
           <Route path="notes" element={<NotesPage />} />
@@ -82,8 +108,8 @@ export default function App() {
           <Route path="profile" element={<ProfilePage />} />
         </Route>
 
-        {/* Full-screen routes — auth required, no sidebar */}
-        <Route element={<RequireAuth><Outlet /></RequireAuth>}>
+        {/* Full-screen routes — auth + MFA required, no sidebar */}
+        <Route element={<RequireFullAuth><Outlet /></RequireFullAuth>}>
           <Route path="exam/:sessionId" element={<ExamPage />} />
           <Route path="review/:sessionId" element={<ReviewPage />} />
           <Route path="results/:sessionId" element={<ResultsPage />} />

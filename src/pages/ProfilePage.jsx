@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Trophy, Flame, Zap, Heart } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trophy, Flame, Zap, Heart, ShieldCheck, ShieldOff } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import useGamificationStore from '../stores/gamificationStore'
 import { supabase } from '../lib/supabase'
 import { getActivePlan } from '../lib/studyPlanStorage'
+import { useMFA } from '../hooks/useMFA'
+import MFAEnrollModal from '../components/auth/MFAEnrollModal'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 const EXAM_DATE = new Date('2026-07-29')
@@ -193,8 +195,13 @@ export default function ProfilePage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
   const { streak, xp, hearts, achievements } = useGamificationStore()
+  const { listFactors, unenroll } = useMFA()
   const [activePlan, setActivePlan] = useState(null)
   const [planLoading, setPlanLoading] = useState(true)
+  const [mfaEnabled, setMfaEnabled] = useState(false)
+  const [mfaFactorId, setMfaFactorId] = useState(null)
+  const [mfaLoading, setMfaLoading] = useState(false)
+  const [showMFAModal, setShowMFAModal] = useState(false)
 
   const daysLeft = daysUntil(EXAM_DATE)
   const pct = prepProgress()
@@ -209,6 +216,22 @@ export default function ProfilePage() {
       .catch(() => setActivePlan(null))
       .finally(() => setPlanLoading(false))
   }, [user?.id])
+
+  useEffect(() => {
+    listFactors().then(({ data, error }) => {
+      if (error || !data?.totp?.length) return
+      const verified = data.totp.find((f) => f.status === 'verified')
+      if (verified) { setMfaEnabled(true); setMfaFactorId(verified.id) }
+    })
+  }, [])
+
+  const handleDisableMFA = async () => {
+    if (!mfaFactorId) return
+    setMfaLoading(true)
+    const { error } = await unenroll(mfaFactorId)
+    setMfaLoading(false)
+    if (!error) { setMfaEnabled(false); setMfaFactorId(null) }
+  }
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -298,6 +321,47 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Section G: Security */}
+            <div>
+              <SectionHeader label="Security" />
+              <div className="bg-slate-800 rounded-xl border border-slate-700 divide-y divide-slate-700">
+                <div className="px-4 py-4 flex items-start gap-3">
+                  <div className="mt-0.5">
+                    {mfaEnabled
+                      ? <ShieldCheck className="w-5 h-5 text-teal-400" />
+                      : <ShieldOff className="w-5 h-5 text-slate-500" />
+                    }
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white">Two-Factor Authentication</p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {mfaEnabled
+                        ? 'Your account is protected with an authenticator app.'
+                        : 'Add an extra layer of security to your account.'}
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    {mfaEnabled ? (
+                      <button
+                        onClick={handleDisableMFA}
+                        disabled={mfaLoading}
+                        className="text-xs text-red-400 hover:text-red-300 font-medium disabled:opacity-50 transition-colors"
+                      >
+                        {mfaLoading ? 'Disabling…' : 'Disable'}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowMFAModal(true)}
+                        className="text-xs text-teal-400 hover:text-teal-300 font-medium transition-colors"
+                      >
+                        Set Up
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* ── RIGHT COLUMN: Study Plan + Calendar ── */}
@@ -361,6 +425,19 @@ export default function ProfilePage() {
 
         </div>
       </div>
+
+      <MFAEnrollModal
+        open={showMFAModal}
+        onClose={() => setShowMFAModal(false)}
+        onSuccess={() => {
+          setMfaEnabled(true)
+          // Refresh factor ID for future unenroll
+          listFactors().then(({ data }) => {
+            const verified = data?.totp?.find((f) => f.status === 'verified')
+            if (verified) setMfaFactorId(verified.id)
+          })
+        }}
+      />
     </div>
   )
 }
