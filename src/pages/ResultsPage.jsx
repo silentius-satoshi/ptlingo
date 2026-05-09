@@ -1,11 +1,23 @@
 import { useEffect, useState, useCallback, Fragment, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import { useUiStore } from '../store/uiStore'
 import CountdownRing from '../components/exam/CountdownRing'
 import RationalePanel from '../components/exam/RationalePanel'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import useGamificationStore from '../stores/gamificationStore'
+import { MascotPNG } from '../components/mascot'
+import confetti from 'canvas-confetti'
+
+const statContainerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1 } },
+}
+const statItemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show:   { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -44,10 +56,13 @@ function StatCard({ label, value, color }) {
     slate: 'text-slate-900 dark:text-white',
   }
   return (
-    <div className={`flex-1 min-w-[90px] rounded-xl border p-4 text-center ${bg[color]}`}>
+    <motion.div
+      variants={statItemVariants}
+      className={`flex-1 min-w-[90px] rounded-xl border p-4 text-center ${bg[color]}`}
+    >
       <div className={`text-3xl font-bold tabular-nums ${text[color]}`}>{value}</div>
       <div className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-medium">{label}</div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -149,6 +164,23 @@ export default function ResultsPage() {
       }
     }
   }, [session, awardXP, unlockAchievement])
+
+  // Confetti if score >= 70%
+  useEffect(() => {
+    if (!session) return
+    const pct = Math.round((session.score || 0) * 100)
+    if (pct >= 70) {
+      const t = setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 90,
+          origin: { y: 0.5 },
+          colors: ['#14b8a6', '#22c55e', '#f59e0b'],
+        })
+      }, 600)
+      return () => clearTimeout(t)
+    }
+  }, [session?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset page when filter/sort changes
   useEffect(() => { setPage(0) }, [filter, sortField, sortDir])
@@ -296,6 +328,7 @@ export default function ResultsPage() {
 
           {/* ── Score hero ── */}
           <div className="flex flex-col items-center gap-5">
+            <MascotPNG mascot="sparky" trigger="celebrate" size={120} />
             <CountdownRing total={100} remaining={displayScore} color={scoreColor} size={200} strokeWidth={12}>
               <span className={`text-4xl font-extrabold tabular-nums leading-none ${
                 scoreColor === 'teal'  ? 'text-teal-700 dark:text-teal-400' :
@@ -329,12 +362,17 @@ export default function ResultsPage() {
           </div>
 
           {/* ── Stat cards ── */}
-          <div className="flex gap-3 flex-wrap">
+          <motion.div
+            className="flex gap-3 flex-wrap"
+            variants={statContainerVariants}
+            initial="hidden"
+            animate="show"
+          >
             <StatCard label="Correct"    value={correctCount}    color="green" />
-            <StatCard label="Incorrect"  value={incorrectCount}  color="red" />
+            <StatCard label="Incorrect"  value={incorrectCount}  color="red"   />
             <StatCard label="Unanswered" value={unansweredCount} color="amber" />
             <StatCard label="Marked"     value={marked.length}   color="slate" />
-          </div>
+          </motion.div>
 
           {/* ── Performance by subject (collapsible) ── */}
           <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">

@@ -7,6 +7,7 @@ import { buildDrillQueue } from '../lib/tutorDrillQueue'
 import TutorContextPanel from '../components/tutor/TutorContextPanel'
 import TutorConversation from '../components/tutor/TutorConversation'
 import TutorInputBar from '../components/tutor/TutorInputBar'
+import { MascotPNG, SUBJECT_MASCOT_MAP } from '../components/mascot'
 
 const CHOICE_LETTERS = ['A', 'B', 'C', 'D', 'E']
 
@@ -31,6 +32,7 @@ export default function TutorPage() {
   const [answeredDrillIds, setAnsweredDrillIds] = useState(new Set())
   const [injectedText, setInjectedText] = useState('')
   const [panelOpen, setPanelOpen] = useState(true)
+  const [drillAnswerResult, setDrillAnswerResult] = useState(null)
 
   const systemPromptRef = useRef('')
   const contextRef = useRef(null)
@@ -213,6 +215,9 @@ export default function TutorPage() {
   // ── Drill answer handler ───────────────────────────────────────────────────
   const handleDrillAnswer = useCallback((msgId, question, selectedIndex) => {
     setAnsweredDrillIds((prev) => new Set([...prev, msgId]))
+    const isCorrect = selectedIndex === question.correct_index
+    setDrillAnswerResult(isCorrect ? 'correct' : 'incorrect')
+    setTimeout(() => setDrillAnswerResult(null), 1500)
     const letter = CHOICE_LETTERS[selectedIndex] ?? '?'
     const choiceText = question.choices?.[selectedIndex] ?? ''
     sendMessage(`I chose ${letter}. "${choiceText}"`)
@@ -324,10 +329,19 @@ export default function TutorPage() {
           <span className="text-xs px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 font-medium capitalize ml-1">
             {sessionMode === 'free' ? 'Open Chat' : sessionMode === 'drill' ? 'Drill Mode' : sessionMode === 'rationale' ? 'Rationale Deep Dive' : 'Concept Explainer'}
           </span>
-          {drillQueue.length < 5 && sessionMode === 'drill' && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 ml-auto">
-              Low flagged questions — pulling from weakest subject
-            </p>
+          {sessionMode === 'drill' && (
+            <div className="ml-auto flex items-center gap-2 flex-shrink-0">
+              {drillQueue.length < 5 && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Low flagged questions — pulling from weakest subject
+                </p>
+              )}
+              <MascotPNG
+                mascot={SUBJECT_MASCOT_MAP[Object.keys(context?.subjectAccuracy ?? {})[0]?.toLowerCase()] || 'sparky'}
+                size={44}
+                trigger={drillAnswerResult}
+              />
+            </div>
           )}
         </div>
 

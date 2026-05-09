@@ -1,10 +1,24 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { getSystemColors } from '../../lib/bodySystemColors'
 
 export default function MissionCard({ mission, compact = false }) {
   const navigate = useNavigate()
   const pct = mission.target > 0 ? Math.min(100, Math.round((mission.progress / mission.target) * 100)) : 0
   const sys = getSystemColors(mission.subject)
+
+  const prevCompletedRef = useRef(mission.completed)
+  const [justCompleted, setJustCompleted] = useState(false)
+
+  useEffect(() => {
+    if (!prevCompletedRef.current && mission.completed) {
+      setJustCompleted(true)
+      const t = setTimeout(() => setJustCompleted(false), 900)
+      return () => clearTimeout(t)
+    }
+    prevCompletedRef.current = mission.completed
+  }, [mission.completed])
 
   function handleClick() {
     if (mission.completed) return
@@ -43,7 +57,6 @@ export default function MissionCard({ mission, compact = false }) {
         )}
         <span className="text-slate-600 dark:text-slate-300 truncate">{mission.description}</span>
         <span className="flex-shrink-0 text-slate-400 dark:text-slate-500 tabular-nums">{mission.progress}/{mission.target}</span>
-        {/* compact progress */}
         <div className="flex-shrink-0 w-12 h-2 rounded-full bg-slate-700 overflow-hidden">
           <div className="h-full rounded-full bg-teal-400 transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
@@ -52,14 +65,25 @@ export default function MissionCard({ mission, compact = false }) {
   }
 
   return (
-    <button
+    <motion.button
       onClick={handleClick}
-      className={`flex flex-col gap-3 p-4 rounded-xl border border-slate-700 bg-slate-800 text-left overflow-hidden transition-all border-l-4 w-full ${
+      animate={justCompleted
+        ? {
+            boxShadow: [
+              `0 0 0px ${sys.hex}00`,
+              `0 0 20px ${sys.hex}99`,
+              `0 0 0px ${sys.hex}00`,
+            ],
+          }
+        : {}
+      }
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      className={`flex flex-col gap-3 p-4 rounded-xl border border-slate-700 bg-slate-800 text-left overflow-hidden w-full ${
         mission.completed
           ? 'opacity-60 cursor-not-allowed'
           : 'hover:border-slate-600 cursor-pointer'
       }`}
-      style={{ borderLeftColor: sys.hex }}
+      style={{ borderLeftColor: sys.hex, borderLeftWidth: 4 }}
     >
       {/* Top row: emoji + title + XP pill */}
       <div className="flex items-start gap-3">
@@ -69,8 +93,26 @@ export default function MissionCard({ mission, compact = false }) {
         <p className="flex-1 min-w-0 text-sm font-semibold text-white leading-snug break-words">
           {mission.description}
         </p>
-        <span className={`flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${sys.bg}`}>
-          {mission.completed ? '✓ ' : '+'}{mission.xp_reward} XP
+        <span className={`flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${sys.bg} flex items-center gap-1`}>
+          {mission.completed && (
+            <svg
+              className="w-2.5 h-2.5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <motion.path
+                d="M5 13l4 4L19 7"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.4, delay: 0.5, ease: 'easeOut' }}
+              />
+            </svg>
+          )}
+          {mission.completed ? '' : '+'}{mission.xp_reward} XP
         </span>
       </div>
 
@@ -87,6 +129,6 @@ export default function MissionCard({ mission, compact = false }) {
           />
         </div>
       </div>
-    </button>
+    </motion.button>
   )
 }

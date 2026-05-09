@@ -16,8 +16,12 @@ export const useSessionStore = create((set, get) => ({
   timePerQuestion: {},  // { [questionId]: seconds }
   timeRemaining: 0,
   status: null,         // 'in_progress' | 'submitted'
+  correctStreak: 0,
 
   setSession: (session) => set(session),
+
+  incrementStreak: () => set((s) => ({ correctStreak: s.correctStreak + 1 })),
+  resetStreak: () => set({ correctStreak: 0 }),
 
   setCurrentIndex: (index) => set({ currentIndex: index }),
 
@@ -75,5 +79,6 @@ export const useSessionStore = create((set, get) => ({
       timePerQuestion: {},
       timeRemaining: 0,
       status: null,
+      correctStreak: 0,
     }),
 }))

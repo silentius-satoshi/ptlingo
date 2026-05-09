@@ -20,6 +20,7 @@ import RationalePanel from '../components/exam/RationalePanel'
 import HeartBar from '../components/gamification/HeartBar'
 import HeartEmptyModal from '../components/gamification/HeartEmptyModal'
 import useGamificationStore from '../stores/gamificationStore'
+import StreakBanner from '../components/exam/StreakBanner'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -88,6 +89,9 @@ export default function ExamPage() {
     setNote,
     setHighlights,
     resetSession,
+    correctStreak,
+    incrementStreak,
+    resetStreak,
   } = useSessionStore()
 
   // ── Load session + questions ───────────────────────────────────────────────
@@ -249,7 +253,9 @@ export default function ExamPage() {
         if (i === q.correct_index) {
           awardXP(10, 'Correct answer')
           advanceMission('questions', q.subject)
+          incrementStreak()
         } else {
+          resetStreak()
           // Track recent wrong IDs for HeartEmptyModal
           recentWrongIdsRef.current = [currentQuestionId, ...recentWrongIdsRef.current].slice(0, 3)
           const newHearts = useGamificationStore.getState().hearts - 1
@@ -259,7 +265,7 @@ export default function ExamPage() {
       }
     }
     scheduleSave()
-  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductHeart])
+  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductHeart, incrementStreak, resetStreak])
 
   const handleToggleEliminated = useCallback((i) => {
     if (!currentQuestionId) return
@@ -517,6 +523,10 @@ export default function ExamPage() {
         paused={breakState === 'mandatory' || readOnly}
         readOnly={readOnly}
       />
+
+      {type === 'quiz' && !readOnly && (
+        <StreakBanner correctStreak={correctStreak} />
+      )}
 
       <div className="flex-1 flex overflow-hidden">
         {breakState === 'mandatory' || breakState === 'optional' ? (

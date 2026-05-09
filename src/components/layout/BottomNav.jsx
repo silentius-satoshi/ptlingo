@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { Home, BookOpen, Lightbulb, BarChart2, User } from 'lucide-react'
 
-// ── Internal tab button ────────────────────────────────────────────────────
+const tapTransition = { type: 'spring', stiffness: 600, damping: 20 }
+
 function Tab({ to, icon, label, end = false }) {
   return (
     <NavLink
@@ -14,13 +16,22 @@ function Tab({ to, icon, label, end = false }) {
         }`
       }
     >
-      <span className="w-6 h-6 flex items-center justify-center flex-shrink-0">{icon}</span>
-      {label}
+      {() => (
+        <>
+          <motion.div
+            whileTap={{ scale: 0.8 }}
+            transition={tapTransition}
+            className="w-6 h-6 flex items-center justify-center flex-shrink-0"
+          >
+            {icon}
+          </motion.div>
+          {label}
+        </>
+      )}
     </NavLink>
   )
 }
 
-// ── Question sheet card ────────────────────────────────────────────────────
 function SheetCard({ to, emoji, title, subtitle, onNavigate }) {
   const navigate = useNavigate()
   return (
@@ -37,21 +48,18 @@ function SheetCard({ to, emoji, title, subtitle, onNavigate }) {
   )
 }
 
-// ── Paths that activate the Questions tab ─────────────────────────────────
 const QUESTIONS_PATHS = ['/question-bank', '/exam/']
 
 export default function BottomNav() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const location = useLocation()
 
-  // Close sheet on any navigation
   useEffect(() => { setSheetOpen(false) }, [location.pathname])
 
   const questionsActive = QUESTIONS_PATHS.some((p) => location.pathname.startsWith(p))
 
   return (
     <>
-      {/* Backdrop */}
       {sheetOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
@@ -66,9 +74,7 @@ export default function BottomNav() {
         }`}
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {/* Drag handle */}
         <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mt-3 mb-4" />
-
         <div className="px-4 pb-4 space-y-2">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1 mb-3">
             Questions
@@ -97,17 +103,12 @@ export default function BottomNav() {
         </div>
       </div>
 
-      {/* ── Fixed bottom tab bar ─────────────────────────────────────────── */}
+      {/* Fixed bottom tab bar */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex items-stretch"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        <Tab
-          to="/"
-          end
-          label="Dashboard"
-          icon={<Home className="w-6 h-6" />}
-        />
+        <Tab to="/" end label="Dashboard" icon={<Home className="w-6 h-6" />} />
 
         {/* Questions tab — opens sheet */}
         <button
@@ -117,27 +118,19 @@ export default function BottomNav() {
             questionsActive || sheetOpen ? 'text-teal-500 dark:text-teal-400' : 'text-slate-500 dark:text-slate-400'
           }`}
         >
-          <span className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+          <motion.div
+            whileTap={{ scale: 0.8 }}
+            transition={tapTransition}
+            className="w-6 h-6 flex items-center justify-center flex-shrink-0"
+          >
             <BookOpen className="w-6 h-6" />
-          </span>
+          </motion.div>
           Questions
         </button>
 
-        <Tab
-          to="/tutor"
-          label="AI Tutor"
-          icon={<Lightbulb className="w-6 h-6" />}
-        />
-        <Tab
-          to="/performance"
-          label="Performance"
-          icon={<BarChart2 className="w-6 h-6" />}
-        />
-        <Tab
-          to="/profile"
-          label="Profile"
-          icon={<User className="w-6 h-6" />}
-        />
+        <Tab to="/tutor"       label="AI Tutor"     icon={<Lightbulb className="w-6 h-6" />} />
+        <Tab to="/performance" label="Performance"  icon={<BarChart2 className="w-6 h-6" />} />
+        <Tab to="/profile"     label="Profile"      icon={<User className="w-6 h-6" />} />
       </nav>
     </>
   )

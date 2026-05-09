@@ -1,65 +1,57 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { motion } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import useGamificationStore from '../../stores/gamificationStore'
-import { getLevelTitle } from '../../lib/xpFormulas'
 
-function Toast({ toast, onDone }) {
-  const [visible, setVisible] = useState(false)
+function FloatToast({ toast, offsetIndex, onDone }) {
+  const isBig = toast.amount >= 50
+  const isLevelUp = toast.levelUp
 
   useEffect(() => {
-    const show = setTimeout(() => setVisible(true), 10)
-    const hide = setTimeout(() => { setVisible(false); setTimeout(onDone, 300) }, 2500)
-    return () => { clearTimeout(show); clearTimeout(hide) }
-  }, [onDone])
-
-  const isLevelUp    = toast.levelUp
-  const isAllMissions = toast.source === 'all_missions_complete'
-  const bg = isLevelUp ? 'bg-teal-600' : 'bg-amber-500'
+    const t = setTimeout(onDone, offsetIndex * 200 + 900)
+    return () => clearTimeout(t)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div
-      className={`${bg} text-white rounded-xl px-4 py-3 shadow-2xl text-sm min-w-[180px] transition-all duration-300 ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    <motion.div
+      initial={{ y: 0, opacity: 1, scale: 1 }}
+      animate={{ y: -70, opacity: 0, scale: isBig ? 1.3 : 1.1 }}
+      transition={{ duration: 0.9, ease: 'easeOut', delay: offsetIndex * 0.2 }}
+      className={`font-black pointer-events-none select-none drop-shadow-lg text-amber-400 ${
+        isBig ? 'text-2xl' : 'text-lg'
       }`}
     >
-      {isLevelUp ? (
-        <>
-          <p className="font-bold">+1 Level! 🎓</p>
-          <p className="text-xs opacity-90 mt-0.5">
-            {getLevelTitle(toast.oldLevel).title} → {getLevelTitle(toast.newLevel).title}
-          </p>
-        </>
-      ) : isAllMissions ? (
-        <p className="font-bold text-base">+50 XP — All missions complete! 🔥</p>
-      ) : (
-        <>
-          <p className="font-bold">+{toast.amount} XP ⚡</p>
-          <p className="text-xs opacity-90 mt-0.5 truncate max-w-[180px]">{toast.source}</p>
-        </>
-      )}
-    </div>
+      {isLevelUp ? `Level Up! 🎓` : `+${toast.amount} XP ⚡`}
+    </motion.div>
   )
 }
 
 export default function XPToast() {
   const { toastQueue, dismissToast } = useGamificationStore()
-  const [current, setCurrent] = useState(null)
 
   useEffect(() => {
-    if (!current && toastQueue.length > 0) {
-      setCurrent(toastQueue[0])
-    }
-  }, [toastQueue, current])
+    toastQueue.forEach((t) => {
+      if (t.amount >= 50 && !t._confettiFired) {
+        t._confettiFired = true
+        confetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { x: 0.5, y: 0.6 },
+          colors: ['#14b8a6', '#f59e0b', '#22c55e'],
+        })
+      }
+    })
+  }, [toastQueue])
 
-  const handleDone = () => {
-    if (current) dismissToast(current.id)
-    setCurrent(null)
-  }
-
-  if (!current) return null
+  if (toastQueue.length === 0) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end">
-      <Toast key={current.id} toast={current} onDone={handleDone} />
+    <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-1" style={{ marginTop: '-10%' }}>
+        {toastQueue.map((t, i) => (
+          <FloatToast key={t.id} toast={t} offsetIndex={i} onDone={() => dismissToast(t.id)} />
+        ))}
+      </div>
     </div>
   )
 }

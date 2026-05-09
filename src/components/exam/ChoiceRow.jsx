@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion'
+
 const LETTERS = ['A', 'B', 'C', 'D']
 
 export default function ChoiceRow({
@@ -9,18 +11,24 @@ export default function ChoiceRow({
   onSelect,
   onToggleEliminate,
   onFocus,
-  revealed = false,  // true when rationale is visible (quiz mode, answered)
-  correct  = false,  // true if this is the correct answer
+  revealed = false,
+  correct  = false,
 }) {
   const letter = LETTERS[index]
 
-  // Interaction disabled once rationale is revealed
+  const answerState = revealed
+    ? correct
+      ? 'correct'
+      : selected
+      ? 'incorrect'
+      : null
+    : null
+
   const handleClick = () => {
     if (revealed || eliminated) return
     onSelect(index)
   }
 
-  // Container border + background
   const containerClass = revealed
     ? correct
       ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 cursor-default'
@@ -35,7 +43,6 @@ export default function ChoiceRow({
     ? 'border-slate-400 dark:border-slate-500 bg-white dark:bg-slate-800'
     : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-750'
 
-  // Radio ring + fill
   const radioClass = revealed
     ? correct
       ? 'border-teal-600 bg-teal-600'
@@ -46,7 +53,6 @@ export default function ChoiceRow({
     ? 'border-teal-600 bg-teal-600'
     : 'border-slate-300 dark:border-slate-600'
 
-  // Letter badge
   const letterClass = revealed
     ? correct
       ? 'bg-teal-600 text-white'
@@ -58,17 +64,42 @@ export default function ChoiceRow({
     : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
 
   return (
-    <div
+    <motion.div
       className={`group relative flex items-start gap-3 p-4 rounded-xl border-2 select-none transition-colors ${containerClass}`}
       onClick={handleClick}
       onMouseEnter={() => !revealed && onFocus(index)}
       onMouseLeave={() => !revealed && onFocus(null)}
+      animate={
+        answerState === 'correct' && selected
+          ? { scale: [1, 1.04, 1], x: 0 }
+          : answerState === 'incorrect' && selected
+          ? { x: [-8, 8, -6, 6, -3, 3, 0] }
+          : {}
+      }
+      transition={
+        answerState === 'correct' && selected
+          ? { type: 'spring', stiffness: 500, damping: 20 }
+          : { duration: 0.4 }
+      }
     >
       {/* Radio indicator */}
       <div className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${radioClass}`}>
         {revealed && correct ? (
-          <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          <svg
+            className="w-2.5 h-2.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <motion.path
+              d="M5 13l4 4L19 7"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            />
           </svg>
         ) : revealed && selected && !correct ? (
           <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -93,7 +124,7 @@ export default function ChoiceRow({
         {text}
       </span>
 
-      {/* Eliminate button — hidden when selected or in revealed mode */}
+      {/* Eliminate button */}
       {!revealed && (
         <button
           className={`flex-shrink-0 p-1.5 rounded-lg transition-all ${
@@ -113,6 +144,6 @@ export default function ChoiceRow({
           </svg>
         </button>
       )}
-    </div>
+    </motion.div>
   )
 }
