@@ -217,135 +217,149 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-full bg-slate-950 text-white overflow-x-hidden">
-      <div className="max-w-lg mx-auto px-4 py-6 pb-8 space-y-8">
+      <div className="max-w-lg md:max-w-none mx-auto px-4 py-6 pb-8">
 
-        {/* ── Section A: User Header ───────────────────────────────────── */}
-        <div className="flex flex-col items-center text-center gap-2 pt-2">
-          <div className="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center text-2xl font-bold text-white flex-shrink-0">
-            {getInitials(user?.email)}
-          </div>
-          <p className="text-xs text-slate-400 truncate max-w-full">{user?.email}</p>
-          <p className="text-sm font-semibold text-white">Attempt 6 Candidate</p>
-          <p className="text-xs text-slate-500">Member since {memberSince}</p>
-        </div>
+        {/* Two-column layout on desktop */}
+        <div className="flex flex-col md:flex-row md:gap-8 md:items-start">
 
-        {/* ── Section B: Stats Grid ────────────────────────────────────── */}
-        <div>
-          <SectionHeader label="Stats" />
-          <div className="grid grid-cols-2 gap-3">
-            <StatCard icon={<Flame className="w-4 h-4 text-orange-400" />} value={streak} label="Days Studied" />
-            <StatCard icon={<Trophy className="w-4 h-4 text-amber-400" />} value={achievements.length} label="Achievements" />
-            <StatCard icon={<Zap className="w-4 h-4 text-yellow-400" />} value={xp.toLocaleString()} label="Total XP" />
-            <StatCard icon={<Heart className="w-4 h-4 text-red-400" />} value={`${hearts}/5`} label="Hearts" />
-          </div>
-        </div>
+          {/* ── LEFT COLUMN: User + Stats + Countdown + Quick Actions ── */}
+          <div className="md:w-2/5 space-y-6">
 
-        {/* ── Section C: Exam Countdown ────────────────────────────────── */}
-        <div>
-          <SectionHeader label="Exam Countdown" />
-          <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
-            <div className="flex items-start justify-between mb-1">
-              <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wider">Next Attempt</p>
-                <p className="text-base font-semibold text-white mt-0.5">July 29, 2026</p>
+            {/* Section A: User Header */}
+            <div className="flex flex-col items-center text-center gap-2 pt-2">
+              <div className="w-20 h-20 rounded-full bg-teal-600 flex items-center justify-center text-2xl font-bold text-white flex-shrink-0">
+                {getInitials(user?.email)}
               </div>
-              <div className="text-right">
-                <p className={`text-3xl font-bold ${daysLeft < 30 ? 'text-red-400' : 'text-amber-400'}`}>
-                  {daysLeft}
-                </p>
-                <p className="text-xs text-slate-400">days left</p>
+              <p className="text-xs text-slate-400 truncate max-w-full">{user?.email}</p>
+              <p className="text-sm font-semibold text-white">Attempt 6 Candidate</p>
+              <p className="text-xs text-slate-500">Member since {memberSince}</p>
+            </div>
+
+            {/* Section B: Stats Grid */}
+            <div>
+              <SectionHeader label="Stats" />
+              <div className="grid grid-cols-2 gap-3">
+                <StatCard icon={<Flame className="w-4 h-4 text-orange-400" />} value={streak} label="Days Studied" />
+                <StatCard icon={<Trophy className="w-4 h-4 text-amber-400" />} value={achievements.length} label="Achievements" />
+                <StatCard icon={<Zap className="w-4 h-4 text-yellow-400" />} value={xp.toLocaleString()} label="Total XP" />
+                <StatCard icon={<Heart className="w-4 h-4 text-red-400" />} value={`${hearts}/5`} label="Hearts" />
               </div>
             </div>
-            <div className="h-2 rounded-full bg-slate-700 overflow-hidden mt-4 mb-2">
-              <div
-                className="h-full rounded-full bg-amber-500 transition-all duration-700"
-                style={{ width: `${pct}%` }}
-              />
+
+            {/* Section C: Exam Countdown */}
+            <div>
+              <SectionHeader label="Exam Countdown" />
+              <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
+                <div className="flex items-start justify-between mb-1">
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider">Next Attempt</p>
+                    <p className="text-base font-semibold text-white mt-0.5">July 29, 2026</p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-3xl font-bold ${daysLeft < 30 ? 'text-red-400' : 'text-amber-400'}`}>
+                      {daysLeft}
+                    </p>
+                    <p className="text-xs text-slate-400">days left</p>
+                  </div>
+                </div>
+                <div className="h-2 rounded-full bg-slate-700 overflow-hidden mt-4 mb-2">
+                  <div
+                    className="h-full rounded-full bg-amber-500 transition-all duration-700"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-500">Score needed: 600 · Current best: 585</p>
+              </div>
             </div>
-            <p className="text-xs text-slate-500">Score needed: 600 · Current best: 585</p>
+
+            {/* Section F: Quick Actions */}
+            <div>
+              <SectionHeader label="Quick Actions" />
+              <div className="space-y-2">
+                <button
+                  onClick={() => navigate('/achievements')}
+                  className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-teal-600 transition-colors"
+                >
+                  <span className="flex items-center gap-3 text-sm font-medium text-white">
+                    <Trophy className="w-5 h-5 text-amber-400" />
+                    View Achievements
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-slate-500" />
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-red-600 transition-colors text-sm font-medium text-red-400"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Sign Out
+                </button>
+              </div>
+            </div>
+
           </div>
-        </div>
 
-        {/* ── Section D: Study Plan ────────────────────────────────────── */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <SectionHeader label="Study Plan" />
-            {activePlan && (
-              <button
-                onClick={() => navigate('/performance')}
-                className="text-xs text-teal-400 hover:text-teal-300 font-medium -mt-3"
-              >
-                View Full Plan →
-              </button>
-            )}
+          {/* ── RIGHT COLUMN: Study Plan + Calendar ── */}
+          <div className="md:w-3/5 space-y-6 mt-6 md:mt-0">
+
+            {/* Section D: Study Plan */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <SectionHeader label="Study Plan" />
+                {activePlan && (
+                  <button
+                    onClick={() => navigate('/performance')}
+                    className="text-xs text-teal-400 hover:text-teal-300 font-medium -mt-3"
+                  >
+                    View Full Plan →
+                  </button>
+                )}
+              </div>
+
+              {planLoading ? (
+                <div className="bg-slate-800 rounded-xl border border-slate-700 p-5 text-center">
+                  <p className="text-xs text-slate-400">Loading...</p>
+                </div>
+              ) : activePlan ? (
+                <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
+                  <p className="text-sm font-semibold text-white mb-1">
+                    {activePlan.weeks_remaining}-Week Study Plan
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Exam: {activePlan.exam_date
+                      ? new Date(activePlan.exam_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                      : 'July 29, 2026'}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Generated {new Date(activePlan.generated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-slate-800 rounded-xl border border-slate-700 p-5 text-center">
+                  <p className="text-sm text-slate-300 mb-3">No active study plan</p>
+                  <p className="text-xs text-slate-500 mb-4">
+                    Generate your personalized 12-week plan to stay on track for your exam.
+                  </p>
+                  <button
+                    onClick={() => navigate('/performance')}
+                    className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors"
+                  >
+                    Generate Study Plan
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Section E: Calendar */}
+            <div>
+              <SectionHeader label="Study Calendar" />
+              <Calendar activePlan={activePlan} />
+            </div>
+
           </div>
 
-          {planLoading ? (
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-5 text-center">
-              <p className="text-xs text-slate-400">Loading...</p>
-            </div>
-          ) : activePlan ? (
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-5">
-              <p className="text-sm font-semibold text-white mb-1">
-                {activePlan.weeks_remaining}-Week Study Plan
-              </p>
-              <p className="text-xs text-slate-400">
-                Exam: {activePlan.exam_date
-                  ? new Date(activePlan.exam_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                  : 'July 29, 2026'}
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
-                Generated {new Date(activePlan.generated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
-            </div>
-          ) : (
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-5 text-center">
-              <p className="text-sm text-slate-300 mb-3">No active study plan</p>
-              <p className="text-xs text-slate-500 mb-4">
-                Generate your personalized 12-week plan to stay on track for your exam.
-              </p>
-              <button
-                onClick={() => navigate('/performance')}
-                className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors"
-              >
-                Generate Study Plan
-              </button>
-            </div>
-          )}
         </div>
-
-        {/* ── Section E: Calendar ──────────────────────────────────────── */}
-        <div>
-          <SectionHeader label="Study Calendar" />
-          <Calendar activePlan={activePlan} />
-        </div>
-
-        {/* ── Section F: Quick Actions ─────────────────────────────────── */}
-        <div>
-          <SectionHeader label="Quick Actions" />
-          <div className="space-y-2">
-            <button
-              onClick={() => navigate('/achievements')}
-              className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-teal-600 transition-colors"
-            >
-              <span className="flex items-center gap-3 text-sm font-medium text-white">
-                <Trophy className="w-5 h-5 text-amber-400" />
-                View Achievements
-              </span>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-red-600 transition-colors text-sm font-medium text-red-400"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Sign Out
-            </button>
-          </div>
-        </div>
-
       </div>
     </div>
   )

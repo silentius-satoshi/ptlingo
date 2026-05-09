@@ -13,7 +13,9 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <TopStatsBar />
         <main className="flex-1 flex flex-col overflow-y-auto pb-24 md:pb-0">
-          <Outlet />
+          <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 md:px-8">
+            <Outlet />
+          </div>
         </main>
       </div>
       <BottomNav />

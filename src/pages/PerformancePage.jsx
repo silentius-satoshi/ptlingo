@@ -312,15 +312,15 @@ export default function PerformancePage() {
         <MasteryRingsRow subjectMastery={subjectMastery} />
 
         {/* Tab bar */}
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 self-start">
+        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700">
           {TABS.map((tab, i) => (
             <button
               key={tab}
               onClick={() => setActiveTab(i)}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 activeTab === i
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  ? 'border-teal-400 text-teal-400 dark:text-teal-400'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
               }`}
             >
               {tab}
