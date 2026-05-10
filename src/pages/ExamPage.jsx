@@ -462,10 +462,56 @@ export default function ExamPage() {
     }
   }, [currentIndex, questions.length, setCurrentIndex, handleSubmit])
 
-  const handleSheetExplain = useCallback(() => {
+  const handleSheetExplain = useCallback(async () => {
     setShowFeedbackSheet(false)
-    setExplainMode(true)
-  }, [])
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    const s = useSessionStore.getState()
+    await supabase.from('sessions').update({
+      answers:           s.answers,
+      marked:            s.marked,
+      eliminated:        s.eliminated,
+      notes:             s.notes,
+      highlights:        s.highlights,
+      time_per_question: s.timePerQuestion,
+      time_remaining:    s.timeRemaining,
+      current_index:     s.currentIndex,
+    }).eq('id', sessionId)
+    navigate('/rationale', {
+      state: {
+        question:       currentQuestion,
+        selectedAnswer,
+        systemName:     currentQuestion?.subject,
+        sessionId,
+        currentIndex,
+        totalQuestions: questions.length,
+      },
+    })
+  }, [sessionId, currentQuestion, selectedAnswer, currentIndex, questions.length, navigate])
+
+  const handleReviewExplanation = useCallback(async () => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    const s = useSessionStore.getState()
+    await supabase.from('sessions').update({
+      answers:           s.answers,
+      marked:            s.marked,
+      eliminated:        s.eliminated,
+      notes:             s.notes,
+      highlights:        s.highlights,
+      time_per_question: s.timePerQuestion,
+      time_remaining:    s.timeRemaining,
+      current_index:     s.currentIndex,
+    }).eq('id', sessionId)
+    navigate('/rationale', {
+      state: {
+        question:       currentQuestion,
+        selectedAnswer,
+        systemName:     currentQuestion?.subject,
+        sessionId,
+        currentIndex,
+        totalQuestions: questions.length,
+      },
+    })
+  }, [sessionId, currentQuestion, selectedAnswer, currentIndex, questions.length, navigate])
 
   const handleExpire = useCallback(() => handleSubmit(), [handleSubmit])
 
@@ -595,28 +641,44 @@ export default function ExamPage() {
                   <RationalePanel question={currentQuestion} selectedAnswer={selectedAnswer} />
                 </>
               ) : (
-                <div className="flex min-h-full">
-                  <QuestionPanel
-                    question={currentQuestion}
-                    questionNumber={currentIndex + 1}
-                    totalQuestions={questions.length}
-                    isMarked={isMarked}
-                    highlightMode={highlightMode}
-                    highlights={highlights[currentQuestionId] || []}
-                    onAddHighlight={handleAddHighlight}
-                    onRemoveHighlight={handleRemoveHighlight}
-                  />
-                  <AnswerPanel
-                    question={currentQuestion}
-                    selectedAnswer={selectedAnswer}
-                    eliminated={currentEliminated}
-                    onSelect={handleSelectAnswer}
-                    onToggleEliminate={handleToggleEliminated}
-                    focusedChoice={focusedChoice}
-                    onFocusChoice={setFocusedChoice}
-                    rationaleVisible={false}
-                  />
-                </div>
+                <>
+                  <div className="flex min-h-full">
+                    <QuestionPanel
+                      question={currentQuestion}
+                      questionNumber={currentIndex + 1}
+                      totalQuestions={questions.length}
+                      isMarked={isMarked}
+                      highlightMode={highlightMode}
+                      highlights={highlights[currentQuestionId] || []}
+                      onAddHighlight={handleAddHighlight}
+                      onRemoveHighlight={handleRemoveHighlight}
+                    />
+                    <AnswerPanel
+                      question={currentQuestion}
+                      selectedAnswer={selectedAnswer}
+                      eliminated={currentEliminated}
+                      onSelect={handleSelectAnswer}
+                      onToggleEliminate={handleToggleEliminated}
+                      focusedChoice={focusedChoice}
+                      onFocusChoice={setFocusedChoice}
+                      rationaleVisible={false}
+                    />
+                  </div>
+                  {type === 'quiz' && !readOnly && selectedAnswer !== null && currentQuestion &&
+                    selectedAnswer !== currentQuestion.correct_index && (
+                    <div className="flex justify-center py-4">
+                      <button
+                        onClick={handleReviewExplanation}
+                        className="flex items-center gap-1 text-[13px] text-white/40 hover:text-white/70 transition-colors"
+                      >
+                        Review Explanation
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

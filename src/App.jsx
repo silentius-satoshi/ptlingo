@@ -21,6 +21,7 @@ import PerformancePage from './pages/PerformancePage'
 import AchievementsPage from './pages/AchievementsPage'
 import TutorPage from './pages/TutorPage'
 import ProfilePage from './pages/ProfilePage'
+import RationalePage from './pages/RationalePage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
 import IosInstallHint from './components/IosInstallHint'
@@ -117,6 +118,7 @@ export default function App() {
           <Route path="exam/:sessionId" element={<ExamPage />} />
           <Route path="review/:sessionId" element={<ReviewPage />} />
           <Route path="results/:sessionId" element={<ResultsPage />} />
+          <Route path="rationale" element={<RationalePage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
