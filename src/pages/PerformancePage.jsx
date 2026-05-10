@@ -11,6 +11,7 @@ import NpteHistory from '../components/performance/NpteHistory'
 import StudyPlanTab from '../components/performance/StudyPlanTab'
 import MasteryRing from '../components/gamification/MasteryRing'
 import useGamificationStore from '../stores/gamificationStore'
+import { getSystemConfig } from '../constants/systemConfig'
 
 const TABS = ['Practice Analytics', 'NPTE History', 'Study Plan']
 
@@ -110,6 +111,7 @@ function MasteryRingsRow({ subjectMastery }) {
             pct={subjectMastery[s] ?? 0}
             size={64}
             label={SUBJECT_ABBR[s] ?? s}
+            accentColor={getSystemConfig(s)?.primary}
           />
         ))}
       </div>

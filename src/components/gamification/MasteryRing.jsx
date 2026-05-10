@@ -1,11 +1,11 @@
 import { masteryColor, MASTERY_STROKE } from '../../lib/xpFormulas'
 
-export default function MasteryRing({ pct = 0, size = 64, label, sublabel }) {
-  const r       = (size - 8) / 2
-  const circ    = 2 * Math.PI * r
-  const filled  = circ * (pct / 100)
-  const color   = masteryColor(pct)
-  const stroke  = MASTERY_STROKE[color]
+export default function MasteryRing({ pct = 0, size = 64, label, sublabel, accentColor }) {
+  const r           = (size - 8) / 2
+  const circ        = 2 * Math.PI * r
+  const filled      = circ * (pct / 100)
+  const color       = masteryColor(pct)
+  const strokeColor = accentColor ?? MASTERY_STROKE[color]
 
   return (
     <div className="flex flex-col items-center gap-1.5">
@@ -21,7 +21,7 @@ export default function MasteryRing({ pct = 0, size = 64, label, sublabel }) {
           <circle
             cx={size / 2} cy={size / 2} r={r}
             fill="none"
-            stroke={stroke}
+            stroke={strokeColor}
             strokeWidth={5}
             strokeDasharray={`${filled} ${circ - filled}`}
             strokeLinecap="round"

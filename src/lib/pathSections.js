@@ -1,11 +1,13 @@
+import { SYSTEM_CONFIG } from '../constants/systemConfig'
+
 export const PATH_SECTIONS = [
   {
     system: 'neuromuscular',
     masteryKey: 'Neuromuscular',
     label: 'Neuromuscular & Nervous Systems',
     mascot: 'sparky',
-    color: '#7c3aed',
-    lightBg: '#f5f3ff',
+    color: SYSTEM_CONFIG.Neuromuscular.primary,
+    lightBg: SYSTEM_CONFIG.Neuromuscular.light,
     emoji: '⚡',
     nodes: [
       { id: 'neuro-1', topic: 'Lesion Identification',    masteryThreshold: 0  },
@@ -20,8 +22,8 @@ export const PATH_SECTIONS = [
     masteryKey: 'Musculoskeletal',
     label: 'Musculoskeletal System',
     mascot: 'flex',
-    color: '#ef4444',
-    lightBg: '#fef2f2',
+    color: SYSTEM_CONFIG.Musculoskeletal.primary,
+    lightBg: SYSTEM_CONFIG.Musculoskeletal.light,
     emoji: '💪',
     nodes: [
       { id: 'msk-1', topic: 'Orthopedic Tests',    masteryThreshold: 0  },
@@ -36,8 +38,8 @@ export const PATH_SECTIONS = [
     masteryKey: 'Cardiovascular and Pulmonary',
     label: 'Cardiovascular & Pulmonary',
     mascot: 'pulse',
-    color: '#ec4899',
-    lightBg: '#fdf2f8',
+    color: SYSTEM_CONFIG['Cardiovascular/Pulmonary'].primary,
+    lightBg: SYSTEM_CONFIG['Cardiovascular/Pulmonary'].light,
     emoji: '❤️',
     nodes: [
       { id: 'cardio-1', topic: 'Cardiac Conditions',   masteryThreshold: 0  },
@@ -52,8 +54,8 @@ export const PATH_SECTIONS = [
     masteryKey: 'Integumentary',
     label: 'Integumentary System',
     mascot: 'patch',
-    color: '#f97316',
-    lightBg: '#fff7ed',
+    color: SYSTEM_CONFIG.Integumentary.primary,
+    lightBg: SYSTEM_CONFIG.Integumentary.light,
     emoji: '🩹',
     nodes: [
       { id: 'integ-1', topic: 'Wound Classification', masteryThreshold: 0  },
@@ -68,8 +70,8 @@ export const PATH_SECTIONS = [
     masteryKey: 'Other',
     label: 'Non-Systems & EBP',
     mascot: 'page',
-    color: '#1e3a5f',
-    lightBg: '#eff6ff',
+    color: SYSTEM_CONFIG['Nonsystem Domains'].primary,
+    lightBg: SYSTEM_CONFIG['Nonsystem Domains'].light,
     emoji: '📋',
     nodes: [
       { id: 'other-1', topic: 'Research & EBP',          masteryThreshold: 0  },
@@ -84,8 +86,8 @@ export const PATH_SECTIONS = [
     masteryKey: 'Pediatrics',
     label: 'Other Systems & Pediatrics',
     mascot: 'flora',
-    color: '#14b8a6',
-    lightBg: '#f0fdfa',
+    color: SYSTEM_CONFIG['Other Systems'].primary,
+    lightBg: SYSTEM_CONFIG['Other Systems'].light,
     emoji: '🌿',
     nodes: [
       { id: 'peds-1', topic: 'Developmental Milestones', masteryThreshold: 0  },

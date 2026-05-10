@@ -26,6 +26,8 @@ export const SYSTEM_CONFIG = {
 }
 
 export function getSystemConfig(systemName) {
+  if (systemName === 'Cardiovascular and Pulmonary') return SYSTEM_CONFIG['Cardiovascular/Pulmonary']
+  if (systemName === 'Pediatrics') return SYSTEM_CONFIG['Other Systems']
   const key = Object.keys(SYSTEM_CONFIG).find(k =>
     k.toLowerCase().includes(systemName?.toLowerCase()) ||
     systemName?.toLowerCase().includes(k.toLowerCase())

@@ -195,19 +195,19 @@ export default function ThePathPage() {
               return (
                 <div
                   key={item.key}
-                  className={`rounded-xl border px-3 py-2 flex items-center gap-2 mb-3 ${i > 0 ? 'mt-6' : ''}`}
-                  style={{
-                    borderColor: item.section.color,
-                    backgroundColor: item.section.color + '18',
-                  }}
+                  className={`rounded-xl px-4 py-3 flex items-center justify-between mb-3 ${i > 0 ? 'mt-6' : ''}`}
+                  style={{ background: item.section.color }}
                 >
-                  <span className="text-lg">{item.section.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
-                      {item.section.label}
-                    </p>
-                    <p className="text-[10px] text-slate-500">{item.masteryPct}% mastered</p>
+                  <div>
+                    <p className="text-[11px] uppercase font-semibold text-white/70 tracking-wider">Body System</p>
+                    <p className="text-white font-bold text-xl leading-tight">{item.section.label}</p>
+                    <p className="text-white/60 text-[11px] mt-0.5">{item.masteryPct}% mastered</p>
                   </div>
+                  <img
+                    src={`/mascots/${item.section.mascot}.png`}
+                    alt=""
+                    className="w-16 h-16 object-contain flex-shrink-0"
+                  />
                 </div>
               )
             }

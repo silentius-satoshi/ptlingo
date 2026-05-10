@@ -54,10 +54,17 @@ export default function PathNode({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="px-4 py-1 rounded-full text-sm font-bold text-white"
-            style={{ backgroundColor: section.color }}
+            className="rounded-xl overflow-hidden px-4 py-3 min-w-[160px]"
+            style={{ background: '#1C1F2E', borderLeft: `3px solid ${section.color}` }}
           >
-            START
+            <p className="text-white font-bold text-sm mb-2">{node.topic}</p>
+            <button
+              onClick={handlePress}
+              className="px-3 py-1 rounded-lg text-white text-xs font-bold uppercase tracking-wide"
+              style={{ background: section.color }}
+            >
+              Start Lesson
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
