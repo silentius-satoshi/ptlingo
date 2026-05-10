@@ -9,7 +9,7 @@ export async function streamTutorResponse({ messages, systemPrompt, onChunk, onD
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
           'HTTP-Referer': window.location.origin,
-          'X-Title': 'NPTE Prep AI Tutor',
+          'X-Title': 'PT Lingo AI Tutor',
         },
         body: JSON.stringify({
           model: 'google/gemini-3-flash-preview',

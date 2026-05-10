@@ -1,6 +1,6 @@
-# NPTE Prep
+# PT Lingo
 
-Personal NPTE study app — React 18 + Vite 5 + Supabase + Tailwind CSS.
+Pass the NPTE. — React 18 + Vite 5 + Supabase + Tailwind CSS.
 
 ## Dev
 
@@ -35,5 +35,5 @@ The app runs in standalone mode (no browser chrome) with a dark status bar.
 ### Desktop (Chrome / Edge)
 
 1. Open the app in Chrome or Edge.
-2. Click the install icon in the address bar (or go to menu → **Install NPTE Prep**).
+2. Click the install icon in the address bar (or go to menu → **Install PT Lingo**).
 3. Click **Install**.

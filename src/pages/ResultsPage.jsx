@@ -300,7 +300,7 @@ export default function ResultsPage() {
       {/* ── Top bar ── */}
       <div className="flex-shrink-0 h-14 flex items-center px-6 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <span className="text-sm font-bold text-teal-600 dark:text-teal-400 tracking-tight select-none">
-          NPTE Prep
+          PT Lingo
         </span>
         <div className="flex-1 flex justify-center">
           <span className="text-sm font-semibold text-slate-900 dark:text-white">Results</span>

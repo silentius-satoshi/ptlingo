@@ -14,7 +14,7 @@ const isValidUrl = (url) => {
 
 if (!isValidUrl(supabaseUrl)) {
   console.warn(
-    '[NPTE Prep] VITE_SUPABASE_URL is missing or invalid. ' +
+    '[PT Lingo] VITE_SUPABASE_URL is missing or invalid. ' +
     'Add your Supabase project URL to .env.local to enable auth and data.'
   )
 }

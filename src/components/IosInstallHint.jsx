@@ -19,7 +19,7 @@ export default function IosInstallHint() {
     <div className="fixed bottom-4 left-4 right-4 z-50 bg-slate-800 border border-slate-700 rounded-lg p-4 shadow-2xl">
       <div className="flex items-start justify-between gap-3">
         <div className="text-sm text-slate-200">
-          <strong className="block text-white mb-1">Install NPTE Prep</strong>
+          <strong className="block text-white mb-1">Install PT Lingo</strong>
           Tap Share, then "Add to Home Screen" for the full app experience.
         </div>
         <button

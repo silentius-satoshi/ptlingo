@@ -60,7 +60,7 @@ export default function AuthPage() {
             <span className="text-white font-bold text-lg">NP</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-            NPTE Prep
+            PT Lingo
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {mode === 'signin' ? 'Sign in to your account' : 'Create your account'}

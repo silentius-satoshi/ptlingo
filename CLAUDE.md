@@ -1,5 +1,5 @@
-# NPTE Prep — Project Reference
-## Current state: Step 24.5 complete. Next: Step 25 (Mascot), Steps 27–29 (Auth).
+# PT Lingo — Project Reference
+## Current state: Step 30 complete (brand rename). Next: Step 31 (Anonymous sign-in).
 
 ---
 
@@ -30,11 +30,12 @@ Build: `npm run build` → clean. Deployed via Vercel (git push trigger).
 | 24.5 | PWA / iOS install | ✅ Complete |
 | 25 | Mascot PNG / Framer Motion | 📋 Specced, pre-exam |
 | 26 | Rive Mascot Upgrade | 📋 Specced, post-exam |
-| 27 | TOTP 2FA | 📋 Specced |
-| 28 | Google OAuth | 📋 Specced |
-| 29 | Passkeys + Biometric Lock | 📋 Specced |
+| 27 | TOTP 2FA | ✅ Complete |
+| 28 | Google OAuth | ✅ Complete |
+| 29 | Passkeys + Biometric Lock | ✅ Complete |
+| 30 | Brand rename → PT Lingo | ✅ Complete |
 
-**Next available step number: 30.**
+**Next available step number: 31.**
 
 ---
 

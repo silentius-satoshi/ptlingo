@@ -19,10 +19,10 @@ export default function SidebarHeader() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-md bg-teal-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-[10px] font-bold">NP</span>
+            <span className="text-white text-[10px] font-bold">PT</span>
           </div>
           <span className="text-sm font-bold text-white">
-            NPTE <span className="font-normal text-slate-400">Prep</span>
+            PT <span className="font-normal text-slate-400">Lingo</span>
           </span>
         </div>
         <button

@@ -4,7 +4,7 @@ export function useMFA() {
   const enroll = async () => {
     return await supabase.auth.mfa.enroll({
       factorType: 'totp',
-      friendlyName: 'NPTE Prep Authenticator',
+      friendlyName: 'PT Lingo Authenticator',
     })
   }
 

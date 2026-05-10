@@ -14,9 +14,9 @@ export default defineConfig({
         'icons/manifest-icon-512.maskable.png',
       ],
       manifest: {
-        name: 'NPTE Prep',
-        short_name: 'NPTE',
-        description: 'Personal NPTE study app',
+        name: 'PT Lingo',
+        short_name: 'PTLingo',
+        description: 'Pass the NPTE with PT Lingo',
         theme_color: '#080d18',
         background_color: '#080d18',
         display: 'standalone',
