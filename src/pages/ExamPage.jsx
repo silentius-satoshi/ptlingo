@@ -21,6 +21,8 @@ import HeartBar from '../components/gamification/HeartBar'
 import HeartEmptyModal from '../components/gamification/HeartEmptyModal'
 import useGamificationStore from '../stores/gamificationStore'
 import StreakBanner from '../components/exam/StreakBanner'
+import { AnimatePresence } from 'framer-motion'
+import AnswerFeedbackSheet from '../components/drill/AnswerFeedbackSheet'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -34,7 +36,10 @@ export default function ExamPage() {
 
   // ── Gamification ──────────────────────────────────────────────────────────
   const { awardXP, deductHeart, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, hearts } = useGamificationStore()
-  const [showHeartEmpty, setShowHeartEmpty] = useState(false)
+  const [showHeartEmpty, setShowHeartEmpty]       = useState(false)
+  const [showFeedbackSheet, setShowFeedbackSheet] = useState(false)
+  const [sheetIsCorrect, setSheetIsCorrect]       = useState(false)
+  const [explainMode, setExplainMode]             = useState(false)
   const recentWrongIdsRef = useRef([])
 
   // ── Loading / error ────────────────────────────────────────────────────────
@@ -231,7 +236,7 @@ export default function ExamPage() {
 
   // ── Action handlers ────────────────────────────────────────────────────────
   // In quiz mode the answer locks once selected (rationale immediately revealed)
-  const rationaleVisible = readOnly || (type === 'quiz' && selectedAnswer !== null)
+  const rationaleVisible = readOnly || explainMode
 
   const handleSelectAnswer = useCallback((i) => {
     if (!currentQuestionId) return
@@ -262,10 +267,18 @@ export default function ExamPage() {
           deductHeart()
           if (newHearts <= 0) setShowHeartEmpty(true)
         }
+        setSheetIsCorrect(i === q.correct_index)
+        setShowFeedbackSheet(true)
       }
     }
     scheduleSave()
   }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductHeart, incrementStreak, resetStreak])
+
+  // Reset sheet + explain state whenever the question changes
+  useEffect(() => {
+    setShowFeedbackSheet(false)
+    setExplainMode(false)
+  }, [currentQuestionId])
 
   const handleToggleEliminated = useCallback((i) => {
     if (!currentQuestionId) return
@@ -439,6 +452,20 @@ export default function ExamPage() {
       setSubmitting(false)
     }
   }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements])
+
+  const handleSheetContinue = useCallback(() => {
+    setShowFeedbackSheet(false)
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+    } else {
+      handleSubmit()
+    }
+  }, [currentIndex, questions.length, setCurrentIndex, handleSubmit])
+
+  const handleSheetExplain = useCallback(() => {
+    setShowFeedbackSheet(false)
+    setExplainMode(true)
+  }, [])
 
   const handleExpire = useCallback(() => handleSubmit(), [handleSubmit])
 
@@ -787,6 +814,23 @@ export default function ExamPage() {
           <Button onClick={() => setShowReportModal(false)}>Submit Report</Button>
         </div>
       </Modal>
+
+      {/* Block all interaction behind the sheet while it's visible */}
+      {type === 'quiz' && showFeedbackSheet && (
+        <div className="fixed inset-0 z-40" style={{ pointerEvents: 'all' }} />
+      )}
+
+      <AnswerFeedbackSheet
+        visible={type === 'quiz' && showFeedbackSheet}
+        isCorrect={sheetIsCorrect}
+        correctAnswerText={
+          currentQuestion
+            ? currentQuestion.choices?.[currentQuestion.correct_index]
+            : ''
+        }
+        onContinue={handleSheetContinue}
+        onExplain={handleSheetExplain}
+      />
     </div>
   )
 }
