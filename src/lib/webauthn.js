@@ -94,6 +94,62 @@ export async function unlockWithPasskey() {
   return authenticateWithPasskey('')
 }
 
+// Conditional UI (passkey autofill) — runs silently in the background.
+// The browser surfaces registered passkeys as autofill suggestions in
+// username fields with autocomplete="username webauthn".
+export async function startConditionalPasskeyAuth({ signal } = {}) {
+  let challengeRes
+  try {
+    challengeRes = await fetch(`${FUNCTIONS_BASE}/webauthn-auth-challenge`, { signal })
+  } catch (err) {
+    if (err?.name === 'AbortError') return { error: null }
+    return { error: 'Network error: could not reach passkey service.' }
+  }
+  if (!challengeRes.ok) {
+    const data = await challengeRes.json().catch(() => ({}))
+    return { error: data.error || `Challenge failed (${challengeRes.status})` }
+  }
+  const options = await challengeRes.json()
+
+  if (signal?.aborted) return { error: null }
+
+  let assertion
+  try {
+    assertion = await startAuthentication(options, true) // true = conditional/mediation UI
+  } catch (err) {
+    if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return { error: null }
+    return { error: err?.message || 'Passkey autofill failed.' }
+  }
+
+  if (signal?.aborted) return { error: null }
+
+  let verifyRes
+  try {
+    verifyRes = await fetch(`${FUNCTIONS_BASE}/webauthn-auth-verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(assertion),
+      signal,
+    })
+  } catch (err) {
+    if (err?.name === 'AbortError') return { error: null }
+    return { error: 'Network error during verification.' }
+  }
+
+  const verifyData = await verifyRes.json().catch(() => ({}))
+  if (!verifyRes.ok || !verifyData.token_hash) {
+    return { error: verifyData.error || 'Authentication verification failed.' }
+  }
+
+  const { error: sessionError } = await supabase.auth.verifyOtp({
+    token_hash: verifyData.token_hash,
+    type: 'email',
+  })
+  if (sessionError) return { error: sessionError.message }
+
+  return { error: null }
+}
+
 export async function listPasskeys() {
   const { data, error } = await supabase
     .from('passkeys')

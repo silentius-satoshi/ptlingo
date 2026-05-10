@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import Button from '../components/shared/Button'
 import GoogleSignInButton from '../components/auth/GoogleSignInButton'
 import PasskeyLoginButton from '../components/auth/PasskeyLoginButton'
+import { startConditionalPasskeyAuth } from '../lib/webauthn'
 
 export default function AuthPage() {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
@@ -14,6 +15,21 @@ export default function AuthPage() {
   const [message, setMessage] = useState('')
   const { signIn, signUp } = useAuthStore()
   const navigate = useNavigate()
+
+  // Conditional UI: surfaces registered passkeys as autofill suggestions
+  // in the email field. Runs silently in background on mount.
+  useEffect(() => {
+    if (!window.PublicKeyCredential?.isConditionalMediationAvailable) return
+    const controller = new AbortController()
+    PublicKeyCredential.isConditionalMediationAvailable().then((available) => {
+      if (!available || controller.signal.aborted) return
+      startConditionalPasskeyAuth({ signal: controller.signal }).then(({ error: err }) => {
+        if (err || controller.signal.aborted) return
+        navigate('/')
+      })
+    })
+    return () => controller.abort()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -79,6 +95,7 @@ export default function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username webauthn"
                 className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
                 placeholder="you@example.com"
               />
