@@ -7,7 +7,7 @@ import CountdownRing from '../components/exam/CountdownRing'
 import RationalePanel from '../components/exam/RationalePanel'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import useGamificationStore from '../stores/gamificationStore'
-import { MascotPNG } from '../components/mascot'
+import { getSystemConfig } from '../constants/systemConfig'
 import confetti from 'canvas-confetti'
 
 const statContainerVariants = {
@@ -98,6 +98,7 @@ export default function ResultsPage() {
   const [error, setError]       = useState('')
   const [session, setSession]   = useState(null)
   const [questions, setQuestions] = useState([])
+  const cfg = getSystemConfig(questions[0]?.subject)
 
   // UI state
   const [subjectOpen, setSubjectOpen]     = useState(false)
@@ -328,7 +329,19 @@ export default function ResultsPage() {
 
           {/* ── Score hero ── */}
           <div className="flex flex-col items-center gap-5">
-            <MascotPNG mascot="sparky" trigger="celebrate" size={120} />
+            <img
+              src={cfg?.mascot ?? '/mascots/sparky.png'}
+              alt={cfg?.mascotName ?? 'Sparky'}
+              style={{
+                width: '105px',
+                height: '200px',
+                objectFit: 'cover',
+                objectPosition: 'top center',
+                border: 'none',
+                background: 'transparent',
+                display: 'block',
+              }}
+            />
             <CountdownRing total={100} remaining={displayScore} color={scoreColor} size={200} strokeWidth={12}>
               <span className={`text-4xl font-extrabold tabular-nums leading-none ${
                 scoreColor === 'teal'  ? 'text-teal-700 dark:text-teal-400' :
