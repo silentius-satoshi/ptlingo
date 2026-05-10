@@ -56,9 +56,11 @@ export default function AuthPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-teal-600 flex items-center justify-center mb-3">
-            <span className="text-white font-bold text-lg">NP</span>
-          </div>
+          <img
+            src="/icons/manifest-icon-192.maskable.png"
+            alt="PT Lingo"
+            className="w-12 h-12 rounded-xl mb-3"
+          />
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
             PT Lingo
           </h1>
