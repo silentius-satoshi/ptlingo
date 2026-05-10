@@ -55,15 +55,23 @@ serve(async (req) => {
     const clientData = JSON.parse(new TextDecoder().decode(clientDataBytes))
     const challengeKey = clientData.challenge
 
-    const kv = await Deno.openKv()
-    const stored = await kv.get<{ challenge: string }>(["wc_auth", challengeKey])
-    if (!stored.value) {
+    const challengeRowId = `wc_auth:${challengeKey}`
+    const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    const { data: chRow } = await adminClient
+      .from("webauthn_challenges")
+      .select("challenge")
+      .eq("id", challengeRowId)
+      .gt("created_at", cutoff)
+      .maybeSingle()
+
+    if (!chRow?.challenge) {
       return new Response(JSON.stringify({ error: "Challenge expired" }), {
         status: 400,
         headers: { ...cors, "Content-Type": "application/json" },
       })
     }
-    await kv.delete(["wc_auth", challengeKey])
+    const expectedChallenge = chRow.challenge as string
+    await adminClient.from("webauthn_challenges").delete().eq("id", challengeRowId)
 
     const origin = req.headers.get("origin") ?? ""
     const rpID = new URL(origin).hostname
@@ -73,7 +81,7 @@ serve(async (req) => {
 
     const verification = await verifyAuthenticationResponse({
       response: body,
-      expectedChallenge: stored.value.challenge,
+      expectedChallenge,
       expectedOrigin: origin,
       expectedRPID: rpID,
       requireUserVerification: true,

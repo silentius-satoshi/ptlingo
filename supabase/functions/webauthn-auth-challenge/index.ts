@@ -55,10 +55,21 @@ serve(async (req) => {
       userVerification: "required",
     })
 
-    const kv = await Deno.openKv()
-    await kv.set(["wc_auth", options.challenge], { challenge: options.challenge }, {
-      expireIn: 300_000,
-    })
+    const challengeId = `wc_auth:${options.challenge}`
+    const { error: storeError } = await adminClient
+      .from("webauthn_challenges")
+      .insert({
+        id: challengeId,
+        user_id: null,
+        challenge: options.challenge,
+        created_at: new Date().toISOString(),
+      })
+    if (storeError) {
+      return new Response(JSON.stringify({ error: `Challenge store failed: ${storeError.message}` }), {
+        status: 500,
+        headers: { ...cors, "Content-Type": "application/json" },
+      })
+    }
 
     return new Response(JSON.stringify(options), {
       headers: { ...cors, "Content-Type": "application/json" },

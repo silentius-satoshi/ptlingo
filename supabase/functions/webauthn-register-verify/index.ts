@@ -41,16 +41,25 @@ serve(async (req) => {
     }
     const user = userData.user
 
-    const kv = await Deno.openKv()
-    const stored = await kv.get<string>(["wc_reg", user.id])
-    if (!stored.value) {
+    const adminClient = createClient(supabaseUrl, serviceKey)
+
+    const challengeId = `wc_reg:${user.id}`
+    const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    const { data: chRow } = await adminClient
+      .from("webauthn_challenges")
+      .select("challenge")
+      .eq("id", challengeId)
+      .gt("created_at", cutoff)
+      .maybeSingle()
+
+    if (!chRow?.challenge) {
       return new Response(JSON.stringify({ error: "Challenge expired or not found" }), {
         status: 400,
         headers: { ...cors, "Content-Type": "application/json" },
       })
     }
-    const expectedChallenge = stored.value
-    await kv.delete(["wc_reg", user.id])
+    const expectedChallenge = chRow.challenge as string
+    await adminClient.from("webauthn_challenges").delete().eq("id", challengeId)
 
     const body = await req.json()
     const origin = req.headers.get("origin") ?? ""
@@ -77,7 +86,6 @@ serve(async (req) => {
     const credentialIdB64 = Buffer.from(credentialID).toString("base64url")
     const publicKeyB64 = Buffer.from(credentialPublicKey).toString("base64url")
 
-    const adminClient = createClient(supabaseUrl, serviceKey)
     const { error: insertError } = await adminClient.from("passkeys").insert({
       user_id: user.id,
       credential_id: credentialIdB64,
