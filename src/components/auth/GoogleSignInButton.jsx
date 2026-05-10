@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 // Inline SVG — Google's official "G" mark, no external dependency
 function GoogleIcon() {
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="#4285F4"
@@ -43,7 +43,7 @@ export default function GoogleSignInButton() {
     <button
       type="button"
       onClick={handleClick}
-      className="w-full flex items-center justify-center gap-3 bg-white text-[#1F1F1F] text-sm font-medium py-2.5 px-4 rounded-lg border border-slate-200 hover:shadow-md transition-shadow"
+      className="w-full flex items-center justify-center gap-2 bg-white text-[#1F1F1F] text-xs font-medium py-2.5 px-3 rounded-lg border border-slate-200 hover:shadow-md transition-shadow whitespace-nowrap"
     >
       <GoogleIcon />
       Continue with Google

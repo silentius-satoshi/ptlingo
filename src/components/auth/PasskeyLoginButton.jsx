@@ -32,14 +32,14 @@ export default function PasskeyLoginButton({ email }) {
   }
 
   return (
-    <div className="mb-3">
+    <div>
       <button
         type="button"
         onClick={handleClick}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium py-2.5 px-4 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-teal-500 dark:hover:border-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium py-2.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-teal-500 dark:hover:border-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
       >
-        <Fingerprint className="w-4 h-4 text-teal-500 dark:text-teal-400" />
+        <Fingerprint className="w-5 h-5 text-teal-500 dark:text-teal-400" />
         {loading ? 'Authenticating…' : 'Sign in with Passkey'}
       </button>
       {error && <p className="text-xs text-red-500 dark:text-red-400 mt-1.5 text-center">{error}</p>}
