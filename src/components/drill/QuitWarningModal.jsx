@@ -2,11 +2,50 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ANIMATION } from '../../constants/design'
 import { getSystemConfig } from '../../constants/systemConfig'
 
-export default function QuitWarningModal({ isOpen, currentSystem, questionsAnswered, onKeepGoing, onQuit }) {
+function getQuitCopy({ questionsRemaining, correctCount, questionsAnswered, streak }) {
+  if (questionsRemaining <= 5 && questionsRemaining > 0)
+    return {
+      heading: "Wait — you're so close!",
+      subtext: `You only have ${questionsRemaining} question${questionsRemaining === 1 ? '' : 's'} left — finish strong!`,
+    }
+  if (correctCount === questionsAnswered && questionsAnswered >= 3)
+    return {
+      heading: "Don't break your perfect run!",
+      subtext: `${correctCount} correct in a row — don't stop now.`,
+    }
+  if (questionsAnswered > questionsRemaining)
+    return {
+      heading: "Wait — you're so close!",
+      subtext: "You've already done the hard part — you're past halfway. Don't waste it.",
+    }
+  if (streak > 0)
+    return {
+      heading: "Wait — you're so close!",
+      subtext: `Quit now and your ${streak}-day streak is at risk — complete this session to protect it.`,
+    }
+  if (correctCount > 0 && questionsAnswered >= 5 && correctCount / questionsAnswered >= 0.8)
+    return {
+      heading: "Wait — you're so close!",
+      subtext: `You're getting ${Math.round(correctCount / questionsAnswered * 100)}% right — this is a great session. Finish it.`,
+    }
+  if (questionsAnswered === 0)
+    return {
+      heading: "Wait — you're so close!",
+      subtext: 'Quit now and lose 1 energy — no credit for starting this session.',
+    }
+  return {
+    heading: "Wait — you're so close!",
+    subtext: 'Quit now and lose all XP from this session — plus 1 energy penalty for quitting early.',
+  }
+}
+
+export default function QuitWarningModal({ isOpen, currentSystem, questionsAnswered, questionsRemaining, correctCount, streak, onKeepGoing, onQuit }) {
   const cfg        = getSystemConfig(currentSystem)
   const mascotSrc  = cfg?.mascot     ?? '/mascots/sparky.png'
   const mascotName = cfg?.mascotName ?? 'Sparky'
   const primary    = cfg?.primary    ?? '#6366F1'
+
+  const { heading, subtext } = getQuitCopy({ questionsRemaining, correctCount, questionsAnswered, streak })
 
   return (
     <AnimatePresence>
@@ -43,14 +82,12 @@ export default function QuitWarningModal({ isOpen, currentSystem, questionsAnswe
 
             {/* Heading */}
             <h2 className="text-white font-bold text-[22px] text-center mb-3">
-              Wait — you're so close!
+              {heading}
             </h2>
 
             {/* Subtext */}
             <p className="text-center text-[15px] mb-8" style={{ color: 'rgba(255,255,255,0.55)' }}>
-              {questionsAnswered === 0
-                ? 'Quit now and lose 1 energy — no credit for starting this session.'
-                : 'Quit now and lose all XP from this session — plus 1 energy penalty for quitting early.'}
+              {subtext}
             </p>
 
             {/* Buttons */}

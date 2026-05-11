@@ -36,7 +36,7 @@ export default function ExamPage() {
   const { user } = useAuthStore()
 
   // ── Gamification ──────────────────────────────────────────────────────────
-  const { awardXP, deductEnergy, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, energy, maxEnergy } = useGamificationStore()
+  const { awardXP, deductEnergy, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, energy, maxEnergy, streak } = useGamificationStore()
   const [showOutOfEnergy, setShowOutOfEnergy]     = useState(false)
   const [showFeedbackSheet, setShowFeedbackSheet] = useState(false)
   const [sheetIsCorrect, setSheetIsCorrect]       = useState(false)
@@ -235,6 +235,8 @@ export default function ExamPage() {
   const currentEliminated = currentQuestionId != null ? (eliminated[currentQuestionId] || [])   : []
   const currentNote       = currentQuestionId != null ? (notes[currentQuestionId]      || '')   : ''
   const isMarked          = currentQuestionId != null && marked.includes(currentQuestionId)
+  const questionsRemaining = questions.length - currentIndex - 1
+  const correctCount       = questions.filter(q => answers[q.id] != null && answers[q.id] === q.correct_index).length
 
   // ── Action handlers ────────────────────────────────────────────────────────
   // In quiz mode the answer locks once selected (rationale immediately revealed)
@@ -915,6 +917,9 @@ export default function ExamPage() {
         isOpen={showQuitModal}
         currentSystem={currentQuestion?.subject}
         questionsAnswered={Object.keys(answers).length}
+        questionsRemaining={questionsRemaining}
+        correctCount={correctCount}
+        streak={streak}
         onKeepGoing={() => setShowQuitModal(false)}
         onQuit={() => { deductEnergy(); navigate('/') }}
       />
