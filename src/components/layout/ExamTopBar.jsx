@@ -6,6 +6,7 @@ export default function ExamTopBar({
   onToggleToolbar,
   paused    = false,
   readOnly  = false,
+  onBack    = null,
 }) {
   const navigate = useNavigate()
   const { formatted, timeRemaining } = useTimer({ onExpire, paused })
@@ -15,7 +16,7 @@ export default function ExamTopBar({
   return (
     <div className="h-14 flex items-center justify-between px-5 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex-shrink-0 z-10">
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => onBack ? onBack() : navigate(-1)}
         className="flex items-center gap-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

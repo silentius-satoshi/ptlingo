@@ -23,6 +23,7 @@ import useGamificationStore from '../stores/gamificationStore'
 import StreakBanner from '../components/exam/StreakBanner'
 import { AnimatePresence } from 'framer-motion'
 import AnswerFeedbackSheet from '../components/drill/AnswerFeedbackSheet'
+import QuitWarningModal from '../components/drill/QuitWarningModal'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -57,6 +58,7 @@ export default function ExamPage() {
   const [showPauseModal, setShowPauseModal]   = useState(false)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [showEndModal, setShowEndModal]       = useState(false)
+  const [showQuitModal, setShowQuitModal]     = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [submitting, setSubmitting]           = useState(false)
   const [pausing, setPausing]                 = useState(false)
@@ -596,6 +598,14 @@ export default function ExamPage() {
         onToggleToolbar={() => setToolbarExpanded((v) => !v)}
         paused={breakState === 'mandatory' || readOnly}
         readOnly={readOnly}
+        onBack={() => {
+          const questionsRemaining = questions.length - currentIndex - 1
+          if (type === 'quiz' && questionsRemaining > 0) {
+            setShowQuitModal(true)
+          } else {
+            navigate(-1)
+          }
+        }}
       />
 
       {type === 'quiz' && !readOnly && (
@@ -716,7 +726,14 @@ export default function ExamPage() {
               onToggleHighlight={() => setHighlightMode((v) => !v)}
               onPause={() => setShowPauseModal(true)}
               onSubmit={type === 'exam' ? handleGoToReview : () => setShowSubmitModal(true)}
-              onEnd={() => setShowEndModal(true)}
+              onEnd={() => {
+                const questionsRemaining = questions.length - currentIndex - 1
+                if (type === 'quiz' && questionsRemaining > 0) {
+                  setShowQuitModal(true)
+                } else {
+                  setShowEndModal(true)
+                }
+              }}
               readOnly={readOnly}
               onReport={() => setShowReportModal(true)}
             />
@@ -893,6 +910,14 @@ export default function ExamPage() {
         }
         onContinue={handleSheetContinue}
         onExplain={handleSheetExplain}
+      />
+
+      <QuitWarningModal
+        isOpen={showQuitModal}
+        currentSystem={currentQuestion?.subject}
+        questionsAnswered={Object.keys(answers).length}
+        onKeepGoing={() => setShowQuitModal(false)}
+        onQuit={() => { deductHeart(); navigate('/') }}
       />
     </div>
   )
