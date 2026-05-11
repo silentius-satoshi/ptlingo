@@ -24,9 +24,84 @@ import StreakBanner from '../components/exam/StreakBanner'
 import { AnimatePresence } from 'framer-motion'
 import AnswerFeedbackSheet from '../components/drill/AnswerFeedbackSheet'
 import QuitWarningModal from '../components/drill/QuitWarningModal'
+import MotivationBreak from '../components/drill/MotivationBreak'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
+
+const EXAM_DATE_MB = new Date('2026-07-29')
+
+function getMotivationBreak({
+  consecutiveCorrect, prevMaxWrong, correctCount, answerHistory, shownBreaks,
+  energy, maxEnergy, streak, questionsRemaining, currentSystem, currentIndex, questionsTotal,
+}) {
+  const totalAnswered = currentIndex + 1
+  const accuracy   = totalAnswered > 0 ? correctCount / totalAnswered : 0
+  const half       = Math.floor(questionsTotal / 2)
+  const quarter    = Math.floor(questionsTotal / 4)
+  const threeQ     = Math.floor(questionsTotal * 0.75)
+  const daysUntil  = Math.ceil((EXAM_DATE_MB - new Date()) / (1000 * 60 * 60 * 24))
+  const last5      = answerHistory.slice(-5)
+  const prev5      = answerHistory.slice(-10, -5)
+  const last5Acc   = last5.length ? last5.filter(Boolean).length / last5.length : 0
+  const prev5Acc   = prev5.length ? prev5.filter(Boolean).length / prev5.length : 0
+  const isNeuro    = currentSystem?.toLowerCase().includes('neuro')
+
+  const candidates = [
+    { key: 'streak_20',          mood: 'excited',     cond: consecutiveCorrect >= 20,
+      msg: 'Perfect 20 — clinic-level performance.' },
+    { key: 'perfect_10',         mood: 'celebrating', cond: correctCount === totalAnswered && totalAnswered >= 10,
+      msg: `Flawless — ${totalAnswered} questions, zero mistakes.` },
+    { key: 'streak_15',          mood: 'excited',     cond: consecutiveCorrect >= 15,
+      msg: '15 in a row — unstoppable!' },
+    { key: 'streak_10',          mood: 'excited',     cond: consecutiveCorrect >= 10,
+      msg: '10 in a row — on fire!' },
+    { key: 'neuro_streak',       mood: 'celebrating', cond: isNeuro && consecutiveCorrect >= 3,
+      msg: "Neuro is your biggest gap — and you're answering correctly. This is exactly the work." },
+    { key: 'streak_7',           mood: 'celebrating', cond: consecutiveCorrect >= 7,
+      msg: "7 correct — you're in the zone!" },
+    { key: 'accuracy_halfway',   mood: 'encouraging', cond: totalAnswered >= half && accuracy >= 0.9,
+      msg: `${Math.round(accuracy * 100)}% accuracy at the halfway point — that's exam-day performance.` },
+    { key: 'streak_5',           mood: 'celebrating', cond: consecutiveCorrect >= 5,
+      msg: 'Cool! 5 in a row!' },
+    { key: 'clean_energy',       mood: 'celebrating', cond: energy === maxEnergy && totalAnswered >= half,
+      msg: 'Not a single energy charge lost — clean session.' },
+    { key: 'last_1',             mood: 'encouraging', cond: questionsRemaining === 1,
+      msg: "Last one. You've got this." },
+    { key: 'last_5',             mood: 'encouraging', cond: questionsRemaining <= 5 && questionsRemaining > 1,
+      msg: `${questionsRemaining} questions left — make them count.` },
+    { key: 'three_quarters',     mood: 'encouraging', cond: totalAnswered >= threeQ,
+      msg: 'Almost there — final push.' },
+    { key: 'recovery_strong',    mood: 'surprised',   cond: prevMaxWrong >= 4 && consecutiveCorrect >= 3,
+      msg: 'Big comeback — you fought through that.' },
+    { key: 'recovery_quick',     mood: 'surprised',   cond: prevMaxWrong >= 2 && consecutiveCorrect >= 2,
+      msg: "Back on track — that's real resilience." },
+    { key: 'accuracy_climbing',  mood: 'encouraging', cond: last5.length >= 5 && prev5.length >= 5 && last5Acc > prev5Acc + 0.2,
+      msg: "You're picking up speed — accuracy is climbing." },
+    { key: 'interventions_note', mood: 'encouraging', cond: isNeuro && totalAnswered >= half,
+      msg: "You're putting work into your biggest gap. Every correct answer here moves your scale score." },
+    { key: 'halfway',            mood: 'encouraging', cond: totalAnswered >= half,
+      msg: 'Halfway there — stay focused.' },
+    { key: 'exam_three_quarters',mood: 'encouraging', cond: totalAnswered >= threeQ,
+      msg: `July 29 is ${daysUntil} days away. Sessions like this one move the needle.` },
+    { key: 'streak_milestone',   mood: 'encouraging', cond: streak > 0 && streak % 7 === 0,
+      msg: `${Math.floor(streak / 7)} week${streak >= 14 ? 's' : ''} of your streak — consistency compounds.` },
+    { key: 'streak_alive',       mood: 'encouraging', cond: streak > 0 && totalAnswered === 1,
+      msg: `Day ${streak} of your streak — this session is keeping it alive.` },
+    { key: 'low_energy',         mood: 'concerned',   cond: energy <= 8,
+      msg: 'Energy running low — finish strong anyway.' },
+    { key: 'neuro_recovery',     mood: 'surprised',   cond: isNeuro && prevMaxWrong >= 2 && consecutiveCorrect >= 2,
+      msg: "You missed some Neuro questions — that's exactly why you're drilling. Keep going." },
+    { key: 'still_standing',     mood: 'encouraging', cond: prevMaxWrong >= 3 && accuracy >= 0.6,
+      msg: 'Rough patch behind you — still above passing pace.' },
+    { key: 'streak_3',           mood: 'celebrating', cond: consecutiveCorrect >= 3,
+      msg: "3 in a row — you're warming up!" },
+    { key: 'quarter',            mood: 'encouraging', cond: totalAnswered >= quarter,
+      msg: 'Good start — build on this.' },
+  ]
+
+  return candidates.find(c => c.cond && !shownBreaks.has(c.key)) ?? null
+}
 
 export default function ExamPage() {
   const { sessionId } = useParams()
@@ -62,6 +137,15 @@ export default function ExamPage() {
   const [showReportModal, setShowReportModal] = useState(false)
   const [submitting, setSubmitting]           = useState(false)
   const [pausing, setPausing]                 = useState(false)
+
+  // ── MotivationBreak tracking ───────────────────────────────────────────────
+  const [showMotivation, setShowMotivation] = useState(false)
+  const [motivationData, setMotivationData] = useState(null)
+  const consecutiveCorrectRef = useRef(0)
+  const prevMaxWrongRef       = useRef(0)
+  const consecutiveWrongRef   = useRef(0)
+  const answerHistoryRef      = useRef([])
+  const shownBreaksRef        = useRef(new Set())
 
   const saveTimeoutRef     = useRef(null)
   const notesSaveRef       = useRef({})
@@ -259,18 +343,26 @@ export default function ExamPage() {
     if (type === 'quiz' && !readOnly) {
       const q = questions.find((q) => q.id === currentQuestionId)
       if (q) {
-        if (i === q.correct_index) {
+        const isCorrect = i === q.correct_index
+        if (isCorrect) {
           awardXP(10, 'Correct answer')
           advanceMission('questions', q.subject)
           incrementStreak()
+          consecutiveCorrectRef.current += 1
+          consecutiveWrongRef.current = 0
+          answerHistoryRef.current = [...answerHistoryRef.current.slice(-9), true]
         } else {
           resetStreak()
           recentWrongIdsRef.current = [currentQuestionId, ...recentWrongIdsRef.current].slice(0, 3)
           deductEnergy()
           const newEnergy = useGamificationStore.getState().energy
           if (newEnergy <= 0) setShowOutOfEnergy(true)
+          consecutiveWrongRef.current += 1
+          prevMaxWrongRef.current = Math.max(prevMaxWrongRef.current, consecutiveWrongRef.current)
+          consecutiveCorrectRef.current = 0
+          answerHistoryRef.current = [...answerHistoryRef.current.slice(-9), false]
         }
-        setSheetIsCorrect(i === q.correct_index)
+        setSheetIsCorrect(isCorrect)
         setShowFeedbackSheet(true)
       }
     }
@@ -459,6 +551,38 @@ export default function ExamPage() {
 
   const handleSheetContinue = useCallback(() => {
     setShowFeedbackSheet(false)
+    if (type === 'quiz' && !readOnly) {
+      const breakData = getMotivationBreak({
+        consecutiveCorrect: consecutiveCorrectRef.current,
+        prevMaxWrong:       prevMaxWrongRef.current,
+        correctCount,
+        answerHistory:      answerHistoryRef.current,
+        shownBreaks:        shownBreaksRef.current,
+        energy, maxEnergy, streak,
+        questionsRemaining,
+        currentSystem:      currentQuestion?.subject,
+        currentIndex,
+        questionsTotal:     questions.length,
+      })
+      if (breakData) {
+        shownBreaksRef.current = new Set([...shownBreaksRef.current, breakData.key])
+        setMotivationData(breakData)
+        setShowMotivation(true)
+        return
+      }
+    }
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+    } else {
+      handleSubmit()
+    }
+  }, [currentIndex, questions.length, setCurrentIndex, handleSubmit,
+      type, readOnly, correctCount, energy, maxEnergy, streak,
+      questionsRemaining, currentQuestion])
+
+  const handleMotivationContinue = useCallback(() => {
+    setShowMotivation(false)
+    setMotivationData(null)
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1)
     } else {
@@ -591,6 +715,19 @@ export default function ExamPage() {
         <OutOfEnergyModal
           onKeepGoing={() => setShowOutOfEnergy(false)}
           onEndSession={() => { setShowOutOfEnergy(false); navigate('/') }}
+        />
+      )}
+
+      {/* Motivation break interstitial — quiz mode only, z-30 */}
+      {showMotivation && motivationData && type === 'quiz' && (
+        <MotivationBreak
+          currentSystem={currentQuestion?.subject}
+          message={motivationData.msg}
+          mood={motivationData.mood}
+          onContinue={handleMotivationContinue}
+          progressPct={(currentIndex / questions.length) * 100}
+          energy={energy}
+          maxEnergy={maxEnergy}
         />
       )}
 
