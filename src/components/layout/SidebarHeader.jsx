@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sun, Moon, Flame, Zap, Heart, Trophy } from 'lucide-react'
+import { Sun, Moon, Flame, Zap, Gem, Trophy } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
@@ -10,7 +10,7 @@ const EXAM_DATE = new Date('2026-07-29')
 
 export default function SidebarHeader() {
   const navigate = useNavigate()
-  const { streak, xp, hearts, loaded } = useGamificationStore()
+  const { streak, xp, energy, maxEnergy, coins, loaded } = useGamificationStore()
   const { darkMode, toggleDarkMode } = useUiStore()
   const [showStreak, setShowStreak] = useState(false)
 
@@ -44,7 +44,7 @@ export default function SidebarHeader() {
         <span>{daysLeft} days to exam · July 29, 2026</span>
       </div>
 
-      {/* Row 3: Stats strip */}
+      {/* Row 3: Stats strip — streak | coins | energy */}
       {loaded && (
         <div className="flex items-center justify-around px-2 py-2 rounded-lg">
           <button
@@ -61,21 +61,21 @@ export default function SidebarHeader() {
             onClick={() => navigate('/profile')}
             className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
           >
-            <div className="flex items-center gap-1 text-yellow-400">
-              <Zap className="w-3.5 h-3.5" />
-              <span className="text-sm font-bold text-white">{xp.toLocaleString()}</span>
+            <div className="flex items-center gap-1" style={{ color: '#F59E0B' }}>
+              <Gem className="w-3.5 h-3.5" />
+              <span className="text-sm font-bold text-white">{coins}</span>
             </div>
-            <span className="text-[9px] text-slate-500">XP</span>
+            <span className="text-[9px] text-slate-500">coins</span>
           </button>
           <button
             onClick={() => navigate('/profile')}
             className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
           >
-            <div className="flex items-center gap-1 text-red-400">
-              <Heart className="w-3.5 h-3.5" />
-              <span className="text-sm font-bold text-white">{hearts}/5</span>
+            <div className="flex items-center gap-1 text-yellow-300">
+              <Zap className="w-3.5 h-3.5" />
+              <span className="text-sm font-bold text-white">{energy}/{maxEnergy}</span>
             </div>
-            <span className="text-[9px] text-slate-500">hearts</span>
+            <span className="text-[9px] text-slate-500">energy</span>
           </button>
         </div>
       )}

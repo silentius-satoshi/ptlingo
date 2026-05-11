@@ -20,7 +20,13 @@ const useGamificationStore = create((set, get) => ({
   level: 1,
   streak: 0,
   longestStreak: 0,
-  hearts: 5,
+  // Energy system (replaces hearts)
+  energy: 25,
+  maxEnergy: 25,
+  lastEnergyUpdate: null,
+  coins: 0,
+  // Deprecated alias — mirrors energy for any existing callers
+  hearts: 25,
   subjectMastery: {},
   dailyMissions: {},
   achievements: [],
@@ -39,20 +45,25 @@ const useGamificationStore = create((set, get) => ({
       }
 
       const missions = row.daily_missions ?? {}
+      const energy   = row.energy        ?? 25
       set({
         userId,
-        xp:             row.xp             ?? 0,
-        level:          row.level           ?? 1,
-        streak:         row.streak          ?? 0,
-        longestStreak:  row.longest_streak  ?? 0,
-        hearts:         row.hearts          ?? 5,
-        subjectMastery: coerceMastery(row.subject_mastery),
-        dailyMissions:  missions,
-        achievements:   row.achievements    ?? [],
+        xp:               row.xp             ?? 0,
+        level:            row.level           ?? 1,
+        streak:           row.streak          ?? 0,
+        longestStreak:    row.longest_streak  ?? 0,
+        energy,
+        maxEnergy:        row.max_energy      ?? 25,
+        lastEnergyUpdate: row.last_energy_update ?? null,
+        coins:            row.coins           ?? 0,
+        hearts:           energy,             // deprecated alias
+        subjectMastery:   coerceMastery(row.subject_mastery),
+        dailyMissions:    missions,
+        achievements:     row.achievements    ?? [],
         loaded: true,
       })
 
-      get().resetHeartsIfNewDay(userId, row.hearts_last_reset)
+      get().rechargeEnergy()
 
       // Generate missions if they are stale or missing
       if (!missions.date || missions.date !== todayStr()) {
@@ -64,27 +75,48 @@ const useGamificationStore = create((set, get) => ({
     }
   },
 
-  // ── Hearts ─────────────────────────────────────────────────────────────────
-  resetHeartsIfNewDay: async (userId, heartsLastReset) => {
-    const today = todayStr()
-    if (heartsLastReset !== today) {
-      set({ hearts: 5 })
-      await upsertGamification(userId, { hearts: 5, hearts_last_reset: today })
-    }
+  // ── Energy ────────────────────────────────────────────────────────────────
+  rechargeEnergy: async () => {
+    const { userId, energy, maxEnergy, lastEnergyUpdate } = get()
+    if (energy >= maxEnergy || !lastEnergyUpdate) return
+    const now  = new Date()
+    const last = new Date(lastEnergyUpdate)
+    const gained = Math.floor((now - last) / (30 * 60 * 1000))
+    if (gained <= 0) return
+    const newEnergy = Math.min(energy + gained, maxEnergy)
+    // Advance by gained*30min (preserves leftover fractional minutes)
+    const newTs = new Date(last.getTime() + gained * 30 * 60 * 1000).toISOString()
+    set({ energy: newEnergy, hearts: newEnergy, lastEnergyUpdate: newTs })
+    await upsertGamification(userId, { energy: newEnergy, last_energy_update: newTs })
   },
 
-  deductHeart: async () => {
-    const { userId, hearts } = get()
-    const newHearts = Math.max(0, hearts - 1)
-    set({ hearts: newHearts })
-    await upsertGamification(userId, { hearts: newHearts })
+  deductEnergy: async () => {
+    const { userId, energy } = get()
+    if (energy <= 0) return
+    const newEnergy = energy - 1
+    const now = new Date().toISOString()
+    set({ energy: newEnergy, hearts: newEnergy, lastEnergyUpdate: now })
+    await upsertGamification(userId, { energy: newEnergy, last_energy_update: now })
   },
 
-  refillHeart: async () => {
-    const { userId, hearts } = get()
-    const newHearts = Math.min(5, hearts + 1)
-    set({ hearts: newHearts })
-    await upsertGamification(userId, { hearts: newHearts })
+  // Deprecated alias — existing callers (QuitWarningModal onQuit) forward here
+  deductHeart: () => get().deductEnergy(),
+
+  // ── Coins ─────────────────────────────────────────────────────────────────
+  addCoins: async (amount) => {
+    const { userId, coins } = get()
+    const newCoins = coins + amount
+    set({ coins: newCoins })
+    await upsertGamification(userId, { coins: newCoins })
+  },
+
+  rechargeEnergyWithCoins: async () => {
+    const { userId, coins, maxEnergy } = get()
+    if (coins < 500) return
+    const now = new Date().toISOString()
+    const newCoins = coins - 500
+    set({ energy: maxEnergy, hearts: maxEnergy, lastEnergyUpdate: now, coins: newCoins })
+    await upsertGamification(userId, { energy: maxEnergy, last_energy_update: now, coins: newCoins })
   },
 
   // ── XP + Level ────────────────────────────────────────────────────────────
@@ -131,12 +163,6 @@ const useGamificationStore = create((set, get) => ({
 
     if (newStreak === 7) await get().awardXP(100, '7-day streak')
     get().checkAchievements()
-  },
-
-  refreshHeartsForNewDay: async () => {
-    const { userId } = get()
-    const row = await fetchOrCreateGamification(userId)
-    if (row) get().resetHeartsIfNewDay(userId, row.hearts_last_reset)
   },
 
   // ── Subject Mastery ───────────────────────────────────────────────────────

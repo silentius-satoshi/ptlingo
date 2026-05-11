@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronLeft, ChevronRight, Trophy, Flame, Zap, Heart, ShieldCheck, ShieldOff, KeyRound, Fingerprint, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Trophy, Flame, Zap, ShieldCheck, ShieldOff, KeyRound, Fingerprint, Trash2 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import useGamificationStore from '../stores/gamificationStore'
 import { supabase } from '../lib/supabase'
@@ -196,7 +196,7 @@ function Calendar({ activePlan }) {
 export default function ProfilePage() {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const { streak, xp, hearts, achievements } = useGamificationStore()
+  const { streak, xp, energy, maxEnergy, achievements } = useGamificationStore()
   const { listFactors, unenroll } = useMFA()
   const { passkeys, loading: passkeyLoading, error: passkeyError, register: registerPasskey, remove: removePasskey } = usePasskey()
   const { enabled: bioEnabled, setEnabled: setBioEnabled, timeoutMinutes: bioTimeout, setTimeoutMinutes: setBioTimeout } = useBiometricLock()
@@ -269,7 +269,7 @@ export default function ProfilePage() {
                 <StatCard icon={<Flame className="w-4 h-4 text-orange-400" />} value={streak} label="Days Studied" />
                 <StatCard icon={<Trophy className="w-4 h-4 text-amber-400" />} value={achievements.length} label="Achievements" />
                 <StatCard icon={<Zap className="w-4 h-4 text-yellow-400" />} value={xp.toLocaleString()} label="Total XP" />
-                <StatCard icon={<Heart className="w-4 h-4 text-red-400" />} value={`${hearts}/5`} label="Hearts" />
+                <StatCard icon={<Zap className="w-4 h-4 text-yellow-400" />} value={`${energy}/${maxEnergy}`} label="Energy" />
               </div>
             </div>
 

@@ -60,6 +60,7 @@ export default function App() {
   const { setUser, setLoading } = useAuthStore()
   const { darkMode } = useUiStore()
   const loadGamification = useGamificationStore((s) => s.load)
+  const rechargeEnergy   = useGamificationStore((s) => s.rechargeEnergy)
 
   // Apply dark mode class on mount
   useEffect(() => {
@@ -89,6 +90,13 @@ export default function App() {
 
     return () => subscription.unsubscribe()
   }, [setUser, setLoading, loadGamification])
+
+  // Recharge energy whenever the user returns to the app
+  useEffect(() => {
+    const handler = () => rechargeEnergy()
+    window.addEventListener('focus', handler)
+    return () => window.removeEventListener('focus', handler)
+  }, [rechargeEnergy])
 
   return (
     <BrowserRouter>

@@ -17,8 +17,8 @@ import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import BreakScreen from '../components/exam/BreakScreen'
 import RationalePanel from '../components/exam/RationalePanel'
-import HeartBar from '../components/gamification/HeartBar'
-import HeartEmptyModal from '../components/gamification/HeartEmptyModal'
+import EnergyBar from '../components/gamification/EnergyBar'
+import OutOfEnergyModal from '../components/gamification/OutOfEnergyModal'
 import useGamificationStore from '../stores/gamificationStore'
 import StreakBanner from '../components/exam/StreakBanner'
 import { AnimatePresence } from 'framer-motion'
@@ -36,8 +36,8 @@ export default function ExamPage() {
   const { user } = useAuthStore()
 
   // ── Gamification ──────────────────────────────────────────────────────────
-  const { awardXP, deductHeart, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, hearts } = useGamificationStore()
-  const [showHeartEmpty, setShowHeartEmpty]       = useState(false)
+  const { awardXP, deductEnergy, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, energy, maxEnergy } = useGamificationStore()
+  const [showOutOfEnergy, setShowOutOfEnergy]     = useState(false)
   const [showFeedbackSheet, setShowFeedbackSheet] = useState(false)
   const [sheetIsCorrect, setSheetIsCorrect]       = useState(false)
   const [explainMode, setExplainMode]             = useState(false)
@@ -263,18 +263,17 @@ export default function ExamPage() {
           incrementStreak()
         } else {
           resetStreak()
-          // Track recent wrong IDs for HeartEmptyModal
           recentWrongIdsRef.current = [currentQuestionId, ...recentWrongIdsRef.current].slice(0, 3)
-          const newHearts = useGamificationStore.getState().hearts - 1
-          deductHeart()
-          if (newHearts <= 0) setShowHeartEmpty(true)
+          deductEnergy()
+          const newEnergy = useGamificationStore.getState().energy
+          if (newEnergy <= 0) setShowOutOfEnergy(true)
         }
         setSheetIsCorrect(i === q.correct_index)
         setShowFeedbackSheet(true)
       }
     }
     scheduleSave()
-  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductHeart, incrementStreak, resetStreak])
+  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductEnergy, incrementStreak, resetStreak])
 
   // Reset sheet + explain state whenever the question changes
   useEffect(() => {
@@ -585,11 +584,11 @@ export default function ExamPage() {
 
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-slate-900 overflow-hidden">
-      {/* HeartEmpty modal — quiz mode only */}
-      {showHeartEmpty && type === 'quiz' && !readOnly && (
-        <HeartEmptyModal
-          wrongQuestionIds={recentWrongIdsRef.current}
-          onEndSession={() => { setShowHeartEmpty(false); handleSubmit() }}
+      {/* Out of energy modal — quiz mode only */}
+      {showOutOfEnergy && type === 'quiz' && !readOnly && (
+        <OutOfEnergyModal
+          onKeepGoing={() => setShowOutOfEnergy(false)}
+          onEndSession={() => { setShowOutOfEnergy(false); navigate('/') }}
         />
       )}
 
@@ -750,10 +749,10 @@ export default function ExamPage() {
         />
       )}
 
-      {/* Hearts display — quiz mode only */}
+      {/* Energy display — quiz mode only */}
       {type === 'quiz' && !readOnly && !breakState && (
         <div className="absolute top-14 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <HeartBar count={hearts} />
+          <EnergyBar energy={energy} maxEnergy={maxEnergy} />
         </div>
       )}
 
@@ -917,7 +916,7 @@ export default function ExamPage() {
         currentSystem={currentQuestion?.subject}
         questionsAnswered={Object.keys(answers).length}
         onKeepGoing={() => setShowQuitModal(false)}
-        onQuit={() => { deductHeart(); navigate('/') }}
+        onQuit={() => { deductEnergy(); navigate('/') }}
       />
     </div>
   )

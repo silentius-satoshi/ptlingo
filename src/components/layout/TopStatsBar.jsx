@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Flame, Zap, Heart, Trophy, Sun, Moon } from 'lucide-react'
+import { Flame, Zap, Gem, Trophy, Sun, Moon } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
@@ -10,7 +10,7 @@ const EXAM_DATE = new Date('2026-07-29')
 
 export default function TopStatsBar() {
   const navigate = useNavigate()
-  const { streak, xp, hearts } = useGamificationStore()
+  const { streak, xp, energy, maxEnergy, coins } = useGamificationStore()
   const { darkMode, toggleDarkMode } = useUiStore()
   const [showStreak, setShowStreak] = useState(false)
 
@@ -39,13 +39,14 @@ export default function TopStatsBar() {
           <Zap className="w-3.5 h-3.5" />
           {xp}
         </button>
-        <button
-          onClick={() => navigate('/profile')}
-          className="flex items-center gap-1 text-xs font-bold text-red-400"
-        >
-          <Heart className="w-3.5 h-3.5" />
-          {hearts}/5
-        </button>
+        <div className="flex items-center gap-1 text-xs font-bold" style={{ color: '#F59E0B' }}>
+          <Gem className="w-3.5 h-3.5" />
+          {coins}
+        </div>
+        <div className="flex items-center gap-1 text-xs font-bold text-yellow-300">
+          <Zap className="w-3.5 h-3.5" />
+          {energy}/{maxEnergy}
+        </div>
       </div>
 
       {/* Right: countdown + trophy + theme toggle */}
