@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { Flame, Zap, Heart, Trophy, Sun, Moon } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
 import { useUiStore } from '../../store/uiStore'
+import StreakModal from '../streak/StreakModal'
 
 const EXAM_DATE = new Date('2026-07-29')
 
@@ -9,6 +12,7 @@ export default function TopStatsBar() {
   const navigate = useNavigate()
   const { streak, xp, hearts } = useGamificationStore()
   const { darkMode, toggleDarkMode } = useUiStore()
+  const [showStreak, setShowStreak] = useState(false)
 
   const daysLeft = Math.max(0, Math.ceil((EXAM_DATE - new Date()) / 86400000))
   const pillColor = daysLeft < 30 ? 'bg-red-500' : 'bg-amber-500'
@@ -18,24 +22,31 @@ export default function TopStatsBar() {
       className="md:hidden flex items-center justify-between px-4 bg-slate-900 border-b border-slate-700 flex-shrink-0"
       style={{ height: 44 }}
     >
-      {/* Left: stats → /profile */}
-      <button
-        onClick={() => navigate('/profile')}
-        className="flex items-center gap-3"
-      >
-        <span className="flex items-center gap-1 text-xs font-bold text-orange-400">
+      {/* Left: stats */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setShowStreak(true)}
+          className="flex items-center gap-0.5 text-xs font-bold"
+          style={{ color: '#FF9600' }}
+        >
           <Flame className="w-3.5 h-3.5" />
           {streak}
-        </span>
-        <span className="flex items-center gap-1 text-xs font-bold text-yellow-400">
+        </button>
+        <button
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-1 text-xs font-bold text-yellow-400"
+        >
           <Zap className="w-3.5 h-3.5" />
           {xp}
-        </span>
-        <span className="flex items-center gap-1 text-xs font-bold text-red-400">
+        </button>
+        <button
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-1 text-xs font-bold text-red-400"
+        >
           <Heart className="w-3.5 h-3.5" />
           {hearts}/5
-        </span>
-      </button>
+        </button>
+      </div>
 
       {/* Right: countdown + trophy + theme toggle */}
       <div className="flex items-center gap-1.5">
@@ -60,6 +71,10 @@ export default function TopStatsBar() {
           }
         </button>
       </div>
+
+      <AnimatePresence>
+        {showStreak && <StreakModal streak={streak} onClose={() => setShowStreak(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

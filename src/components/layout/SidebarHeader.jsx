@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { Sun, Moon, Flame, Zap, Heart, Trophy } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
 import { useUiStore } from '../../store/uiStore'
+import StreakModal from '../streak/StreakModal'
 
 const EXAM_DATE = new Date('2026-07-29')
 
@@ -9,11 +12,13 @@ export default function SidebarHeader() {
   const navigate = useNavigate()
   const { streak, xp, hearts, loaded } = useGamificationStore()
   const { darkMode, toggleDarkMode } = useUiStore()
+  const [showStreak, setShowStreak] = useState(false)
 
   const daysLeft = Math.max(0, Math.ceil((EXAM_DATE - new Date()) / 86400000))
   const pillColor = daysLeft < 30 ? 'bg-red-500' : 'bg-amber-500'
 
   return (
+    <>
     <div className="mx-3 mt-3 mb-2 p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-3">
       {/* Row 1: Logo + dark mode toggle */}
       <div className="flex items-center justify-between">
@@ -39,34 +44,40 @@ export default function SidebarHeader() {
         <span>{daysLeft} days to exam · July 29, 2026</span>
       </div>
 
-      {/* Row 3: Stats strip → /profile */}
+      {/* Row 3: Stats strip */}
       {loaded && (
-        <button
-          onClick={() => navigate('/profile')}
-          className="w-full flex items-center justify-around px-2 py-2 rounded-lg hover:bg-slate-700/50 transition-colors"
-        >
-          <div className="flex flex-col items-center gap-0.5">
+        <div className="flex items-center justify-around px-2 py-2 rounded-lg">
+          <button
+            onClick={() => setShowStreak(true)}
+            className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
+          >
             <div className="flex items-center gap-1 text-orange-400">
               <Flame className="w-3.5 h-3.5" />
               <span className="text-sm font-bold text-white">{streak}</span>
             </div>
             <span className="text-[9px] text-slate-500">streak</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
+          </button>
+          <button
+            onClick={() => navigate('/profile')}
+            className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
+          >
             <div className="flex items-center gap-1 text-yellow-400">
               <Zap className="w-3.5 h-3.5" />
               <span className="text-sm font-bold text-white">{xp.toLocaleString()}</span>
             </div>
             <span className="text-[9px] text-slate-500">XP</span>
-          </div>
-          <div className="flex flex-col items-center gap-0.5">
+          </button>
+          <button
+            onClick={() => navigate('/profile')}
+            className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
+          >
             <div className="flex items-center gap-1 text-red-400">
               <Heart className="w-3.5 h-3.5" />
               <span className="text-sm font-bold text-white">{hearts}/5</span>
             </div>
             <span className="text-[9px] text-slate-500">hearts</span>
-          </div>
-        </button>
+          </button>
+        </div>
       )}
 
       {/* Row 4: Trophy row → /achievements */}
@@ -79,5 +90,10 @@ export default function SidebarHeader() {
         <span className="text-slate-600">›</span>
       </button>
     </div>
+
+    <AnimatePresence>
+      {showStreak && <StreakModal streak={streak} onClose={() => setShowStreak(false)} />}
+    </AnimatePresence>
+    </>
   )
 }
