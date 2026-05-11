@@ -2,7 +2,10 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import confetti from 'canvas-confetti'
 import useGamificationStore from '../stores/gamificationStore'
-import PathNode, { ChestNode, HexNode } from '../components/gamification/PathNode'
+import { useAuthStore } from '../store/authStore'
+import { supabase } from '../lib/supabase'
+import PathNode, { HexNode } from '../components/gamification/PathNode'
+import TreasureChest from '../components/gamification/TreasureChest'
 import MissionCard from '../components/gamification/MissionCard'
 import StreakBadge from '../components/gamification/StreakBadge'
 import LevelBadge from '../components/gamification/LevelBadge'
@@ -28,9 +31,11 @@ export default function ThePathPage() {
     awardXP,
   } = useGamificationStore()
 
+  const { user } = useAuthStore()
+
   const [generatingMissions, setGeneratingMissions] = useState(false)
   const [showAllMissionsBanner, setShowAllMissionsBanner] = useState(false)
-  const [claimedChests, setClaimedChests] = useState(() => new Set())
+  const [claimedSystems, setClaimedSystems] = useState(() => new Set())
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
@@ -72,16 +77,32 @@ export default function ThePathPage() {
     }
   }, [loaded])
 
+  // Load claimed milestones from Supabase
+  useEffect(() => {
+    if (!loaded || !user) return
+    supabase.from('path_milestones')
+      .select('system_name')
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        if (data) setClaimedSystems(new Set(data.map(r => r.system_name)))
+      })
+  }, [loaded, user])
+
   const allAbove60 = PATH_SECTIONS.every((s) => {
     const pct = subjectMastery[s.masteryKey]?.pct ?? subjectMastery[s.masteryKey] ?? 0
     return pct >= 60
   })
 
-  const handleChestClaim = useCallback((chestId, sectionSystem) => {
-    if (claimedChests.has(chestId)) return
-    setClaimedChests((prev) => new Set([...prev, chestId]))
-    awardXP(100, `chest_unlock_${sectionSystem}`)
-  }, [claimedChests, awardXP])
+  const handleChestClaim = useCallback(async (sectionSystem, sectionLabel) => {
+    if (claimedSystems.has(sectionSystem)) return
+    setClaimedSystems(prev => new Set([...prev, sectionSystem]))
+    awardXP(50, `${sectionLabel} Milestone! 🎉`)
+    await supabase.from('path_milestones').insert({
+      user_id: user.id,
+      system_name: sectionSystem,
+      xp_awarded: 50,
+    })
+  }, [claimedSystems, awardXP, user])
 
   // Build render items list
   const renderItems = []
@@ -112,13 +133,13 @@ export default function ThePathPage() {
       nodeIndex++
     })
 
-    // Chest between sections
-    if (sectionIdx < PATH_SECTIONS.length - 1) {
-      const chestId = `chest-${section.system}`
-      const chestUnlocked = masteryPct >= 80
-      renderItems.push({ type: 'chest', chestUnlocked, chestId, section, key: chestId })
-      nodeIndex++
-    }
+    // Treasure chest after each section
+    const questionsAnswered = subjectMastery[section.masteryKey]?.total ?? 0
+    const chestState = claimedSystems.has(section.system)
+      ? 'opened'
+      : (questionsAnswered >= 20 && masteryPct >= 60) ? 'unlocked' : 'locked'
+    renderItems.push({ type: 'chest', chestState, section, key: `chest-${section.system}` })
+    nodeIndex++
   })
 
   // Mark the FIRST active node across all sections as isGlobalActive
@@ -215,10 +236,9 @@ export default function ThePathPage() {
             if (item.type === 'chest') {
               return (
                 <div key={item.key} className="flex justify-center my-5">
-                  <ChestNode
-                    unlocked={item.chestUnlocked}
-                    claimed={claimedChests.has(item.chestId)}
-                    onClaim={() => handleChestClaim(item.chestId, item.section.system)}
+                  <TreasureChest
+                    state={item.chestState}
+                    onClaim={() => handleChestClaim(item.section.system, item.section.label)}
                   />
                 </div>
               )
