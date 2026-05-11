@@ -17,7 +17,6 @@ import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import BreakScreen from '../components/exam/BreakScreen'
 import RationalePanel from '../components/exam/RationalePanel'
-import EnergyBar from '../components/gamification/EnergyBar'
 import OutOfEnergyModal from '../components/gamification/OutOfEnergyModal'
 import useGamificationStore from '../stores/gamificationStore'
 import StreakBanner from '../components/exam/StreakBanner'
@@ -758,6 +757,12 @@ export default function ExamPage() {
             navigate(-1)
           }
         }}
+        type={type}
+        currentIndex={currentIndex}
+        questionsTotal={questions.length}
+        currentSystem={currentQuestion?.subject}
+        energy={energy}
+        maxEnergy={maxEnergy}
       />
 
       {type === 'quiz' && !readOnly && (
@@ -902,12 +907,6 @@ export default function ExamPage() {
         />
       )}
 
-      {/* Energy display — quiz mode only */}
-      {type === 'quiz' && !readOnly && !breakState && (
-        <div className="absolute top-14 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <EnergyBar energy={energy} maxEnergy={maxEnergy} />
-        </div>
-      )}
 
       {/* ── Section complete — optional break offer ── */}
       <Modal
