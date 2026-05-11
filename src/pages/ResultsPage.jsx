@@ -333,10 +333,10 @@ export default function ResultsPage() {
               src={cfg?.mascot ?? '/mascots/sparky.png'}
               alt={cfg?.mascotName ?? 'Sparky'}
               style={{
-                width: '105px',
-                height: '200px',
-                objectFit: 'cover',
-                objectPosition: 'top center',
+                width: 'auto',
+                height: 'auto',
+                maxHeight: '180px',
+                objectFit: 'contain',
                 border: 'none',
                 background: 'transparent',
                 display: 'block',
