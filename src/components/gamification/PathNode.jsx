@@ -11,12 +11,13 @@ export default function PathNode({
   isGlobalActive,
   masteryPct,
   wasLocked,
+  sessionsCompleted,
   onPress,
 }) {
   const [showLockedTip, setShowLockedTip] = useState(false)
   const nodeRef = useRef(null)
 
-  const size = state === 'locked' ? 56 : 72
+  const size = 56
   const isCompleted = state === 'completed'
   const isActive = state === 'active'
   const isLocked = state === 'locked'
@@ -36,17 +37,13 @@ export default function PathNode({
     onPress()
   }
 
-  const nodeColor = isLocked
-    ? '#334155'
-    : isActive && !isGlobalActive
-    ? section.color + '99'
-    : section.color
+  const nodeColor = isLocked ? '#3D4A6B' : section.color
 
   const ringCircumference = Math.PI * (size - 6)
 
   return (
     <div ref={nodeRef} className="relative flex flex-col items-center gap-1">
-      {/* START callout above global active */}
+      {/* START bubble above global active */}
       <AnimatePresence>
         {isGlobalActive && (
           <motion.div
@@ -54,39 +51,48 @@ export default function PathNode({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="rounded-xl overflow-hidden px-4 py-3 min-w-[160px]"
-            style={{ background: '#1C1F2E', borderLeft: `3px solid ${section.color}` }}
+            className="rounded-lg px-4 py-1.5 relative"
+            style={{ background: '#1C1F2E' }}
           >
-            <p className="text-white font-bold text-sm mb-2">{node.topic}</p>
-            <button
-              onClick={handlePress}
-              className="px-3 py-1 rounded-lg text-white text-xs font-bold uppercase tracking-wide"
-              style={{ background: section.color }}
-            >
-              Start Lesson
-            </button>
+            <p className="text-xs font-bold tracking-widest uppercase" style={{ color: section.color }}>
+              START
+            </p>
+            <div style={{
+              position: 'absolute',
+              bottom: -6,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0,
+              height: 0,
+              borderLeft: '6px solid transparent',
+              borderRight: '6px solid transparent',
+              borderTop: '6px solid #1C1F2E',
+            }} />
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="flex items-center gap-3">
         {/* Main node button */}
-        <div className="relative flex-shrink-0">
+        <div className="relative flex-shrink-0" style={{ overflow: 'visible' }}>
           <motion.button
             initial={wasLocked ? { scale: 0, rotate: -15, opacity: 0 } : { scale: 1, opacity: 1 }}
             animate={{ scale: 1, rotate: 0, opacity: isLocked ? 0.6 : 1 }}
             transition={wasLocked ? { type: 'spring', stiffness: 260, damping: 14, delay: 0.1 } : {}}
-            whileTap={{ scale: isLocked ? 1 : 0.92 }}
+            whileTap={!isLocked ? {
+              y: 4,
+              boxShadow: `0 2px 0 0 ${section.dark}, 0 4px 8px rgba(0,0,0,0.3)`,
+            } : {}}
             onClick={handlePress}
             style={{
               width: size,
               height: size,
               backgroundColor: nodeColor,
-              boxShadow: isGlobalActive
-                ? `0 0 0 4px white, 0 0 0 8px ${section.color}`
-                : isCompleted
-                ? `0 4px 14px ${section.color}66`
-                : 'none',
+              boxShadow: isLocked
+                ? '0 6px 0 0 #1E2340, 0 7px 16px rgba(0,0,0,0.4)'
+                : isGlobalActive
+                ? `0 0 0 4px white, 0 0 0 8px ${section.color}, 0 6px 0 0 ${section.dark}, 0 8px 20px rgba(0,0,0,0.45)`
+                : `0 6px 0 0 ${section.dark}, 0 8px 20px rgba(0,0,0,0.45)`,
             }}
             className="rounded-full flex items-center justify-center relative focus:outline-none"
           >
@@ -99,6 +105,17 @@ export default function PathNode({
                 style={{ backgroundColor: section.color }}
               />
             )}
+
+            {/* Glossy highlight */}
+            <div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{
+                background: isLocked
+                  ? 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.08) 0%, transparent 60%)'
+                  : 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.30) 0%, transparent 60%)',
+                zIndex: 5,
+              }}
+            />
 
             {/* Icon */}
             {isCompleted ? (
@@ -147,6 +164,33 @@ export default function PathNode({
               />
             </svg>
           )}
+
+          {/* Session progress ring for global active node */}
+          {isGlobalActive && (() => {
+            const ringSize = size + 48
+            const cx = ringSize / 2
+            const r = ringSize / 2 - 10
+            const circ = 2 * Math.PI * r
+            const offset = circ * (1 - (sessionsCompleted ?? 0) / 4)
+            return (
+              <svg
+                className="absolute pointer-events-none"
+                style={{ top: -24, left: -24, zIndex: 20 }}
+                width={ringSize}
+                height={ringSize}
+                viewBox={`0 0 ${ringSize} ${ringSize}`}
+              >
+                <circle cx={cx} cy={cx} r={r} fill="none"
+                  stroke="rgba(255,255,255,0.28)" strokeWidth={5} />
+                <circle cx={cx} cy={cx} r={r} fill="none"
+                  stroke="white" strokeWidth={5} strokeLinecap="round"
+                  strokeDasharray={circ} strokeDashoffset={offset}
+                  transform={`rotate(-90 ${cx} ${cx})`}
+                  style={{ transition: 'stroke-dashoffset 600ms ease' }}
+                />
+              </svg>
+            )
+          })()}
         </div>
 
         {/* Mascot beside global active node */}
@@ -164,21 +208,6 @@ export default function PathNode({
         </AnimatePresence>
       </div>
 
-      {/* Topic label below active/completed nodes */}
-      <AnimatePresence>
-        {(isActive || isCompleted) && (
-          <motion.span
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ delay: 0.15 }}
-            className="text-xs font-semibold px-2 py-0.5 rounded-full text-white max-w-[120px] text-center leading-tight mt-0.5"
-            style={{ backgroundColor: section.color + 'cc' }}
-          >
-            {node.topic}
-          </motion.span>
-        )}
-      </AnimatePresence>
 
       {/* Stars for completed */}
       {isCompleted && (

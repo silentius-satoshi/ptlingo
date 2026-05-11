@@ -110,6 +110,7 @@ export default function ThePathPage() {
 
   PATH_SECTIONS.forEach((section, sectionIdx) => {
     const masteryPct = subjectMastery[section.masteryKey]?.pct ?? subjectMastery[section.masteryKey] ?? 0
+    const sessionsCompleted = Math.min(4, Math.floor((subjectMastery[section.masteryKey]?.total ?? 0) / 10))
 
     renderItems.push({ type: 'banner', section, masteryPct, key: `banner-${section.system}` })
 
@@ -128,6 +129,7 @@ export default function ThePathPage() {
         wasLocked,
         isGlobalActive: false,
         nodeIndex,
+        sessionsCompleted,
         key: node.id,
       })
       nodeIndex++
@@ -262,6 +264,7 @@ export default function ThePathPage() {
                     masteryPct={item.masteryPct}
                     isGlobalActive={item.isGlobalActive}
                     wasLocked={item.wasLocked}
+                    sessionsCompleted={item.sessionsCompleted}
                     onPress={() => navigate(`/question-bank?subject=${encodeURIComponent(item.section.masteryKey)}`)}
                   />
                 </div>

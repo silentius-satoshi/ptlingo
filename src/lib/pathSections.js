@@ -8,6 +8,7 @@ export const PATH_SECTIONS = [
     mascot: 'sparky',
     color: SYSTEM_CONFIG.Neuromuscular.primary,
     lightBg: SYSTEM_CONFIG.Neuromuscular.light,
+    dark: SYSTEM_CONFIG.Neuromuscular.dark,
     emoji: '⚡',
     nodes: [
       { id: 'neuro-1', topic: 'Lesion Identification',    masteryThreshold: 0  },
@@ -24,6 +25,7 @@ export const PATH_SECTIONS = [
     mascot: 'flex',
     color: SYSTEM_CONFIG.Musculoskeletal.primary,
     lightBg: SYSTEM_CONFIG.Musculoskeletal.light,
+    dark: SYSTEM_CONFIG.Musculoskeletal.dark,
     emoji: '💪',
     nodes: [
       { id: 'msk-1', topic: 'Orthopedic Tests',    masteryThreshold: 0  },
@@ -40,6 +42,7 @@ export const PATH_SECTIONS = [
     mascot: 'pulse',
     color: SYSTEM_CONFIG['Cardiovascular/Pulmonary'].primary,
     lightBg: SYSTEM_CONFIG['Cardiovascular/Pulmonary'].light,
+    dark: SYSTEM_CONFIG['Cardiovascular/Pulmonary'].dark,
     emoji: '❤️',
     nodes: [
       { id: 'cardio-1', topic: 'Cardiac Conditions',   masteryThreshold: 0  },
@@ -56,6 +59,7 @@ export const PATH_SECTIONS = [
     mascot: 'patch',
     color: SYSTEM_CONFIG.Integumentary.primary,
     lightBg: SYSTEM_CONFIG.Integumentary.light,
+    dark: SYSTEM_CONFIG.Integumentary.dark,
     emoji: '🩹',
     nodes: [
       { id: 'integ-1', topic: 'Wound Classification', masteryThreshold: 0  },
@@ -72,6 +76,7 @@ export const PATH_SECTIONS = [
     mascot: 'page',
     color: SYSTEM_CONFIG['Nonsystem Domains'].primary,
     lightBg: SYSTEM_CONFIG['Nonsystem Domains'].light,
+    dark: SYSTEM_CONFIG['Nonsystem Domains'].dark,
     emoji: '📋',
     nodes: [
       { id: 'other-1', topic: 'Research & EBP',          masteryThreshold: 0  },
@@ -88,6 +93,7 @@ export const PATH_SECTIONS = [
     mascot: 'flora',
     color: SYSTEM_CONFIG['Other Systems'].primary,
     lightBg: SYSTEM_CONFIG['Other Systems'].light,
+    dark: SYSTEM_CONFIG['Other Systems'].dark,
     emoji: '🌿',
     nodes: [
       { id: 'peds-1', topic: 'Developmental Milestones', masteryThreshold: 0  },
