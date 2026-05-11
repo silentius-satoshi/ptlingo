@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Flame, Zap, Gem, Trophy, Sun, Moon } from 'lucide-react'
+import { Flame, Zap, Gem, Star, Trophy, Sun, Moon } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
@@ -36,7 +36,7 @@ export default function TopStatsBar() {
           onClick={() => navigate('/profile')}
           className="flex items-center gap-1 text-xs font-bold text-yellow-400"
         >
-          <Zap className="w-3.5 h-3.5" />
+          <Star className="w-3.5 h-3.5" />
           {xp}
         </button>
         <div className="flex items-center gap-1 text-xs font-bold" style={{ color: '#F59E0B' }}>
