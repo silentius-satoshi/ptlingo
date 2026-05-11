@@ -35,7 +35,7 @@ export default function ExamPage() {
   const { user } = useAuthStore()
 
   // ── Gamification ──────────────────────────────────────────────────────────
-  const { awardXP, deductHeart, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, hearts } = useGamificationStore()
+  const { awardXP, deductHeart, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, hearts } = useGamificationStore()
   const [showHeartEmpty, setShowHeartEmpty]       = useState(false)
   const [showFeedbackSheet, setShowFeedbackSheet] = useState(false)
   const [sheetIsCorrect, setSheetIsCorrect]       = useState(false)
@@ -444,6 +444,7 @@ export default function ExamPage() {
       // Refresh mastery + check question count achievements
       await refreshSubjectMastery()
       await checkQuestionCountAchievements()
+      await advanceStreak()
 
       navigate(`/results/${sessionId}`)
     } catch (err) {
@@ -451,7 +452,7 @@ export default function ExamPage() {
     } finally {
       setSubmitting(false)
     }
-  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements])
+  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak])
 
   const handleSheetContinue = useCallback(() => {
     setShowFeedbackSheet(false)

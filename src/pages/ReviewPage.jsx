@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import useGamificationStore from '../stores/gamificationStore'
 import { useSessionStore } from '../store/sessionStore'
 import { useTimer } from '../hooks/useTimer'
 import Modal from '../components/shared/Modal'
@@ -72,6 +73,7 @@ function QuestionCard({ question, questionNumber, isAnswered, onGoTo }) {
 export default function ReviewPage() {
   const { sessionId } = useParams()
   const navigate      = useNavigate()
+  const { advanceStreak } = useGamificationStore()
 
   const [loading, setLoading]                 = useState(true)
   const [error, setError]                     = useState('')
@@ -149,13 +151,14 @@ export default function ReviewPage() {
         })
         .eq('id', sessionId)
 
+      await advanceStreak()
       navigate(`/results/${sessionId}`)
     } catch (err) {
       console.error('Submit error:', err)
     } finally {
       setSubmitting(false)
     }
-  }, [session, questions, sessionId, navigate])
+  }, [session, questions, sessionId, navigate, advanceStreak])
 
   // ── Live timer — timed sessions only, paused until session loaded ──────────
   const timerPaused = loading || session?.mode !== 'timed'
