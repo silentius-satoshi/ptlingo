@@ -59,7 +59,7 @@ const useGamificationStore = create((set, get) => ({
   coins: _c.coins ?? 0,
   // Deprecated alias — mirrors energy for any existing callers
   hearts: _c.energy ?? 25,
-  subjectMastery: {},
+  subjectMastery: _c.subjectMastery ?? {},
   dailyMissions: {},
   achievements: [],
   loaded: false,
@@ -105,12 +105,13 @@ const useGamificationStore = create((set, get) => ({
         loaded: true,
       })
       localStorage.setItem('ptlingo_gam', JSON.stringify({
-        xp:           row.xp           ?? 0,
-        streak:       row.streak        ?? 0,
-        energy:       row.energy        ?? 25,
-        coins:        row.coins         ?? 0,
-        ptLingoScore: computePtLingoScore(coercedMastery),
-        level:        getLevelFromXP(row.xp ?? 0),
+        xp:             row.xp           ?? 0,
+        streak:         row.streak        ?? 0,
+        energy:         row.energy        ?? 25,
+        coins:          row.coins         ?? 0,
+        ptLingoScore:   computePtLingoScore(coercedMastery),
+        level:          getLevelFromXP(row.xp ?? 0),
+        subjectMastery: coercedMastery,
       }))
 
       get().rechargeEnergy()
@@ -271,8 +272,11 @@ const useGamificationStore = create((set, get) => ({
     const { userId, subjectMastery } = get()
     const entry = typeof data === 'number' ? { pct: data, correct: 0, total: 0 } : data
     const updated = { ...subjectMastery, [subject]: entry }
-    set({ subjectMastery: updated, ptLingoScore: computePtLingoScore(updated) })
+    const newScore = computePtLingoScore(updated)
+    set({ subjectMastery: updated, ptLingoScore: newScore })
     await upsertGamification(userId, { subject_mastery: updated })
+    const cached = JSON.parse(localStorage.getItem('ptlingo_gam') ?? '{}')
+    localStorage.setItem('ptlingo_gam', JSON.stringify({ ...cached, subjectMastery: updated, ptLingoScore: newScore }))
     get().checkAchievements()
   },
 
@@ -281,8 +285,11 @@ const useGamificationStore = create((set, get) => ({
     const accuracy = await fetchAccuracyBySubject(userId)
     const { subjectMastery } = get()
     const updated = { ...subjectMastery, ...accuracy }
-    set({ subjectMastery: updated, ptLingoScore: computePtLingoScore(updated) })
+    const newScore = computePtLingoScore(updated)
+    set({ subjectMastery: updated, ptLingoScore: newScore })
     await upsertGamification(userId, { subject_mastery: updated })
+    const cached = JSON.parse(localStorage.getItem('ptlingo_gam') ?? '{}')
+    localStorage.setItem('ptlingo_gam', JSON.stringify({ ...cached, subjectMastery: updated, ptLingoScore: newScore }))
     get().checkAchievements()
   },
 
