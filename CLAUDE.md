@@ -1,339 +1,195 @@
 # PT Lingo — Project Reference
-## Current state: Step 30 complete (brand rename). Next: Step 31 (Anonymous sign-in).
-
----
+Step 36 complete. Step 37 next (PostSessionFlow).
 
 ## Stack
-
-- **React 18** + **Vite 5** (ESM, no TypeScript)
-- **Tailwind CSS 3** — utility-first; dark mode via `class` strategy
-- **React Router v6** — `BrowserRouter`, `Routes/Route`
-- **Zustand** — `sessionStore`, `authStore`, `uiStore`, `gamificationStore`
-- **Supabase JS v2** — auth + Postgres (RLS enabled on all tables)
-- **Recharts** — performance charts, trend dashboard
-- **OpenRouter** (Gemini Flash) — AI Tutor Max (in-app, high-frequency)
-- **Anthropic API** (Claude) — study plan generation only (low-frequency, deep)
-- **vite-plugin-pwa** + **Workbox** — PWA, iOS Safari Add to Home Screen
-
-Build: `npm run build` → clean. Deployed via Vercel (git push trigger).
-
----
-
-## Step Build Map
-
-| Step | Feature | Status |
-|------|---------|--------|
-| 1–18 | Scaffold → Performance page | ✅ Complete |
-| 19–22e | NPTE Performance Review module | ✅ Complete |
-| 23 | AI Tutor Coach "Max" | ✅ Complete |
-| 24 | Gamification — "The Path" | ✅ Complete |
-| 24.5 | PWA / iOS install | ✅ Complete |
-| 25 | Mascot PNG / Framer Motion | 📋 Specced, pre-exam |
-| 26 | Rive Mascot Upgrade | 📋 Specced, post-exam |
-| 27 | TOTP 2FA | ✅ Complete |
-| 28 | Google OAuth | ✅ Complete |
-| 29 | Passkeys + Biometric Lock | ✅ Complete |
-| 30 | Brand rename → PT Lingo | ✅ Complete |
-
-**Next available step number: 31.**
-
----
-
-## Routing
-
-| Path | Component | Layout |
-|---|---|---|
-| `/auth` | `AuthPage` | Standalone |
-| `/` | `DashboardPage` | `AppLayout` (sidebar) |
-| `/submissions` | `SubmissionsPage` | `AppLayout` |
-| `/notes` | `NotesPage` | `AppLayout` |
-| `/question-bank` | `QuestionBankPage` | `AppLayout` |
-| `/performance` | `PerformancePage` | `AppLayout` |
-| `/performance-review` | `PerformanceReviewPage` | `AppLayout` |
-| `/tutor` | `TutorPage` | `AppLayout` |
-| `/path` | `PathPage` (skill tree home) | `AppLayout` |
-| `/achievements` | `AchievementsPage` | `AppLayout` |
-| `/exam/:examId/start` | `MockExamStartPage` | `AppLayout` |
-| `/exam/:sessionId` | `ExamPage` | Full-screen (no sidebar) |
-| `/review/:sessionId` | `ReviewPage` | Full-screen |
-| `/results/:sessionId` | `ResultsPage` | Full-screen |
-| `/auth/callback` | `AuthCallback` | Standalone *(Step 28)* |
-| `/mfa-challenge` | `MFAChallenge` | Standalone *(Step 27)* |
-
----
-
-## AI Architecture — Cost Split
-
-Two separate AI systems. Do NOT consolidate them.
-
-**OpenRouter → Gemini Flash** (`src/lib/openrouter.js`)
-- Used by: AI Tutor Max (Step 23)
-- Rationale: High-frequency per-exchange calls; cost-optimized
-- Four session modes: Open Chat, Drill Mode, Rationale Deep Dive, Concept Explainer
-- Streaming responses via SSE
-- Context-aware system prompt pulls live Supabase performance data on session start
-
-**Anthropic API** (`src/lib/anthropic.js`)
-- Used by: Study plan generator only (Step 22e)
-- Rationale: Reserved for deep, low-frequency generation
-- Model: `claude-sonnet-4-6` (update if deprecated)
-- ⚠️ Deprecation notice: `claude-sonnet-4-20250514` retires June 15 2026 — search codebase for that string
-
----
-
-## Supabase Schema — Key Tables
-
-### Core (Steps 1–18)
-```
-questions       id, content, choices, correct_index, subject, difficulty, tags, rationale
-sessions        type, mode, status, time_multiplier, time_remaining, current_index,
-                question_ids, answers, marked, eliminated, highlights, notes,
-                time_per_question, score, submitted_at
-notes           user_id, question_id, content, timestamps (RLS)
-```
-
-### Performance Review (Steps 19–22e)
-```
-fsbpt_attempts  id, user_id, attempt_number, exam_date, scale_score, section_scores (jsonb),
-                body_system_scores (jsonb), work_activity_scores (jsonb), created_at
-study_plans     id, user_id, attempt_id, plan_content, generated_at, duration_days
-```
-
-### Gamification (Step 24)
-```
-user_xp         user_id, total_xp, level, streak_days, last_active_date
-user_hearts     user_id, hearts (0–5), last_refill_at
-daily_missions  id, user_id, mission_type, target, progress, completed, date
-achievements    id, user_id, achievement_key, unlocked_at
-subject_mastery id, user_id, subject, questions_answered, correct_count, mastery_ring (0–3)
-```
-
-All tables: RLS enabled, `auth.uid() = user_id` policies.
-
----
-
-## Gamification System (Step 24)
-
-**XP Economy**
-- Correct answer: +10 XP
-- Drill completion: +25 XP
-- Daily mission complete: +50 XP bonus (all three missions)
-- Streak bonus: +5 XP/day multiplier
-
-**Hearts system**
-- 5 hearts max; lose 1 per wrong answer in drill mode
-- Refill: 1 heart per 30 min, or watch ad / purchase (future)
-- At 0 hearts: locked out of drill mode
-
-**Skill tree home (`/path`)**
-- Subjects displayed as nodes on a path (Duolingo-style)
-- `questionsToNextBracket` computed per subject from `subject_mastery`
-- "Ask Max" button on each node links to Tutor with subject context
-
-**Daily missions**
-- Three missions generated on login, tied to study plan focus areas
-- All-missions-complete: 50 XP bonus toast
-
-**Mastery rings**
-- 0 = locked, 1 = bronze, 2 = silver, 3 = gold
-- Thresholds: 0/20/50/100 correct answers per subject
-
----
-
-## AI Tutor Max (Step 23)
-
-File: `src/pages/TutorPage.jsx`, `src/components/tutor/`
-
-- Four session modes selectable at session start:
-  - **Open Chat** — free-form Q&A
-  - **Drill Mode** — question generation loop with hearts penalty
-  - **Rationale Deep Dive** — paste a missed question, get full breakdown
-  - **Concept Explainer** — topic explanation with clinical examples
-- Streaming via OpenRouter SSE; response renders token-by-token
-- System prompt built dynamically from live Supabase data:
-  - User's weakest subjects (from `subject_mastery`)
-  - Active study plan focus areas (from `study_plans`)
-  - Recent session accuracy (from `sessions`)
-- ⚠️ React StrictMode bug: double-invocation fix — compute message history
-  from a `ref`, move network calls outside state updater functions
-
----
-
-## NPTE Performance Review (Steps 19–22e)
-
-File: `src/pages/PerformanceReviewPage.jsx`, `src/lib/insightEngine.js`
-
-- Manual FSBPT score report entry (5 attempts stored)
-- Multi-attempt trend dashboard: 5 Recharts charts
-  - Scale score trend, section score trend, body system radar,
-    work activity bar, attempt comparison table
-- Gap analysis engine (`insightEngine.js`):
-  - Computes priority order: Neuromuscular → Interventions →
-    Nonsystem Domains → Cardiopulm → MSK (maintenance only)
-  - Retake ceiling logic per body system
-- AI study plan generator:
-  - Calls Anthropic API with full attempt history + gap analysis
-  - Dynamic duration scaling (days until exam auto-calculated)
-  - Plan history restore (previous plans stored, selectable)
-
----
-
-## PWA (Step 24.5)
-
-- `vite-plugin-pwa` + Workbox runtime caching
-- iOS Safari: Add to Home Screen → standalone mode
-- Cached: Supabase API endpoints, static assets
-- ⚠️ iOS caveat: `localStorage` (day-checkbox state) vulnerable to
-  eviction after ~7 weeks non-use. Core progress data in Supabase is safe.
-- Manifest: `public/manifest.webmanifest`
-- Service worker: auto-generated by vite-plugin-pwa on build
-
----
-
-## Auth — Current State (Steps 1–2) + Incoming (Steps 27–29)
-
-**Current:** Supabase email/password only. `RequireAuth` HOC gates all
-`AppLayout` routes. `authStore` (Zustand) holds session.
-
-**Step 27 (TOTP 2FA) — Specced, not yet built**
-- Supabase native MFA: `supabase.auth.mfa.*`
-- Dashboard prereq: Authentication → MFA → Enable Authenticator App
-- New: `MFAEnrollModal.jsx`, `MFAChallenge.jsx`, `useMFA.js`
-- Modified: `Settings.jsx` (Security section), `AuthGuard.jsx` (AAL2 check)
-- Route: `/mfa-challenge` (full-screen, not dismissible)
-
-**Step 28 (Google OAuth) — Specced, not yet built**
-- Supabase OAuth provider: Google
-- New: `GoogleSignInButton.jsx`, `AuthCallback.jsx`
-- Route: `/auth/callback`
-- PWA note: iOS standalone mode uses redirect flow (not popup)
-- Dashboard prereq: Google Cloud Console OAuth credentials
-
-**Step 29 (Passkeys + Biometric Lock) — Specced, not yet built**
-- Library: `@simplewebauthn/browser` (client), `@simplewebauthn/server` (Edge Functions)
-- New Supabase Edge Functions:
-  - `webauthn-register-challenge`, `webauthn-register-verify`
-  - `webauthn-auth-challenge`, `webauthn-auth-verify`
-- New DB table: `passkeys` (credential_id, public_key, counter, device_name)
-- New: `PasskeySetup.jsx`, `PasskeyLoginButton.jsx`, `BiometricLock.jsx`
-- New: `usePasskey.js`, `useBiometricLock.js`
-- iOS: `navigator.credentials.*` works in Safari 16+ and PWA standalone
-- Always gate behind: `await platformAuthenticatorIsAvailable()`
-
----
-
-## Question Import Pipeline
-
-Script: `scripts/importQuestions.js`
-
-⚠️ **Critical quirk:** The parser requires a `---` separator BEFORE the
-very first question block, or Q1 is silently skipped.
-
-Format:
-```
----
-## Question 1
-[content]
-
----
-## Question 2
-[content]
-```
-
-- "Missing Q107–Q225" warnings on subject-specific imports are expected
-  and ignorable — those IDs don't exist in subject-filtered files.
-- Current bank: ~900 questions from FSBPT PEAT exams
-- 106 Neuromuscular-tagged questions imported
-
----
-
-## Session Model
-
-`sessions` table columns relevant to the exam engine:
-
-```
-type             'exam' | 'quiz'
-mode             'timed' | 'practice'
-status           'in_progress' | 'paused' | 'submitted'
-time_multiplier  1 | 1.5 | 2
-time_remaining   seconds (integer)
-current_index    0-based question index
-question_ids     uuid[]
-answers          jsonb  { questionId: choiceIndex }
-marked           uuid[]
-eliminated       jsonb  { questionId: int[] }
-highlights       jsonb  { questionId: [{start, end}][] }
-notes            jsonb  { questionId: string }
-time_per_question jsonb { questionId: seconds }
-score            float (0–1), set on submit
-submitted_at     timestamptz
-```
-
----
-
-## Exam Engine — Key Decisions
-
-### Session types
-- **`exam`** — timer counts down, rationale hidden until results screen,
-  section breaks trigger after sections 1–4.
-- **`quiz`** — rationale revealed immediately after first answer pick;
-  answer locks; timer still runs but is practice time.
-
-### Section breaks (exam mode only)
-- Only fires when `type === 'exam' && questions.length === 225`.
-- `SECTION_END = new Set([44, 89, 134, 179])` — 0-indexed last-question
-  indices for sections 1–4.
-- After section 2 (index 89): **mandatory** 15-min break, timer pauses.
-- After sections 1, 3, 4: **optional** break offer modal; timer keeps running.
-- Break state machine: `null` | `'offer'` | `'optional'` | `'mandatory'`.
-- To test breaks locally: temporarily set `new Set([1, 3])` and restore after.
-
-### Per-question time tracking
-- `prevQuestionIdRef` + `questionStartRef` refs.
-- `useEffect` on `currentQuestionId` saves elapsed time for previous question.
-- Quiz mode: time saved immediately on answer selection; `questionStartRef`
-  reset to prevent double-counting on navigation.
-- Writes via `useSessionStore.getState()` (non-reactive) — avoids stale closure.
-
-### Scroll / layout architecture
-- `h-screen flex flex-col overflow-hidden` outer shell.
-- `ExamTopBar` and `QuestionNav` are `flex-shrink-0` — never scroll.
-- Center: single `flex-1 overflow-y-auto scrollbar-thin` column.
-- No nested scrollable containers inside `QuestionPanel`, `AnswerPanel`,
-  or `RationalePanel`.
-- Normal mode: inner `flex min-h-full` row.
-- Quiz/rationale mode: `flex flex-col` — Q+A row with `border-b`,
-  `RationalePanel` below; scrolls as one unit.
-- Right toolbar: `flex-shrink-0`, stays fixed while content scrolls.
-
-### Keyboard shortcuts
-- `1–4`: select answer
-- `E`: toggle eliminate focused/hovered choice
-- `M`: toggle mark for review
-- `←` / `→`: previous / next question
-- All disabled when `loading || breakState !== null`.
-
-### Toolbar
-- Starts collapsed (`toolbarExpanded = false`, 56px wide icon strip).
-- Expands to 176px via toggle in `ExamTopBar`.
-- Dark/light mode toggle in toolbar footer (`useUiStore`).
-- `ProgressGrid` has its own internal scroll — intentional (utility panel).
-
----
-
-## Known Issues / Gotchas
-
-- **React StrictMode + streaming**: double-invocation causes double network
-  fires in Tutor. Fix: compute message history from a `ref`, move network
-  calls outside state updater functions.
-- **Gamification 404 loading hang**: resolved — ensure gamification tables
-  exist before rendering `PathPage`.
-- **`questionsToNextBracket` stub**: was returning zeros — fixed in Step 24
-  patch. Confirm live calculation from `subject_mastery` table.
-- **Chart RangeError**: caused by invalid date format options in Recharts
-  trend chart — fixed. If recurring, check date strings passed to charts.
-- **iOS PWA `localStorage` eviction**: ~7 weeks non-use; day-checkbox state
-  may reset. Not a data-loss risk — core data in Supabase.
-- **VS Code extension model revert bug**: Claude Code VS Code extension may
-  silently revert to Opus despite Sonnet configuration. Run `/context`
-  mid-session to verify actual model in use.
+React 18 + Vite 5 | Tailwind 3 | React Router v6 | Zustand
+Supabase JS v2 | Framer Motion | Recharts
+OpenRouter (Gemini Flash) — AI Tutor Max (~$0.007/exchange)
+Anthropic claude-sonnet-4-6 — study plan only (low-freq)
+vite-plugin-pwa + Workbox — PWA/iOS
+⚠️ claude-sonnet-4-20250514 retires June 15 2026
+
+## Steps
+1–30: scaffold→perf review→AI tutor→gamification→PWA→2FA→OAuth→passkeys→rebrand ✅
+31-A: Answer Feedback Sheet ✅
+31-B: Path 3D nodes + START bubble + completion ring ✅
+31-C: Rationale screen + A/B/C/D slider ✅
+31-D: Treasure chests (Supabase) ✅
+31-E: Streak calendar + StreakModal ✅
+31-F: Quit friction modal (7-variant) ✅
+31-G: Energy 25/25 + coins header ✅
+32: MotivationBreak (25 triggers, 5 moods) ✅
+33: PT Lingo Score + mascot TopStatsBar + Achievements hero ✅
+34: Shop page (energy/XP boost/freeze/shield) ✅
+35: Settings page (/settings, avatar, profile, notifications, security) ✅
+36: PT Lingo casual quiz mode + onboarding modal ✅
+37: PostSessionFlow ⬜ next
+38: Retention engine (spaced rep, variable rewards, smart notifs) ⬜
+
+## Routes
+/auth AuthPage standalone
+/ DashboardPage AppLayout
+/submissions /notes /question-bank /performance
+/performance-review /tutor AppLayout
+/path ThePathPage AppLayout
+/achievements AchievementsPage AppLayout
+/shop ShopPage AppLayout
+/settings SettingsPage AppLayout
+/exam/:examId/start MockExamStartPage AppLayout
+/exam/:sessionId ExamPage full-screen
+/review/:sessionId ReviewPage full-screen
+/results/:sessionId ResultsPage full-screen
+/rationale RationalePage full-screen
+/auth/callback /mfa-challenge standalone
+
+## Supabase Schema
+questions: id, content, choices(array), correct_index(int), subject, difficulty, tags, rationale
+sessions: id, user_id, type(exam|quiz), mode, status(in_progress|paused|submitted),
+  time_multiplier, time_remaining, current_index, question_ids(uuid[]),
+  answers(jsonb), marked(uuid[]), eliminated(jsonb), highlights(jsonb),
+  notes(jsonb), time_per_question(jsonb), score(float), submitted_at, started_at
+notes: user_id, question_id, content
+fsbpt_attempts: id, user_id, attempt_number, exam_date, scale_score,
+  section_scores(jsonb), body_system_scores(jsonb), work_activity_scores(jsonb)
+study_plans: id, user_id, attempt_id, plan_content, generated_at, duration_days
+user_gamification: user_id, xp, level, streak, longest_streak, last_activity_date,
+  hearts, energy(def 25), max_energy(def 25), last_energy_update(timestamptz),
+  coins(def 0), xp_boost_active(bool), streak_freeze_count(int),
+  streak_shield_expiry(timestamptz), subject_mastery(jsonb {subject:{pct,correct,total}})
+daily_missions: id, user_id, mission_type, target, progress, completed, date
+achievements: id, user_id, achievement_key, unlocked_at
+path_milestones: id, user_id, system_name, claimed_at, xp_awarded — UNIQUE(user_id,system_name)
+profiles: id(PK→auth.users), name, username, avatar_url, exam_date(def 2026-07-29)
+  RLS: auth.uid()=id
+push_subscriptions: id, user_id(→auth.users), subscription(jsonb) — UNIQUE(user_id)
+  RLS: auth.uid()=user_id
+Storage bucket: avatars (public) path:{user_id}/avatar.jpg
+  INSERT/UPDATE policy: name LIKE (auth.uid()::text || '/%')
+
+## LocalStorage Keys
+ptlingo_quiz_mode        'standard'|'ptlingo'
+ptlingo_quiz_mode_set    'true' — onboarding shown flag
+ptlingo_profile          JSON — profile cache (no flash on refresh)
+ptlingo_gam              JSON — gamification cache (no flash on refresh)
+ptlingo_reminders_enabled 'true'|'false'
+ptlingo_push_enabled     'true'|'false'
+ptlingo_email_reminders  'true'|'false'
+
+## Stores (Zustand)
+gamificationStore (src/stores/gamificationStore.js)
+  state: xp, level, streak, longestStreak, energy, maxEnergy,
+    lastEnergyUpdate, coins, hearts(alias=energy), xpBoostActive,
+    streakFreezeCount, streakShieldExpiry, subjectMastery,
+    ptLingoScore, activeSystem, dailyMissions, achievements, loaded
+  actions: load, awardXP, deductEnergy, deductHeart(alias),
+    rechargeEnergy, rechargeEnergyWithCoins, addCoins,
+    purchaseXpBoost, purchaseStreakFreeze, purchaseStreakShield,
+    advanceStreak, advanceMission, refreshSubjectMastery,
+    updateSubjectMastery, checkQuestionCountAchievements
+  cache: localStorage('ptlingo_gam') seeded on init, written after load()
+
+authStore (src/store/authStore.js)
+  state: user, profile({} not null), examDate, loading
+  actions: loadProfile, updateExamDate, signOut
+  cache: localStorage('ptlingo_profile')
+  signOut clears BOTH ptlingo_profile AND ptlingo_gam caches
+
+sessionStore: manages active exam/quiz (answers, currentIndex, questions, etc.)
+
+## System Config
+src/constants/systemConfig.js — getSystemConfig(subjectName)
+Neuromuscular          #F59E0B gold    /mascots/sparky.png
+Musculoskeletal        #EF4444 crimson /mascots/flex.png
+Cardiovascular/Pulm    #EC4899 rose    /mascots/pulse.png
+Integumentary          #F97316 orange  /mascots/patch.png
+Other Systems          #22C55E green   /mascots/flora.png
+Nonsystem Domains      #3B82F6 blue    /mascots/page.png
+
+## Gamification
+Energy: 25 max, -1 per wrong answer, -1 on quit, +1/30min recharge
+Coins: +50 per session submit, +50 per treasure chest
+Shop: Energy Recharge 500💎 | XP Boost 750💎 | Streak Freeze 1000💎 | Shield 3000💎
+XP Boost: 2× multiplier on next awardXP call, auto-deactivates
+Streak Freeze: auto-applies if missed exactly 1 day, stackable
+Streak Shield: 7-day window stored in streak_shield_expiry
+PT Lingo Score 0-100: Musculoskeletal×0.32 + Neuromuscular×0.23
+  + Cardiopulm×0.17 + Other×0.13 + Integ×0.08 + Nonsystem×0.07
+Levels: Novice(0-16) Developing(17-33) Competent(34-50)
+  Proficient(51-67) Advanced(68-84) Expert(85-100)
+getPtLingoLevel() exported from gamificationStore
+
+## Quiz Mode (Step 36)
+Standard: two-panel desktop layout (unchanged)
+PT Lingo: CasualQuizView.jsx — mascot float + speech bubble + 4 answer cards
+  pendingAnswer (local) → CHECK tap → onSelectAnswer (ExamPage commit)
+  Desktop: centered max-w-2xl, toolbar hidden
+Onboarding: QuizModeOnboarding.jsx fires once on login
+  (checks ptlingo_quiz_mode_set in localStorage)
+ExamPage: const isCasual = quizMode==='ptlingo' && type==='quiz'
+
+## MotivationBreak (Step 32)
+getMotivationBreak() — module-level pure fn in ExamPage.jsx
+Refs (not state): consecutiveCorrectRef, prevMaxWrongRef,
+  answerHistoryRef, shownBreaksRef
+Fires in handleSheetContinue() BEFORE advancing question
+25 candidates, first match wins, each key fires once per session
+Key order: streak_20→perfect_10→streak_15→streak_10→neuro_streak
+  →streak_7→accuracy_halfway→streak_5→total_5-25→clean_energy
+  →last_1→last_5→three_quarters→recovery_strong→recovery_quick
+  →accuracy_climbing→halfway→exam_three_quarters→streak_milestone
+  →streak_alive→low_energy→neuro_recovery→still_standing→total_3
+  →streak_3→quarter→total_1
+
+## Exam Engine
+Section breaks (exam 225q only): SECTION_END=new Set([44,89,134,179])
+  Index 89: mandatory 15min break. Others: optional.
+Quiz top bar: progress bar (system primary) + pink energy badge
+  Mobile: [✕][progress bar][⚡|N]  Desktop: [←Back][progress bar][⚡|N][≡]
+Quit friction: QuitWarningModal fires if questionsRemaining>0
+  onQuit: deducts 1 energy, no submit, session stays in_progress
+Mobile responsive: flex-col md:flex-row (stacked on mobile)
+Keyboard: 1-4 select | E eliminate | M mark | ←→ navigate
+Toolbar: starts collapsed 56px, expands to 176px
+
+## Auth (Steps 27-29 Complete)
+TOTP 2FA: supabase.auth.mfa.* | useMFA.js | MFAEnrollModal.jsx
+Google OAuth: GoogleSignInButton.jsx | /auth/callback
+Passkeys: @simplewebauthn/browser | usePasskey.js
+Biometric Lock: useBiometricLock.js | idle timeout
+All security flows in Settings → Security (/settings)
+
+## Settings Page (Step 35)
+Route: /settings (dedicated page, not sheet)
+Gear icon on ProfilePage → navigate('/settings')
+Sections: Preferences | Profile | Notifications | Security |
+  Exam Countdown | View Achievements | Sign Out
+Avatar: Supabase Storage avatars bucket, {userId}/avatar.jpg
+Password change: requires signInWithPassword re-auth first
+Exam date: updates profiles.exam_date + authStore.examDate
+  Propagates to TopStatsBar countdown pill everywhere
+
+## Key Components (Steps 31-36)
+src/components/drill/
+  AnswerFeedbackSheet.jsx  QuitWarningModal.jsx  MotivationBreak.jsx
+src/components/exam/
+  CasualQuizView.jsx  ExamTopBar.jsx
+src/components/gamification/
+  PathNode.jsx  TreasureChest.jsx  OutOfEnergyModal.jsx  EnergyBar.jsx
+src/components/streak/
+  StreakCalendar.jsx  StreakModal.jsx
+src/components/onboarding/
+  QuizModeOnboarding.jsx
+src/components/layout/
+  TopStatsBar.jsx (mobile: [mascot+score][🔥][💎][⚡|N][Nd])
+  SidebarHeader.jsx
+
+## Gotchas
+- profile initial state is {} not null (prevents flash)
+- signOut clears BOTH localStorage caches
+- Workbox precache limit raised to 4MB (lottie-react)
+- Import script: needs --- before first question or Q1 skipped
+- React StrictMode streaming double-fire: use refs, not state updaters
+- ptlingo_quiz_mode_set: clear to re-trigger onboarding
+- VITE_VAPID_PUBLIC_KEY not yet set — push notifs show graceful fallback
+- VS Code extension may revert to Opus silently — run /context to verify
+- question_reviews table not yet created — needed for Step 38
