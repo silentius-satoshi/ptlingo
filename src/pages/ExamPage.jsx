@@ -25,6 +25,7 @@ import AnswerFeedbackSheet from '../components/drill/AnswerFeedbackSheet'
 import QuitWarningModal from '../components/drill/QuitWarningModal'
 import MotivationBreak from '../components/drill/MotivationBreak'
 import CasualQuizView from '../components/exam/CasualQuizView'
+import MobilePanelSheet from '../components/exam/MobilePanelSheet'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -138,6 +139,7 @@ export default function ExamPage() {
   // ── Toolbar / UI ───────────────────────────────────────────────────────────
   const [toolbarExpanded, setToolbarExpanded] = useState(false)
   const [toolbarPanel, setToolbarPanel]       = useState(null)
+  const [mobileSheet,  setMobileSheet]        = useState(null)
   const [highlightMode, setHighlightMode]     = useState(false)
   const [focusedChoice, setFocusedChoice]     = useState(null)
 
@@ -431,6 +433,19 @@ export default function ExamPage() {
     setFocusedChoice(null)
     setToolbarPanel((p) => p === 'progress' ? null : p)
   }, [setCurrentIndex, scheduleSave])
+
+  const handleSetPanel = useCallback((panel) => {
+    if (window.innerWidth < 768) {
+      setMobileSheet((p) => (p === panel ? null : panel))
+    } else {
+      setToolbarPanel((p) => (p === panel ? null : panel))
+    }
+  }, [])
+
+  const handleMobileJump = useCallback((index) => {
+    setMobileSheet(null)
+    goTo(index)
+  }, [goTo])
 
   const goNext = useCallback(() => {
     if (currentIndex >= questions.length - 1) return
@@ -905,8 +920,8 @@ export default function ExamPage() {
             <ExamToolbar
               className={isCasual ? 'max-md:hidden' : ''}
               expanded={toolbarExpanded}
-              activePanel={toolbarPanel}
-              onSetPanel={setToolbarPanel}
+              activePanel={window.innerWidth < 768 ? mobileSheet : toolbarPanel}
+              onSetPanel={handleSetPanel}
               isMarked={isMarked}
               onMark={handleMark}
               highlightMode={highlightMode}
@@ -1102,6 +1117,19 @@ export default function ExamPage() {
         streak={streak}
         onKeepGoing={() => setShowQuitModal(false)}
         onQuit={() => { deductEnergy(); navigate('/') }}
+      />
+
+      <MobilePanelSheet
+        panel={mobileSheet}
+        onClose={() => setMobileSheet(null)}
+        questions={questions}
+        answers={answers}
+        marked={marked}
+        currentIndex={currentIndex}
+        onJump={handleMobileJump}
+        questionNumber={currentIndex + 1}
+        note={currentNote}
+        onChange={handleNoteChange}
       />
     </div>
   )
