@@ -60,7 +60,7 @@ export default function ActiveSectionBanner({
             <BookOpen size={18} color="white" />
           </button>
           {dueCount > 0 && !missionsOpen && (
-            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 pointer-events-none" />
+            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 pointer-events-none" style={{ boxShadow: '0 0 0 2px white' }} />
           )}
         </div>
       </div>
