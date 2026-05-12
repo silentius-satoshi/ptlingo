@@ -240,7 +240,14 @@ export default function ProfilePage() {
                 }
               </div>
               <p className="text-xs text-slate-400 truncate max-w-full">{user?.email}</p>
-              <p className="text-sm font-semibold text-white">Attempt 6 Candidate</p>
+              <p className="text-sm font-semibold text-white">
+                {profile?.name ?? user?.email?.split('@')[0] ?? 'PT Lingo User'}
+              </p>
+              {profile?.username && (
+                <p className="text-xs text-slate-400 mt-0.5">
+                  @{profile?.username}
+                </p>
+              )}
               <p className="text-xs text-slate-500">Member since {memberSince}</p>
             </div>
 

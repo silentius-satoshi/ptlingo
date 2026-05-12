@@ -144,6 +144,7 @@ export default function SettingsPage() {
   const [usernameVal, setUsernameVal] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [emailVal, setEmailVal] = useState(user?.email ?? '')
+  const [currentPw, setCurrentPw] = useState('')
   const [newPw, setNewPw] = useState('')
   const [confirmPw, setConfirmPw] = useState('')
   const [saving, setSaving] = useState(false)
@@ -191,9 +192,15 @@ export default function SettingsPage() {
     setAvatarLoading(true)
     try {
       const resized = await resizeImage(file, 400)
+      console.log('Uploading to path:', `${user.id}/avatar.jpg`)
+      console.log('Resized blob:', resized, 'size:', resized?.size)
       const { error } = await supabase.storage.from('avatars')
         .upload(`${user.id}/avatar.jpg`, resized, { upsert: true, contentType: 'image/jpeg' })
-      if (error) { showNotif('Upload failed — check avatars Storage bucket exists', '#EF4444'); return }
+      if (error) {
+        console.error('Avatar upload error:', error)
+        showNotif(`Upload failed: ${error.message}`, '#EF4444')
+        return
+      }
       const { data: { publicUrl } } = supabase.storage.from('avatars')
         .getPublicUrl(`${user.id}/avatar.jpg`)
       await supabase.from('profiles').upsert({ id: user.id, avatar_url: `${publicUrl}?t=${Date.now()}` })
@@ -242,13 +249,16 @@ export default function SettingsPage() {
   }
 
   async function handleSavePassword() {
+    if (!currentPw) { showNotif('Enter your current password', '#EF4444'); return }
     if (newPw.length < 8) { showNotif('Minimum 8 characters', '#EF4444'); return }
     if (newPw !== confirmPw) { showNotif('Passwords do not match', '#EF4444'); return }
     setSaving(true)
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email: user.email, password: currentPw })
+    if (signInError) { setSaving(false); showNotif('Current password is incorrect', '#EF4444'); return }
     const { error } = await supabase.auth.updateUser({ password: newPw })
     setSaving(false)
     if (error) { showNotif(error.message, '#EF4444'); return }
-    setNewPw(''); setConfirmPw('')
+    setCurrentPw(''); setNewPw(''); setConfirmPw('')
     setExpandedRow(null)
     showNotif('Password updated')
   }
@@ -441,7 +451,8 @@ export default function SettingsPage() {
             />
             {expandedRow === 'password' && (
               <InlineEdit>
-                <InputField value={newPw} onChange={setNewPw} type="password" placeholder="New password (min 8 chars)" autoFocus />
+                <InputField value={currentPw} onChange={setCurrentPw} type="password" placeholder="Current password" autoFocus />
+                <InputField value={newPw} onChange={setNewPw} type="password" placeholder="New password (min 8 chars)" />
                 <InputField value={confirmPw} onChange={setConfirmPw} type="password" placeholder="Confirm new password" />
                 <SaveBtn onClick={handleSavePassword} loading={saving} />
               </InlineEdit>
