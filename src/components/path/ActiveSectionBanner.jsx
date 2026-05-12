@@ -52,12 +52,17 @@ export default function ActiveSectionBanner({
         <div className="w-px self-stretch bg-white/20" />
 
         {/* Right: missions toggle */}
-        <button
-          className="rounded-lg p-2.5 bg-white/20 active:opacity-70 transition-opacity"
-          onClick={onToggleMissions}
-        >
-          <BookOpen size={18} color="white" />
-        </button>
+        <div className="relative">
+          <button
+            className="rounded-lg p-2.5 bg-white/20 active:opacity-70 transition-opacity"
+            onClick={onToggleMissions}
+          >
+            <BookOpen size={18} color="white" />
+          </button>
+          {dueCount > 0 && !missionsOpen && (
+            <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 pointer-events-none" />
+          )}
+        </div>
       </div>
 
       {/* Missions dropdown */}

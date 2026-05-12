@@ -11,6 +11,7 @@ import TreasureChest from '../components/gamification/TreasureChest'
 import { PATH_SECTIONS, getNodeState } from '../lib/pathSections'
 import { getDueCount } from '../lib/reviewQueue'
 import { rollXP } from '../lib/rewardEngine'
+import { ANIMATION } from '../constants/design'
 import ActiveSectionBanner from '../components/path/ActiveSectionBanner'
 
 
@@ -37,6 +38,7 @@ export default function ThePathPage() {
   const [activeSystemFilter, setActiveSystemFilter] = useState(null)
   const [showSwitcher, setShowSwitcher] = useState(false)
   const [visibleSystem, setVisibleSystem] = useState(PATH_SECTIONS[0].system)
+  const [showReviewAlert, setShowReviewAlert] = useState(false)
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
@@ -91,7 +93,13 @@ export default function ThePathPage() {
   useEffect(() => {
     if (!user) return
     getDueCount(user.id, supabase)
-      .then(setDueCount)
+      .then(count => {
+        setDueCount(count)
+        if (count > 0 && !sessionStorage.getItem('ptlingo_review_alerted')) {
+          setShowReviewAlert(true)
+          sessionStorage.setItem('ptlingo_review_alerted', '1')
+        }
+      })
       .catch(err => console.error('getDueCount error:', err))
   }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -352,6 +360,55 @@ export default function ThePathPage() {
             </div>
           </div>
         </section>
+
+      {/* Due for Review alert modal */}
+      <AnimatePresence>
+        {showReviewAlert && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-40 bg-black/50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setShowReviewAlert(false)}
+            />
+            <motion.div
+              className="fixed bottom-6 left-4 right-4 z-50 mx-auto rounded-2xl p-5"
+              style={{ backgroundColor: '#1C1F2E', maxWidth: 480 }}
+              initial={{ y: 80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 80, opacity: 0 }}
+              transition={ANIMATION.sheetSpring}
+            >
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-2xl">🔁</span>
+                <p className="font-bold text-white text-base">Questions Due for Review</p>
+              </div>
+              <p className="text-sm text-slate-400 mt-1 mb-4">
+                {dueCount} question{dueCount !== 1 ? 's' : ''} from previous sessions are ready to review.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  className="px-4 py-2.5 rounded-xl border border-slate-600 text-slate-400 text-sm font-semibold"
+                  onClick={() => setShowReviewAlert(false)}
+                >
+                  Later
+                </button>
+                <button
+                  className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold"
+                  onClick={() => {
+                    setShowReviewAlert(false)
+                    navigate(`/question-bank?mode=review&limit=${Math.min(dueCount, 10)}`)
+                  }}
+                >
+                  Review Now
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Subject switcher bottom sheet */}
       <AnimatePresence>
