@@ -43,7 +43,7 @@ vite-plugin-pwa + Workbox — PWA/iOS
 /auth/callback /mfa-challenge standalone
 
 ## Supabase Schema
-questions: id, content, choices(array), correct_index(int), subject, difficulty, tags, rationale
+questions: id, stem, choices(array), correct_index(int), subject, difficulty, tags, rationale
 sessions: id, user_id, type(exam|quiz), mode, status(in_progress|paused|submitted),
   time_multiplier, time_remaining, current_index, question_ids(uuid[]),
   answers(jsonb), marked(uuid[]), eliminated(jsonb), highlights(jsonb),
