@@ -14,7 +14,7 @@ export default function AppLayout() {
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <TopStatsBar />
-          <main className="flex-1 flex flex-col overflow-y-auto pb-24 md:pb-0">
+          <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
             <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-6 md:px-8">
               <Outlet />
             </div>

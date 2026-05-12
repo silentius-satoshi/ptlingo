@@ -55,7 +55,6 @@ export default function SidebarHeader() {
               <Flame className="w-3.5 h-3.5" />
               <span className="text-sm font-bold text-white">{streak}</span>
             </div>
-            <span className="text-[9px] text-slate-500">streak</span>
           </button>
           <button
             onClick={() => navigate('/profile')}
@@ -65,7 +64,6 @@ export default function SidebarHeader() {
               <Gem className="w-3.5 h-3.5" />
               <span className="text-sm font-bold text-white">{coins}</span>
             </div>
-            <span className="text-[9px] text-slate-500">coins</span>
           </button>
           <button
             onClick={() => navigate('/profile')}
@@ -75,7 +73,6 @@ export default function SidebarHeader() {
               <Zap className="w-3.5 h-3.5" />
               <span className="text-sm font-bold text-white">{energy}/{maxEnergy}</span>
             </div>
-            <span className="text-[9px] text-slate-500">energy</span>
           </button>
         </div>
       )}

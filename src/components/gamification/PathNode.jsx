@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { MascotPNG } from '../mascot'
 import confetti from 'canvas-confetti'
 
 export default function PathNode({
@@ -43,36 +42,41 @@ export default function PathNode({
 
   return (
     <div ref={nodeRef} className="relative flex flex-col items-center gap-1">
-      {/* START bubble above global active */}
-      <AnimatePresence>
-        {isGlobalActive && (
-          <motion.div
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="rounded-lg px-4 py-1.5 relative"
-            style={{ background: '#1C1F2E' }}
-          >
-            <p className="text-xs font-bold tracking-widest uppercase" style={{ color: section.color }}>
-              START
-            </p>
-            <div style={{
-              position: 'absolute',
-              bottom: -6,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: 0,
-              height: 0,
-              borderLeft: '6px solid transparent',
-              borderRight: '6px solid transparent',
-              borderTop: '6px solid #1C1F2E',
-            }} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="relative">
+        {/* START bubble — absolute, centered above node */}
+        <AnimatePresence>
+          {isGlobalActive && (
+            <motion.div
+              className="absolute pointer-events-none whitespace-nowrap"
+              style={{ bottom: 'calc(100% + 8px)', left: '50%', zIndex: 30 }}
+              initial={{ opacity: 0, x: '-50%' }}
+              animate={{ opacity: 1, x: '-50%', y: [0, -4, 0] }}
+              exit={{ opacity: 0, x: '-50%' }}
+              transition={{
+                opacity: { duration: 0.2 },
+                y: { repeat: Infinity, duration: 1.5, ease: 'easeInOut' },
+              }}
+            >
+              <div className="rounded-lg px-4 py-1.5 relative" style={{ background: '#1C1F2E' }}>
+                <p className="text-xs font-bold tracking-widest uppercase" style={{ color: section.color }}>
+                  START
+                </p>
+                <div style={{
+                  position: 'absolute',
+                  bottom: -6,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 0,
+                  height: 0,
+                  borderLeft: '6px solid transparent',
+                  borderRight: '6px solid transparent',
+                  borderTop: '6px solid #1C1F2E',
+                }} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <div className="flex items-center gap-3">
         {/* Main node button */}
         <div className="relative flex-shrink-0" style={{ overflow: 'visible' }}>
           <motion.button
@@ -90,21 +94,10 @@ export default function PathNode({
               backgroundColor: nodeColor,
               boxShadow: isLocked
                 ? '0 6px 0 0 #1E2340, 0 7px 16px rgba(0,0,0,0.4)'
-                : isGlobalActive
-                ? `0 0 0 4px white, 0 0 0 8px ${section.color}, 0 6px 0 0 ${section.dark}, 0 8px 20px rgba(0,0,0,0.45)`
                 : `0 6px 0 0 ${section.dark}, 0 8px 20px rgba(0,0,0,0.45)`,
             }}
             className="rounded-full flex items-center justify-center relative focus:outline-none"
           >
-            {/* Pulsing ring for global active */}
-            {isGlobalActive && (
-              <motion.div
-                animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute inset-0 rounded-full"
-                style={{ backgroundColor: section.color }}
-              />
-            )}
 
             {/* Glossy highlight */}
             <div
@@ -167,23 +160,23 @@ export default function PathNode({
 
           {/* Session progress ring for global active node */}
           {isGlobalActive && (() => {
-            const ringSize = size + 48
+            const ringSize = size + 28
             const cx = ringSize / 2
-            const r = ringSize / 2 - 10
+            const r = ringSize / 2 - 7
             const circ = 2 * Math.PI * r
             const offset = circ * (1 - (sessionsCompleted ?? 0) / 4)
             return (
               <svg
                 className="absolute pointer-events-none"
-                style={{ top: -24, left: -24, zIndex: 20 }}
+                style={{ top: -14, left: -14, zIndex: 20 }}
                 width={ringSize}
                 height={ringSize}
                 viewBox={`0 0 ${ringSize} ${ringSize}`}
               >
                 <circle cx={cx} cy={cx} r={r} fill="none"
-                  stroke="rgba(255,255,255,0.28)" strokeWidth={5} />
+                  stroke="rgba(255,255,255,0.28)" strokeWidth={8} />
                 <circle cx={cx} cy={cx} r={r} fill="none"
-                  stroke="white" strokeWidth={5} strokeLinecap="round"
+                  stroke="white" strokeWidth={8} strokeLinecap="round"
                   strokeDasharray={circ} strokeDashoffset={offset}
                   transform={`rotate(-90 ${cx} ${cx})`}
                   style={{ transition: 'stroke-dashoffset 600ms ease' }}
@@ -192,27 +185,7 @@ export default function PathNode({
             )
           })()}
         </div>
-
-        {/* Mascot beside global active node */}
-        <AnimatePresence>
-          {isGlobalActive && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.2 }}
-            >
-              <MascotPNG mascot={section.mascot} size={64} />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-
-
-      {/* Stars for completed */}
-      {isCompleted && (
-        <div className="flex gap-0.5 text-amber-400 text-[10px] leading-none">★★★</div>
-      )}
 
       {/* Locked tooltip */}
       <AnimatePresence>

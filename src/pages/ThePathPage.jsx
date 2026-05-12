@@ -1,19 +1,17 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, Fragment } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
 import confetti from 'canvas-confetti'
 import useGamificationStore from '../stores/gamificationStore'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
 import PathNode, { HexNode } from '../components/gamification/PathNode'
 import TreasureChest from '../components/gamification/TreasureChest'
-import MissionCard from '../components/gamification/MissionCard'
-import StreakBadge from '../components/gamification/StreakBadge'
-import AllMissionsBanner from '../components/gamification/AllMissionsBanner'
 import { PATH_SECTIONS, getNodeState } from '../lib/pathSections'
 import { getDueCount } from '../lib/reviewQueue'
+import ActiveSectionBanner from '../components/path/ActiveSectionBanner'
 
-// X-position pattern: nodeIndex % 4
-const JUSTIFY = ['justify-center', 'justify-start pl-8', 'justify-center', 'justify-end pr-8']
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -23,7 +21,6 @@ export default function ThePathPage() {
   const navigate = useNavigate()
   const {
     loaded,
-    streak,
     subjectMastery,
     dailyMissions,
     generateDailyMissions,
@@ -33,32 +30,31 @@ export default function ThePathPage() {
 
   const { user } = useAuthStore()
 
-  const [generatingMissions, setGeneratingMissions] = useState(false)
-  const [showAllMissionsBanner, setShowAllMissionsBanner] = useState(false)
   const [claimedSystems, setClaimedSystems] = useState(() => new Set())
   const [dueCount, setDueCount] = useState(0)
+  const [missionsOpen, setMissionsOpen] = useState(false)
+  const [activeSystemFilter, setActiveSystemFilter] = useState(null)
+  const [showSwitcher, setShowSwitcher] = useState(false)
+  const [visibleSystem, setVisibleSystem] = useState(null)
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
   const prevAllCompleteRef = useRef(false)
+  const sectionMarkersRef = useRef({})
 
   // Generate missions if stale
   useEffect(() => {
     if (!loaded) return
     if (!dailyMissions?.date || dailyMissions.date !== todayStr()) {
-      setGeneratingMissions(true)
       Promise.all([generateDailyMissions(), refreshHeartsForNewDay()])
-        .finally(() => setGeneratingMissions(false))
     }
   }, [loaded, dailyMissions?.date, generateDailyMissions, refreshHeartsForNewDay])
 
-  const missions = dailyMissions?.missions ?? []
   const allComplete = dailyMissions?.all_complete ?? false
 
-  // Detect all_complete transition → show banner + confetti
+  // Confetti when all missions complete
   useEffect(() => {
     if (allComplete && !prevAllCompleteRef.current) {
-      setShowAllMissionsBanner(true)
       confetti({
         particleCount: 120,
         spread: 80,
@@ -97,6 +93,24 @@ export default function ThePathPage() {
       .catch(err => console.error('getDueCount error:', err))
   }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Update sticky banner to match the section scrolled into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setVisibleSystem(entry.target.dataset.system)
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '-60px 0px 0px 0px' }
+    )
+    Object.values(sectionMarkersRef.current).forEach(el => {
+      if (el) observer.observe(el)
+    })
+    return () => observer.disconnect()
+  }, [loaded])
+
   const allAbove60 = PATH_SECTIONS.every((s) => {
     const pct = subjectMastery[s.masteryKey]?.pct ?? subjectMastery[s.masteryKey] ?? 0
     return pct >= 60
@@ -117,11 +131,9 @@ export default function ThePathPage() {
   const renderItems = []
   let nodeIndex = 0
 
-  PATH_SECTIONS.forEach((section, sectionIdx) => {
+  PATH_SECTIONS.forEach((section) => {
     const masteryPct = subjectMastery[section.masteryKey]?.pct ?? subjectMastery[section.masteryKey] ?? 0
     const sessionsCompleted = Math.min(4, Math.floor((subjectMastery[section.masteryKey]?.total ?? 0) / 10))
-
-    renderItems.push({ type: 'banner', section, masteryPct, key: `banner-${section.system}` })
 
     section.nodes.forEach((node) => {
       const state = getNodeState(masteryPct, node)
@@ -163,161 +175,287 @@ export default function ThePathPage() {
     }
   }
 
+  const activeSection = activeSystemFilter
+    ? (PATH_SECTIONS.find(s => s.system === activeSystemFilter) ?? PATH_SECTIONS[0])
+    : (renderItems.find(i => i.type === 'node' && i.state === 'active')?.section ?? PATH_SECTIONS[0])
+
+  const bannerSection = (visibleSystem
+    ? PATH_SECTIONS.find(s => s.system === visibleSystem)
+    : null) ?? activeSection
+
+  const bannerMasteryPct = Math.round(subjectMastery[bannerSection.masteryKey]?.pct ?? 0)
+
+  const visibleItems = activeSystemFilter
+    ? renderItems.filter(item => item.section?.system === activeSystemFilter)
+    : renderItems
+
+  const sectionGroups = []
+  let currentGroup = null
+  for (const item of visibleItems) {
+    if (item.type === 'banner') continue
+    if (!currentGroup || currentGroup.section.system !== item.section?.system) {
+      const pathSectionIdx = PATH_SECTIONS.findIndex(s => s.system === item.section.system)
+      currentGroup = { section: item.section, pathSectionIdx, items: [] }
+      sectionGroups.push(currentGroup)
+    }
+    currentGroup.items.push(item)
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 max-w-2xl mx-auto flex flex-col">
+    <div className="flex-1 flex flex-col w-full">
 
-      {/* Daily Missions */}
-      <section className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-            Today's Missions
-          </h2>
-          {allComplete && (
-            <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              All complete!
-            </span>
-          )}
+        {/* Sticky section banner */}
+        <div className="sticky top-0 z-[35] px-4 pt-3 pb-2 bg-[#080d18] w-full">
+          <ActiveSectionBanner
+            systemLabel={bannerSection.label}
+            systemColor={bannerSection.color}
+            masteryPct={bannerMasteryPct}
+            missions={dailyMissions?.missions ?? []}
+            missionsOpen={missionsOpen}
+            onToggleMissions={() => setMissionsOpen(o => !o)}
+            onSwitcherOpen={() => setShowSwitcher(true)}
+            dueCount={dueCount}
+            onReviewTap={() => navigate(`/question-bank?mode=review&limit=${Math.min(dueCount, 10)}`)}
+          />
         </div>
 
-        {generatingMissions ? (
-          <div className="flex items-center justify-center gap-2 py-6">
-            <svg className="w-4 h-4 text-teal-500 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <p className="text-sm text-slate-400 dark:text-slate-500">Generating today's missions…</p>
-          </div>
-        ) : missions.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {missions.map((m) => (
-              <MissionCard key={m.id} mission={m} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-sm text-slate-400 dark:text-slate-500 italic py-4 text-center">
-            Generating missions…
-          </div>
-        )}
-      </section>
+        {/* The Path */}
+        <section className="px-4 pb-8">
+          <div className="max-w-sm mx-auto flex flex-col mt-4">
+            {sectionGroups.map(({ section, pathSectionIdx, items }, groupIndex) => {
+              const mascotSide = pathSectionIdx % 2 === 0 ? 'left' : 'right'
+              const isActiveSection = visibleSystem === section.system
+                || (!visibleSystem && section === activeSection)
+              const sectionNodes = items.filter(it => it.type === 'node')
+              const totalNodes = sectionNodes.length
+              const direction = pathSectionIdx % 2 === 0 ? 1 : -1
+              const mascotImg = (
+                <img
+                  src={`/mascots/${section.mascot}.png`}
+                  alt=""
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: 120,
+                    objectFit: 'contain',
+                    objectPosition: 'top center',
+                    opacity: isActiveSection ? 1 : 0.35,
+                    filter: isActiveSection ? 'none' : 'grayscale(60%)',
+                    transition: 'opacity 300ms ease, filter 300ms ease',
+                  }}
+                />
+              )
 
-      {/* Due for Review banner */}
-      {dueCount > 0 && (
-        <div
-          className="mb-6 rounded-xl p-4 flex items-center justify-between cursor-pointer active:opacity-80"
-          style={{ background: '#1C1F2E', border: '2px solid #EF4444' }}
-          onClick={() => navigate(`/question-bank?mode=review&limit=${Math.min(dueCount, 10)}`)}
-        >
-          <div>
-            <p className="text-xs text-red-400 font-semibold uppercase tracking-wide">Due for Review</p>
-            <p className="text-white font-bold text-lg">
-              {dueCount} question{dueCount !== 1 ? 's' : ''} waiting
-            </p>
-            <p className="text-slate-400 text-xs mt-0.5">Review now to lock in what you've learned</p>
-          </div>
-          <div className="text-3xl">🔁</div>
-        </div>
-      )}
-
-      {/* The Path */}
-      <section>
-        <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
-          The Path
-        </h2>
-        <p className="text-xs text-slate-400 dark:text-slate-500 mb-6">
-          Complete topics to master the NPTE blueprint
-        </p>
-
-        <div className="max-w-sm mx-auto flex flex-col">
-          {renderItems.map((item, i) => {
-            if (item.type === 'banner') {
               return (
-                <div
-                  key={item.key}
-                  className={`rounded-xl px-4 py-3 flex items-center justify-between mb-3 ${i > 0 ? 'mt-6' : ''}`}
-                  style={{ background: item.section.color }}
-                >
+                <Fragment key={section.system}>
+                  {groupIndex > 0 && (
+                    <div className="flex items-center gap-3 my-6 px-2">
+                      <div className="flex-1 h-px bg-slate-700/60" />
+                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                        {section.label}
+                      </span>
+                      <div className="flex-1 h-px bg-slate-700/60" />
+                    </div>
+                  )}
                   <div>
-                    <p className="text-[11px] uppercase font-semibold text-white/70 tracking-wider">Body System</p>
-                    <p className="text-white font-bold text-xl leading-tight">{item.section.label}</p>
-                    <p className="text-white/60 text-[11px] mt-0.5">{item.masteryPct}% mastered</p>
+                    <div
+                      data-system={section.system}
+                      ref={el => { sectionMarkersRef.current[section.system] = el }}
+                    />
+                    <div className="flex items-start">
+                      {/* Left mascot column */}
+                      <div className="w-[72px] md:w-[120px] flex-shrink-0 pt-8">
+                        {mascotSide === 'left' && mascotImg}
+                      </div>
+
+                      {/* Path nodes center column */}
+                      <div className="flex-1 flex flex-col">
+                        {items.map((item) => {
+                          if (item.type === 'chest') {
+                            return (
+                              <div key={item.key} className="flex justify-center my-4">
+                                <TreasureChest
+                                  state={item.chestState}
+                                  onClaim={() => handleChestClaim(item.section.system, item.section.label)}
+                                />
+                              </div>
+                            )
+                          }
+
+                          const nodeInSection = sectionNodes.indexOf(item)
+                          const t = totalNodes > 1 ? nodeInSection / (totalNodes - 1) : 0.5
+                          const bell = 4 * t * (1 - t)
+                          const offsetPct = Math.round(bell * 20)
+                          const translateX = direction * offsetPct
+
+                          return (
+                            <div
+                              key={item.key}
+                              ref={item.isGlobalActive ? globalActiveRef : undefined}
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                transform: `translateX(${translateX}%)`,
+                                paddingTop: 12,
+                                paddingBottom: 12,
+                              }}
+                            >
+                              <PathNode
+                                node={item.node}
+                                state={item.state}
+                                section={item.section}
+                                masteryPct={item.masteryPct}
+                                isGlobalActive={item.isGlobalActive}
+                                wasLocked={item.wasLocked}
+                                sessionsCompleted={item.sessionsCompleted}
+                                onPress={() => navigate(`/question-bank?subject=${encodeURIComponent(item.section.masteryKey)}`)}
+                              />
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      {/* Right mascot column */}
+                      <div className="w-[72px] md:w-[120px] flex-shrink-0 pt-8">
+                        {mascotSide === 'right' && mascotImg}
+                      </div>
+                    </div>
                   </div>
-                  <img
-                    src={`/mascots/${item.section.mascot}.png`}
-                    alt=""
-                    className="w-16 h-16 object-contain flex-shrink-0"
-                  />
-                </div>
+                </Fragment>
               )
-            }
+            })}
 
-            if (item.type === 'chest') {
-              return (
-                <div key={item.key} className="flex justify-center my-5">
-                  <TreasureChest
-                    state={item.chestState}
-                    onClaim={() => handleChestClaim(item.section.system, item.section.label)}
-                  />
-                </div>
-              )
-            }
-
-            // Node row
-            const justifyClass = JUSTIFY[item.nodeIndex % 4]
-            const nextItem = renderItems[i + 1]
-            const showConnector = nextItem && nextItem.type !== 'banner'
-
-            return (
-              <div key={item.key}>
-                <div
-                  ref={item.isGlobalActive ? globalActiveRef : undefined}
-                  className={`flex ${justifyClass} py-2`}
-                >
-                  <PathNode
-                    node={item.node}
-                    state={item.state}
-                    section={item.section}
-                    masteryPct={item.masteryPct}
-                    isGlobalActive={item.isGlobalActive}
-                    wasLocked={item.wasLocked}
-                    sessionsCompleted={item.sessionsCompleted}
-                    onPress={() => navigate(`/question-bank?subject=${encodeURIComponent(item.section.masteryKey)}`)}
-                  />
-                </div>
-                {showConnector && (
-                  <div className="flex justify-center">
-                    <div className="w-px h-6 border-l-2 border-dashed border-slate-300 dark:border-slate-700" />
-                  </div>
-                )}
-              </div>
-            )
-          })}
-
-          {/* Mock Exam hex nodes */}
-          <div className="mt-8 bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 rounded-2xl overflow-hidden">
-            <HexNode
-              label="Mock Exam 1"
-              locked={!allAbove60}
-              badge="Legendary"
-              onClick={() => navigate('/exam/1/start')}
-            />
-            <div className="border-t border-slate-100 dark:border-slate-800" />
-            <HexNode
-              label="Mock Exam 2"
-              locked={!allAbove60}
-              badge="Legendary"
-              onClick={() => navigate('/exam/2/start')}
-            />
+            {/* Mock Exam hex nodes */}
+            <div className="mt-8 bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 rounded-2xl overflow-hidden">
+              <HexNode
+                label="Mock Exam 1"
+                locked={!allAbove60}
+                badge="Legendary"
+                onClick={() => navigate('/exam/1/start')}
+              />
+              <div className="border-t border-slate-100 dark:border-slate-800" />
+              <HexNode
+                label="Mock Exam 2"
+                locked={!allAbove60}
+                badge="Legendary"
+                onClick={() => navigate('/exam/2/start')}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* All missions complete banner */}
-      {showAllMissionsBanner && (
-        <AllMissionsBanner onDismiss={() => setShowAllMissionsBanner(false)} />
-      )}
+      {/* Subject switcher bottom sheet */}
+      <AnimatePresence>
+        {showSwitcher && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 bg-black/50 z-40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setShowSwitcher(false)}
+            />
+
+            {/* Sheet */}
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl overflow-hidden"
+              style={{ backgroundColor: '#1C1F2E', maxHeight: '80vh' }}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            >
+              {/* Handle + header */}
+              <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                <div className="absolute left-1/2 -translate-x-1/2 top-2 w-10 h-1 rounded-full bg-white/20" />
+                <p className="text-white font-bold text-base mt-2">Switch Subject</p>
+                <button
+                  className="rounded-full p-1.5 bg-white/10 active:opacity-70"
+                  onClick={() => setShowSwitcher(false)}
+                >
+                  <X size={16} color="white" />
+                </button>
+              </div>
+
+              {/* Section rows */}
+              <div className="overflow-y-auto pb-8 px-4">
+                {/* "All subjects" option */}
+                <button
+                  className="w-full flex items-center gap-3 py-3 border-b border-white/5 active:opacity-70"
+                  onClick={() => { setActiveSystemFilter(null); setShowSwitcher(false) }}
+                >
+                  <div
+                    className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
+                  >
+                    🗺️
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-white font-semibold text-sm">All Subjects</p>
+                    <p className="text-slate-400 text-xs mt-0.5">Show full path</p>
+                  </div>
+                  {activeSystemFilter === null && (
+                    <div className="w-5 h-5 rounded-full bg-teal-500 flex items-center justify-center flex-shrink-0">
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+
+                {PATH_SECTIONS.map((section, idx) => {
+                  const pct = Math.round(subjectMastery[section.masteryKey]?.pct ?? 0)
+                  const isSelected = activeSystemFilter === section.system
+                  const circ = 2 * Math.PI * 15
+                  const offset = circ * (1 - pct / 100)
+                  return (
+                    <button
+                      key={section.system}
+                      className={`w-full flex items-center gap-3 py-3 active:opacity-70 ${idx < PATH_SECTIONS.length - 1 ? 'border-b border-white/5' : ''}`}
+                      onClick={() => {
+                        setActiveSystemFilter(isSelected ? null : section.system)
+                        setShowSwitcher(false)
+                      }}
+                    >
+                      <img
+                        src={`/mascots/${section.mascot}.png`}
+                        alt=""
+                        className="w-14 h-14 object-contain flex-shrink-0"
+                      />
+                      <div className="flex-1 text-left">
+                        <p className="text-white font-semibold text-sm">{section.label}</p>
+                        <p className="text-slate-400 text-xs mt-0.5">{pct}% mastered</p>
+                      </div>
+
+                      {/* Mini progress ring */}
+                      <svg width="36" height="36" viewBox="0 0 36 36" className="flex-shrink-0">
+                        <circle cx="18" cy="18" r="15" fill="none"
+                          stroke="rgba(255,255,255,0.12)" strokeWidth="3" />
+                        <circle cx="18" cy="18" r="15" fill="none"
+                          stroke={section.color} strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeDasharray={circ}
+                          strokeDashoffset={offset}
+                          transform="rotate(-90 18 18)" />
+                      </svg>
+
+                      {isSelected && (
+                        <div className="w-5 h-5 rounded-full bg-teal-500 flex items-center justify-center flex-shrink-0">
+                          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                            <path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
