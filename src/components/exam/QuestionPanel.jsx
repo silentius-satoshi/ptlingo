@@ -72,7 +72,7 @@ export default function QuestionPanel({
 
   if (!question) {
     return (
-      <div className="flex-[55] flex items-center justify-center border-r border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 text-sm">
+      <div className="w-full md:flex-[55] flex items-center justify-center md:border-r border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 text-sm">
         No question loaded
       </div>
     )
@@ -81,9 +81,9 @@ export default function QuestionPanel({
   const segments = buildSegments(question.stem, highlights)
 
   return (
-    <div className="flex-[55] flex flex-col border-r border-slate-200 dark:border-slate-700">
+    <div className="w-full md:flex-[55] flex flex-col border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
       {/* Panel header */}
-      <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 flex items-center justify-between">
+      <div className="px-4 md:px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             Question
@@ -104,7 +104,7 @@ export default function QuestionPanel({
 
       {/* Highlight mode banner */}
       {highlightMode && (
-        <div className="px-8 py-1.5 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-100 dark:border-yellow-900 flex-shrink-0 flex items-center justify-between">
+        <div className="px-4 md:px-8 py-1.5 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-100 dark:border-yellow-900 flex-shrink-0 flex items-center justify-between">
           <span className="text-xs text-yellow-700 dark:text-yellow-400 font-medium">
             Highlight mode — select text to highlight · click highlight to remove
           </span>
@@ -120,7 +120,7 @@ export default function QuestionPanel({
       )}
 
       {/* Subject + difficulty badges */}
-      <div className="px-8 pt-5 pb-2 flex-shrink-0 flex items-center gap-2">
+      <div className="px-4 md:px-8 pt-5 pb-2 flex-shrink-0 flex items-center gap-2">
         <span className="text-xs px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 font-medium border border-teal-100 dark:border-teal-800">
           {question.subject}
         </span>
@@ -136,7 +136,7 @@ export default function QuestionPanel({
       </div>
 
       {/* Stem */}
-      <div className="px-8 py-4">
+      <div className="px-4 md:px-8 py-4">
         <p
           ref={stemRef}
           onMouseUp={handleMouseUp}

@@ -11,13 +11,13 @@ export default function AnswerPanel({
   rationaleVisible = false,
 }) {
   if (!question) {
-    return <div className="flex-[45] bg-slate-50 dark:bg-slate-900/50" />
+    return <div className="w-full md:flex-[45] bg-slate-50 dark:bg-slate-900/50" />
   }
 
   return (
-    <div className="flex-[45] flex flex-col bg-slate-50/50 dark:bg-slate-900/30">
+    <div className="w-full md:flex-[45] flex flex-col bg-slate-50/50 dark:bg-slate-900/30">
       {/* Panel header */}
-      <div className="px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 flex items-center gap-3">
+      <div className="px-4 md:px-8 py-4 border-b border-slate-100 dark:border-slate-800 flex-shrink-0 flex items-center gap-3">
         <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
           Answer
         </span>
@@ -27,7 +27,7 @@ export default function AnswerPanel({
       </div>
 
       {/* Choices */}
-      <div className="px-8 py-5 space-y-3">
+      <div className="px-4 py-4 md:px-8 md:py-5 space-y-3">
         {question.choices.map((choice, i) => (
           <ChoiceRow
             key={`${question.id}-${i}`}

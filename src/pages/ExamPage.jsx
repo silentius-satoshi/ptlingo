@@ -792,7 +792,7 @@ export default function ExamPage() {
             <div className="flex-1 overflow-y-auto scrollbar-thin">
               {rationaleVisible ? (
                 <>
-                  <div className="flex border-b border-slate-200 dark:border-slate-700">
+                  <div className="flex flex-col md:flex-row border-b border-slate-200 dark:border-slate-700">
                     <QuestionPanel
                       question={currentQuestion}
                       questionNumber={currentIndex + 1}
@@ -818,7 +818,7 @@ export default function ExamPage() {
                 </>
               ) : (
                 <>
-                  <div className="flex min-h-full">
+                  <div className="flex flex-col md:flex-row md:min-h-full">
                     <QuestionPanel
                       question={currentQuestion}
                       questionNumber={currentIndex + 1}
@@ -860,7 +860,7 @@ export default function ExamPage() {
 
             {/* Toolbar panel (progress / calculator / notes) */}
             {toolbarPanel && (
-              <div className="flex-shrink-0 w-80 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+              <div className="hidden md:flex flex-shrink-0 w-80 border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex-col overflow-hidden">
                 {toolbarPanel === 'progress' && (
                   <ProgressGrid
                     questions={questions}
