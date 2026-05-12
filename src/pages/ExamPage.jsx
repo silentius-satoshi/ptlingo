@@ -26,6 +26,7 @@ import QuitWarningModal from '../components/drill/QuitWarningModal'
 import MotivationBreak from '../components/drill/MotivationBreak'
 import CasualQuizView from '../components/exam/CasualQuizView'
 import MobilePanelSheet from '../components/exam/MobilePanelSheet'
+import PostSessionFlow from '../components/exam/PostSessionFlow'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -142,6 +143,10 @@ export default function ExamPage() {
   const [mobileSheet,  setMobileSheet]        = useState(null)
   const [highlightMode, setHighlightMode]     = useState(false)
   const [focusedChoice, setFocusedChoice]     = useState(null)
+
+  // ── Post-session flow ─────────────────────────────────────────────────────
+  const [showPostFlow,  setShowPostFlow]  = useState(false)
+  const [postFlowData,  setPostFlowData]  = useState(null)
 
   // ── Modals ─────────────────────────────────────────────────────────────────
   const [showPauseModal, setShowPauseModal]   = useState(false)
@@ -573,21 +578,52 @@ export default function ExamPage() {
       const xpAmount = type === 'exam' ? 100 : 25
       await awardXP(xpAmount, type === 'exam' ? 'Mock Exam complete' : 'Quiz complete')
 
+      // Capture score BEFORE mastery refresh updates it
+      const prevPtLingoScore = useGamificationStore.getState().ptLingoScore
+
       // Refresh mastery + check question count achievements
       await refreshSubjectMastery()
       await checkQuestionCountAchievements()
+      const prevStreak = useGamificationStore.getState().streak
       await advanceStreak()
-      await useGamificationStore.getState().addCoins(50)
+      const newStreak = useGamificationStore.getState().streak
+      await useGamificationStore.getState().addCoins(5)
 
-      navigate(`/results/${sessionId}`)
+      if (type !== 'quiz') {
+        navigate(`/results/${sessionId}`)
+        return
+      }
+
+      const gam = useGamificationStore.getState()
+      setPostFlowData({
+        sessionId,
+        xpEarned:        xpAmount,
+        accuracy:        questions.length > 0 ? correct / questions.length : 0,
+        correctCount:    correct,
+        totalQuestions:  questions.length,
+        currentSystem:   currentQuestion?.subject,
+        streakCount:     newStreak,
+        streakAdvanced:  newStreak > prevStreak,
+        ptLingoScore:    gam.ptLingoScore,
+        prevPtLingoScore,
+        missionsAllDone: gam.dailyMissions?.all_complete ?? false,
+        missions:        gam.dailyMissions?.missions ?? [],
+        coinsEarned:     5,
+      })
+      setShowPostFlow(true)
     } catch (err) {
       console.error('Submit error:', err)
     } finally {
       setSubmitting(false)
     }
-  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak])
+  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion])
 
   const handleSheetContinue = useCallback(() => {
+    if (currentIndex >= questions.length - 1) {
+      setShowFeedbackSheet(false)
+      handleSubmit()
+      return
+    }
     setShowFeedbackSheet(false)
     if (type === 'quiz' && !readOnly) {
       const breakData = getMotivationBreak({
@@ -624,6 +660,7 @@ export default function ExamPage() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1)
     } else {
+      setShowFeedbackSheet(false)
       handleSubmit()
     }
   }, [currentIndex, questions.length, setCurrentIndex, handleSubmit])
@@ -1131,6 +1168,14 @@ export default function ExamPage() {
         note={currentNote}
         onChange={handleNoteChange}
       />
+
+      {showPostFlow && postFlowData && (
+        <PostSessionFlow
+          {...postFlowData}
+          onReview={()   => navigate(`/results/${postFlowData.sessionId}`)}
+          onComplete={() => navigate(`/results/${postFlowData.sessionId}`)}
+        />
+      )}
     </div>
   )
 }
