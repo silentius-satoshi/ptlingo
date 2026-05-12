@@ -49,5 +49,6 @@ export const useAuthStore = create((set) => ({
     if (supabase) await supabase.auth.signOut()
     set({ user: null, profile: {}, examDate: '2026-07-29' })
     localStorage.removeItem('ptlingo_profile')
+    localStorage.removeItem('ptlingo_gam')
   },
 }))

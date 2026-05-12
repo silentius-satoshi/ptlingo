@@ -39,25 +39,31 @@ function todayStr() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function readGamCache() {
+  try { return JSON.parse(localStorage.getItem('ptlingo_gam') ?? 'null') ?? {} }
+  catch { return {} }
+}
+const _c = readGamCache()
+
 const useGamificationStore = create((set, get) => ({
   // ── State ──────────────────────────────────────────────────────────────────
   userId: null,
-  xp: 0,
-  level: 1,
-  streak: 0,
+  xp: _c.xp ?? 0,
+  level: _c.level ?? 1,
+  streak: _c.streak ?? 0,
   longestStreak: 0,
   // Energy system (replaces hearts)
-  energy: 25,
+  energy: _c.energy ?? 25,
   maxEnergy: 25,
   lastEnergyUpdate: null,
-  coins: 0,
+  coins: _c.coins ?? 0,
   // Deprecated alias — mirrors energy for any existing callers
-  hearts: 25,
+  hearts: _c.energy ?? 25,
   subjectMastery: {},
   dailyMissions: {},
   achievements: [],
   loaded: false,
-  ptLingoScore: 0,
+  ptLingoScore: _c.ptLingoScore ?? 0,
   activeSystem: 'Neuromuscular',
   xpBoostActive: false,
   streakFreezeCount: 0,
@@ -98,6 +104,14 @@ const useGamificationStore = create((set, get) => ({
         streakShieldExpiry: row.streak_shield_expiry ?? null,
         loaded: true,
       })
+      localStorage.setItem('ptlingo_gam', JSON.stringify({
+        xp:           row.xp           ?? 0,
+        streak:       row.streak        ?? 0,
+        energy:       row.energy        ?? 25,
+        coins:        row.coins         ?? 0,
+        ptLingoScore: computePtLingoScore(coercedMastery),
+        level:        getLevelFromXP(row.xp ?? 0),
+      }))
 
       get().rechargeEnergy()
 
