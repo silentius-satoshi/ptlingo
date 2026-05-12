@@ -21,6 +21,7 @@ import PerformancePage from './pages/PerformancePage'
 import AchievementsPage from './pages/AchievementsPage'
 import TutorPage from './pages/TutorPage'
 import ProfilePage from './pages/ProfilePage'
+import ShopPage from './pages/ShopPage'
 import RationalePage from './pages/RationalePage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
@@ -119,6 +120,7 @@ export default function App() {
           <Route path="tutor" element={<TutorPage />} />
           <Route path="exam/:examId/start" element={<MockExamStartPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="shop" element={<ShopPage />} />
         </Route>
 
         {/* Full-screen routes — auth + MFA required, no sidebar */}

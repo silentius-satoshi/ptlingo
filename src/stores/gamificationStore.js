@@ -59,6 +59,9 @@ const useGamificationStore = create((set, get) => ({
   loaded: false,
   ptLingoScore: 0,
   activeSystem: 'Neuromuscular',
+  xpBoostActive: false,
+  streakFreezeCount: 0,
+  streakShieldExpiry: null,
 
   // XP toast queue: [{ id, amount, source, levelUp, oldTitle, newTitle }]
   toastQueue: [],
@@ -86,10 +89,13 @@ const useGamificationStore = create((set, get) => ({
         lastEnergyUpdate: row.last_energy_update ?? null,
         coins:            row.coins           ?? 0,
         hearts:           energy,             // deprecated alias
-        subjectMastery:   coercedMastery,
-        ptLingoScore:     computePtLingoScore(coercedMastery),
-        dailyMissions:    missions,
-        achievements:     row.achievements    ?? [],
+        subjectMastery:    coercedMastery,
+        ptLingoScore:      computePtLingoScore(coercedMastery),
+        dailyMissions:     missions,
+        achievements:      row.achievements         ?? [],
+        xpBoostActive:     row.xp_boost_active      ?? false,
+        streakFreezeCount: row.streak_freeze_count   ?? 0,
+        streakShieldExpiry: row.streak_shield_expiry ?? null,
         loaded: true,
       })
 
@@ -149,17 +155,50 @@ const useGamificationStore = create((set, get) => ({
     await upsertGamification(userId, { energy: maxEnergy, last_energy_update: now, coins: newCoins })
   },
 
+  purchaseXpBoost: async () => {
+    const { userId, coins, xpBoostActive } = get()
+    if (coins < 750 || xpBoostActive) return
+    const newCoins = coins - 750
+    set({ coins: newCoins, xpBoostActive: true })
+    await upsertGamification(userId, { coins: newCoins, xp_boost_active: true })
+  },
+
+  purchaseStreakFreeze: async () => {
+    const { userId, coins, streakFreezeCount } = get()
+    if (coins < 1000) return
+    const newCoins = coins - 1000
+    const newCount = streakFreezeCount + 1
+    set({ coins: newCoins, streakFreezeCount: newCount })
+    await upsertGamification(userId, { coins: newCoins, streak_freeze_count: newCount })
+  },
+
+  purchaseStreakShield: async () => {
+    const { userId, coins, streakShieldExpiry } = get()
+    if (coins < 3000) return
+    if (streakShieldExpiry && new Date(streakShieldExpiry) > new Date()) return
+    const expiry = new Date()
+    expiry.setDate(expiry.getDate() + 7)
+    const newCoins = coins - 3000
+    set({ coins: newCoins, streakShieldExpiry: expiry.toISOString() })
+    await upsertGamification(userId, { coins: newCoins, streak_shield_expiry: expiry.toISOString() })
+  },
+
   // ── XP + Level ────────────────────────────────────────────────────────────
   awardXP: async (amount, source) => {
-    const { userId, xp: oldXP, level: oldLevel } = get()
-    const newXP    = oldXP + amount
+    const { userId, xp: oldXP, level: oldLevel, xpBoostActive } = get()
+    const multiplied = xpBoostActive ? amount * 2 : amount
+    const newXP    = oldXP + multiplied
     const newLevel = getLevelFromXP(newXP)
     const leveledUp = newLevel > oldLevel
 
-    set({ xp: newXP, level: newLevel })
-    await upsertGamification(userId, { xp: newXP, level: newLevel })
+    set({ xp: newXP, level: newLevel, ...(xpBoostActive ? { xpBoostActive: false } : {}) })
+    await upsertGamification(userId, {
+      xp: newXP,
+      level: newLevel,
+      ...(xpBoostActive ? { xp_boost_active: false } : {}),
+    })
 
-    get()._enqueueToast({ amount, source, levelUp: leveledUp, oldLevel, newLevel })
+    get()._enqueueToast({ amount: multiplied, source, levelUp: leveledUp, oldLevel, newLevel })
     get().checkAchievements()
   },
 
@@ -174,14 +213,32 @@ const useGamificationStore = create((set, get) => ({
 
   // ── Streak ────────────────────────────────────────────────────────────────
   advanceStreak: async () => {
-    const { userId, streak, longestStreak } = get()
+    const { userId, streak, longestStreak, streakFreezeCount, streakShieldExpiry } = get()
     const today    = todayStr()
     const row      = await fetchOrCreateGamification(userId)
     const lastDate = row?.last_activity_date
 
     if (lastDate === today) return // already counted today
 
-    const newStreak = lastDate === getPreviousDay() ? streak + 1 : 1
+    let newStreak
+    if (lastDate === getPreviousDay()) {
+      newStreak = streak + 1
+    } else {
+      const shieldActive  = streakShieldExpiry && new Date(streakShieldExpiry) > new Date()
+      const freezeApplies = streakFreezeCount > 0 && lastDate === getTwoDaysAgo()
+
+      if (shieldActive || freezeApplies) {
+        newStreak = streak + 1
+        if (freezeApplies && !shieldActive) {
+          const newCount = streakFreezeCount - 1
+          set({ streakFreezeCount: newCount })
+          await upsertGamification(userId, { streak_freeze_count: newCount })
+        }
+      } else {
+        newStreak = 1
+      }
+    }
+
     const newLongest = Math.max(longestStreak, newStreak)
 
     set({ streak: newStreak, longestStreak: newLongest })
@@ -313,6 +370,12 @@ function coerceMastery(raw) {
 function getPreviousDay() {
   const d = new Date()
   d.setDate(d.getDate() - 1)
+  return d.toISOString().slice(0, 10)
+}
+
+function getTwoDaysAgo() {
+  const d = new Date()
+  d.setDate(d.getDate() - 2)
   return d.toISOString().slice(0, 10)
 }
 

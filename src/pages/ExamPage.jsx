@@ -560,6 +560,7 @@ export default function ExamPage() {
       await refreshSubjectMastery()
       await checkQuestionCountAchievements()
       await advanceStreak()
+      await useGamificationStore.getState().addCoins(50)
 
       navigate(`/results/${sessionId}`)
     } catch (err) {
