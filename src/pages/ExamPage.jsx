@@ -473,6 +473,13 @@ export default function ExamPage() {
     if (breakState === 'mandatory' && breakTimeLeft === 0) resumeFromBreak()
   }, [breakState, breakTimeLeft, resumeFromBreak])
 
+  // Set activeSystem once when questions first load
+  useEffect(() => {
+    if (questions.length > 0 && currentQuestion?.subject) {
+      useGamificationStore.setState({ activeSystem: currentQuestion.subject })
+    }
+  }, [questions.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Per-question time tracking ─────────────────────────────────────────────
   // Fires when the visible question changes: saves elapsed time for the previous
   // question and starts the clock for the new one.

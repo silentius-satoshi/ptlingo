@@ -8,7 +8,6 @@ import PathNode, { HexNode } from '../components/gamification/PathNode'
 import TreasureChest from '../components/gamification/TreasureChest'
 import MissionCard from '../components/gamification/MissionCard'
 import StreakBadge from '../components/gamification/StreakBadge'
-import LevelBadge from '../components/gamification/LevelBadge'
 import AllMissionsBanner from '../components/gamification/AllMissionsBanner'
 import { PATH_SECTIONS, getNodeState } from '../lib/pathSections'
 
@@ -23,7 +22,7 @@ export default function ThePathPage() {
   const navigate = useNavigate()
   const {
     loaded,
-    streak, level, xp,
+    streak,
     subjectMastery,
     dailyMissions,
     generateDailyMissions,
@@ -156,15 +155,6 @@ export default function ThePathPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 px-4 py-8 max-w-2xl mx-auto flex flex-col">
-
-      {/* Streak + Level strip */}
-      <section className="mb-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 flex items-center gap-6 flex-wrap">
-        <StreakBadge streak={streak} />
-        <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 flex-shrink-0 hidden sm:block" />
-        <div className="flex-1 min-w-[180px]">
-          <LevelBadge level={level} xp={xp} />
-        </div>
-      </section>
 
       {/* Daily Missions */}
       <section className="mb-8">

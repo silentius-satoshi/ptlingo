@@ -9,6 +9,32 @@ import { generateDailyMissions } from '../lib/missionGenerator'
 import { getLevelFromXP, xpForLevel } from '../lib/xpFormulas'
 import { ACHIEVEMENTS } from '../lib/achievements'
 
+const SYSTEM_WEIGHTS = {
+  'Musculoskeletal':            0.32,
+  'Neuromuscular':              0.23,
+  'Cardiovascular and Pulmonary': 0.17,
+  'Other Systems':              0.13,
+  'Integumentary':              0.08,
+  'Nonsystem Domains':          0.07,
+}
+
+function computePtLingoScore(subjectMastery) {
+  const total = Object.entries(SYSTEM_WEIGHTS).reduce(
+    (sum, [key, w]) => sum + (subjectMastery[key]?.pct ?? 0) * w,
+    0
+  )
+  return Math.round(total)
+}
+
+export function getPtLingoLevel(score) {
+  if (score >= 85) return { level: 6, title: 'NPTE Expert',     next: 100 }
+  if (score >= 68) return { level: 5, title: 'NPTE Advanced',   next: 85  }
+  if (score >= 51) return { level: 4, title: 'NPTE Proficient', next: 68  }
+  if (score >= 34) return { level: 3, title: 'NPTE Competent',  next: 51  }
+  if (score >= 17) return { level: 2, title: 'NPTE Developing', next: 34  }
+  return             { level: 1, title: 'NPTE Novice',          next: 17  }
+}
+
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
 }
@@ -31,6 +57,8 @@ const useGamificationStore = create((set, get) => ({
   dailyMissions: {},
   achievements: [],
   loaded: false,
+  ptLingoScore: 0,
+  activeSystem: 'Neuromuscular',
 
   // XP toast queue: [{ id, amount, source, levelUp, oldTitle, newTitle }]
   toastQueue: [],
@@ -44,8 +72,9 @@ const useGamificationStore = create((set, get) => ({
         return
       }
 
-      const missions = row.daily_missions ?? {}
-      const energy   = row.energy        ?? 25
+      const missions       = row.daily_missions ?? {}
+      const energy         = row.energy        ?? 25
+      const coercedMastery = coerceMastery(row.subject_mastery)
       set({
         userId,
         xp:               row.xp             ?? 0,
@@ -57,7 +86,8 @@ const useGamificationStore = create((set, get) => ({
         lastEnergyUpdate: row.last_energy_update ?? null,
         coins:            row.coins           ?? 0,
         hearts:           energy,             // deprecated alias
-        subjectMastery:   coerceMastery(row.subject_mastery),
+        subjectMastery:   coercedMastery,
+        ptLingoScore:     computePtLingoScore(coercedMastery),
         dailyMissions:    missions,
         achievements:     row.achievements    ?? [],
         loaded: true,
@@ -170,7 +200,7 @@ const useGamificationStore = create((set, get) => ({
     const { userId, subjectMastery } = get()
     const entry = typeof data === 'number' ? { pct: data, correct: 0, total: 0 } : data
     const updated = { ...subjectMastery, [subject]: entry }
-    set({ subjectMastery: updated })
+    set({ subjectMastery: updated, ptLingoScore: computePtLingoScore(updated) })
     await upsertGamification(userId, { subject_mastery: updated })
     get().checkAchievements()
   },
@@ -180,7 +210,7 @@ const useGamificationStore = create((set, get) => ({
     const accuracy = await fetchAccuracyBySubject(userId)
     const { subjectMastery } = get()
     const updated = { ...subjectMastery, ...accuracy }
-    set({ subjectMastery: updated })
+    set({ subjectMastery: updated, ptLingoScore: computePtLingoScore(updated) })
     await upsertGamification(userId, { subject_mastery: updated })
     get().checkAchievements()
   },

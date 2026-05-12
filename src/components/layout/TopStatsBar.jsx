@@ -1,81 +1,70 @@
 import { useState } from 'react'
-import { Flame, Zap, Gem, Star, Trophy, Sun, Moon } from 'lucide-react'
+import { Zap, Gem } from 'lucide-react'
+import { getSystemConfig } from '../../constants/systemConfig'
 import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
-import { useUiStore } from '../../store/uiStore'
 import StreakModal from '../streak/StreakModal'
 
 const EXAM_DATE = new Date('2026-07-29')
 
 export default function TopStatsBar() {
   const navigate = useNavigate()
-  const { streak, xp, energy, maxEnergy, coins } = useGamificationStore()
-  const { darkMode, toggleDarkMode } = useUiStore()
+  const { streak, energy, coins, ptLingoScore, activeSystem } = useGamificationStore()
   const [showStreak, setShowStreak] = useState(false)
 
-  const daysLeft = Math.max(0, Math.ceil((EXAM_DATE - new Date()) / 86400000))
-  const pillColor = daysLeft < 30 ? 'bg-red-500' : 'bg-amber-500'
+  const daysLeft = Math.ceil((EXAM_DATE - new Date()) / (1000 * 60 * 60 * 24))
+  const pillColor = daysLeft <= 14 ? '#EF4444' : daysLeft <= 30 ? '#F97316' : '#6B7280'
 
   return (
-    <div
-      className="md:hidden flex items-center justify-between px-4 bg-slate-900 border-b border-slate-700 flex-shrink-0"
-      style={{ height: 44 }}
-    >
-      {/* Left: stats */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setShowStreak(true)}
-          className="flex items-center gap-0.5 text-xs font-bold"
-          style={{ color: '#FF9600' }}
-        >
-          <Flame className="w-3.5 h-3.5" />
-          {streak}
+    <>
+      <div
+        className="md:hidden flex items-center justify-between px-4 bg-slate-900 border-b border-slate-700 flex-shrink-0"
+        style={{ height: 48 }}
+      >
+        {/* PT Lingo Score */}
+        <button onClick={() => navigate('/achievements')} className="flex items-center gap-1.5">
+          <img
+            src={getSystemConfig(activeSystem)?.mascot ?? '/mascots/sparky.png'}
+            style={{ width: 28, height: 28, objectFit: 'contain' }}
+            alt=""
+          />
+          <span className="text-base font-bold text-white">{ptLingoScore}</span>
         </button>
-        <button
-          onClick={() => navigate('/profile')}
-          className="flex items-center gap-1 text-xs font-bold text-yellow-400"
-        >
-          <Star className="w-3.5 h-3.5" />
-          {xp}
-        </button>
-        <div className="flex items-center gap-1 text-xs font-bold" style={{ color: '#F59E0B' }}>
-          <Gem className="w-3.5 h-3.5" />
-          {coins}
-        </div>
-        <div className="flex items-center gap-1 text-xs font-bold text-yellow-300">
-          <Zap className="w-3.5 h-3.5" />
-          {energy}/{maxEnergy}
-        </div>
-      </div>
 
-      {/* Right: countdown + trophy + theme toggle */}
-      <div className="flex items-center gap-1.5">
-        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white ${pillColor}`}>
+        {/* Streak */}
+        <button onClick={() => setShowStreak(true)} className="flex items-center gap-1.5">
+          <span style={{ fontSize: 20, lineHeight: 1 }}>🔥</span>
+          <span className="text-base font-bold text-white">{streak}</span>
+        </button>
+
+        {/* Gems */}
+        <button onClick={() => navigate('/shop')} className="flex items-center gap-1.5">
+          <Gem className="w-5 h-5" style={{ color: '#60A5FA' }} />
+          <span className="text-base font-bold text-white">{coins}</span>
+        </button>
+
+        {/* Charge — pink pill */}
+        <div
+          className="flex flex-shrink-0 items-center gap-1"
+          style={{ background: '#EC4899', borderRadius: 9999, padding: '5px 10px', fontSize: 13, fontWeight: 700, color: 'white' }}
+        >
+          <Zap style={{ width: 12, height: 12 }} />
+          {energy}
+        </div>
+
+        {/* Exam countdown pill */}
+        <div
+          className="flex items-center px-2 py-0.5 rounded-full text-xs font-bold text-white flex-shrink-0"
+          style={{ background: pillColor }}
+        >
           {daysLeft}d
-        </span>
-        <button
-          onClick={() => navigate('/achievements')}
-          className="p-1.5 text-slate-400 hover:text-slate-200 transition-colors"
-          aria-label="Achievements"
-        >
-          <Trophy className="w-4.5 h-4.5" style={{ width: 18, height: 18 }} />
-        </button>
-        <button
-          onClick={toggleDarkMode}
-          className="p-1.5 text-slate-400 hover:text-slate-200 transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {darkMode
-            ? <Sun style={{ width: 18, height: 18 }} />
-            : <Moon style={{ width: 18, height: 18 }} />
-          }
-        </button>
+        </div>
       </div>
 
       <AnimatePresence>
         {showStreak && <StreakModal streak={streak} onClose={() => setShowStreak(false)} />}
       </AnimatePresence>
-    </div>
+    </>
   )
 }
