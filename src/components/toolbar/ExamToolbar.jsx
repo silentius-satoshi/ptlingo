@@ -70,6 +70,7 @@ export default function ExamToolbar({
   onEnd,
   onReport,
   readOnly = false,
+  className = '',
 }) {
   const { darkMode, toggleDarkMode } = useUiStore()
   const togglePanel = (panel) =>
@@ -79,7 +80,7 @@ export default function ExamToolbar({
     <div
       className={`flex-shrink-0 flex flex-col border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 overflow-hidden transition-[width] duration-200 ${
         expanded ? 'w-44' : 'w-14'
-      }`}
+      } ${className}`}
     >
       {/* Main actions */}
       <nav className="flex-1 px-1.5 py-3 space-y-0.5 overflow-y-auto scrollbar-thin">

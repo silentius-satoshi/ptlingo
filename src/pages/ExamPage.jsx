@@ -768,6 +768,7 @@ export default function ExamPage() {
           }
         }}
         type={type}
+        isCasual={isCasual}
         currentIndex={currentIndex}
         questionsTotal={questions.length}
         currentSystem={currentQuestion?.subject}
@@ -902,6 +903,7 @@ export default function ExamPage() {
             )}
 
             <ExamToolbar
+              className={isCasual ? 'max-md:hidden' : ''}
               expanded={toolbarExpanded}
               activePanel={toolbarPanel}
               onSetPanel={setToolbarPanel}

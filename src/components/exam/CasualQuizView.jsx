@@ -78,7 +78,7 @@ export default function CasualQuizView({
           </div>
           <div className="px-4 pt-2 pb-4 overflow-y-auto" style={{ maxHeight: 180 }}>
             <p className="text-white leading-relaxed" style={{ fontSize: 15, fontWeight: 500 }}>
-              {question?.content ?? ''}
+              {question?.stem ?? ''}
             </p>
           </div>
         </div>

@@ -15,6 +15,7 @@ export default function ExamTopBar({
   currentSystem,
   energy        = 0,
   maxEnergy     = 25,
+  isCasual      = false,
 }) {
   const navigate = useNavigate()
   const { formatted, timeRemaining } = useTimer({ onExpire, paused })
@@ -68,7 +69,7 @@ export default function ExamTopBar({
         {/* Desktop only: toolbar toggle */}
         <button
           onClick={onToggleToolbar}
-          className="hidden md:flex flex-shrink-0 p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors"
+          className={`${isCasual ? 'hidden md:flex' : 'flex'} flex-shrink-0 p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors`}
           aria-label="Toggle toolbar"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
