@@ -322,7 +322,7 @@ export default function SettingsPage() {
   }
 
   const today = new Date().toISOString().slice(0, 10)
-  const quizModeLabel = quizMode === 'casual' ? 'Casual' : 'Standard'
+  const quizModeLabel = quizMode === 'ptlingo' ? 'PT Lingo' : 'Standard'
   const avatarUrl = profile?.avatar_url
   const initials = (user?.email ?? '?').slice(0, 2).toUpperCase()
   const formattedExamDate = new Date(examDate ?? '2026-07-29')
@@ -700,8 +700,8 @@ export default function SettingsPage() {
                   desc: 'Classic testing format — full desktop-style layout with question panel, answer panel, and review toolbar. Best for focused study.',
                 },
                 {
-                  id: 'casual', icon: '🎮', label: 'Casual',
-                  desc: 'Duolingo-inspired mobile experience — mascot, speech bubble questions, gamified feedback. Best for quick practice sessions on the go.',
+                  id: 'ptlingo', icon: '🎮', label: 'PT Lingo',
+                  desc: 'Mascot-guided experience with large answer cards. PT Lingo style — gamified and mobile-friendly.',
                 },
               ].map((opt) => (
                 <div

@@ -24,6 +24,8 @@ import ProfilePage from './pages/ProfilePage'
 import ShopPage from './pages/ShopPage'
 import SettingsPage from './pages/SettingsPage'
 import RationalePage from './pages/RationalePage'
+import { AnimatePresence } from 'framer-motion'
+import QuizModeOnboarding from './components/onboarding/QuizModeOnboarding'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
 import IosInstallHint from './components/IosInstallHint'
@@ -60,6 +62,7 @@ function RequireFullAuth({ children }) {
 
 export default function App() {
   const { setUser, setLoading } = useAuthStore()
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const { darkMode } = useUiStore()
   const loadGamification = useGamificationStore((s) => s.load)
   const rechargeEnergy   = useGamificationStore((s) => s.rechargeEnergy)
@@ -85,6 +88,7 @@ export default function App() {
       if (session?.user) {
         loadGamification(session.user.id)
         useAuthStore.getState().loadProfile(session.user.id)
+        if (!localStorage.getItem('ptlingo_quiz_mode_set')) setShowOnboarding(true)
       }
     })
 
@@ -93,6 +97,7 @@ export default function App() {
       if (session?.user) {
         loadGamification(session.user.id)
         useAuthStore.getState().loadProfile(session.user.id)
+        if (!localStorage.getItem('ptlingo_quiz_mode_set')) setShowOnboarding(true)
       }
     })
 
@@ -143,6 +148,11 @@ export default function App() {
       </Routes>
       <XPToast />
       <IosInstallHint />
+      <AnimatePresence>
+        {showOnboarding && (
+          <QuizModeOnboarding onComplete={() => setShowOnboarding(false)} />
+        )}
+      </AnimatePresence>
     </BrowserRouter>
   )
 }

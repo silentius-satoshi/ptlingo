@@ -24,6 +24,7 @@ import { AnimatePresence } from 'framer-motion'
 import AnswerFeedbackSheet from '../components/drill/AnswerFeedbackSheet'
 import QuitWarningModal from '../components/drill/QuitWarningModal'
 import MotivationBreak from '../components/drill/MotivationBreak'
+import CasualQuizView from '../components/exam/CasualQuizView'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -195,6 +196,9 @@ export default function ExamPage() {
     incrementStreak,
     resetStreak,
   } = useSessionStore()
+
+  const quizMode = localStorage.getItem('ptlingo_quiz_mode') ?? 'standard'
+  const isCasual = quizMode === 'ptlingo' && type === 'quiz'
 
   // ── Load session + questions ───────────────────────────────────────────────
   useEffect(() => {
@@ -786,6 +790,22 @@ export default function ExamPage() {
           />
         ) : (
           <>
+            {isCasual ? (
+              <div className="flex-1 flex justify-center overflow-y-auto scrollbar-thin">
+                <div className="w-full max-w-2xl">
+                  <CasualQuizView
+                    question={currentQuestion}
+                    selectedAnswer={selectedAnswer}
+                    onSelectAnswer={handleSelectAnswer}
+                    isAnswered={selectedAnswer !== null}
+                    currentSystem={currentQuestion?.subject}
+                    questionNumber={currentIndex + 1}
+                    totalQuestions={questions.length}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
             {/* Single scrollable center column */}
             <div className="flex-1 overflow-y-auto scrollbar-thin">
               {rationaleVisible ? (
@@ -877,6 +897,8 @@ export default function ExamPage() {
                   />
                 )}
               </div>
+            )}
+              </>
             )}
 
             <ExamToolbar
