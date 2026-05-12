@@ -41,6 +41,7 @@ export default function ThePathPage() {
   const globalActiveRef = useRef(null)
   const prevAllCompleteRef = useRef(false)
   const sectionMarkersRef = useRef({})
+  const scrollContainerRef = useRef(null)
 
   // Generate missions if stale
   useEffect(() => {
@@ -95,20 +96,26 @@ export default function ThePathPage() {
 
   // Update sticky banner to match the section scrolled into view
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setVisibleSystem(entry.target.dataset.system)
-          }
-        })
-      },
-      { threshold: 0.1, rootMargin: '-60px 0px 0px 0px' }
-    )
-    Object.values(sectionMarkersRef.current).forEach(el => {
-      if (el) observer.observe(el)
-    })
-    return () => observer.disconnect()
+    const container = scrollContainerRef.current ?? document.querySelector('main')
+    if (!container) return
+
+    const BANNER_HEIGHT = 80
+
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop + BANNER_HEIGHT
+      let currentSystem = PATH_SECTIONS[0].system
+      for (const [system, el] of Object.entries(sectionMarkersRef.current)) {
+        if (el && el.offsetTop <= scrollTop) {
+          currentSystem = system
+        }
+      }
+      setVisibleSystem(currentSystem)
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => container.removeEventListener('scroll', handleScroll)
   }, [loaded])
 
   const allAbove60 = PATH_SECTIONS.every((s) => {
