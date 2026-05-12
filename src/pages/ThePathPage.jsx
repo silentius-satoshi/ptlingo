@@ -35,7 +35,7 @@ export default function ThePathPage() {
   const [missionsOpen, setMissionsOpen] = useState(false)
   const [activeSystemFilter, setActiveSystemFilter] = useState(null)
   const [showSwitcher, setShowSwitcher] = useState(false)
-  const [visibleSystem, setVisibleSystem] = useState(null)
+  const [visibleSystem, setVisibleSystem] = useState(PATH_SECTIONS[0].system)
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
@@ -285,7 +285,7 @@ export default function ThePathPage() {
                           const nodeInSection = sectionNodes.indexOf(item)
                           const t = totalNodes > 1 ? nodeInSection / (totalNodes - 1) : 0.5
                           const bell = 4 * t * (1 - t)
-                          const offsetPct = Math.round(bell * 20)
+                          const offsetPct = Math.round(bell * 26)
                           const translateX = direction * offsetPct
 
                           return (

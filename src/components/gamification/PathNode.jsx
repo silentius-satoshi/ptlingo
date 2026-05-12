@@ -92,7 +92,9 @@ export default function PathNode({
               width: size,
               height: size,
               backgroundColor: nodeColor,
-              boxShadow: isLocked
+              boxShadow: isGlobalActive
+                ? '0 4px 16px rgba(0,0,0,0.4)'
+                : isLocked
                 ? '0 6px 0 0 #1E2340, 0 7px 16px rgba(0,0,0,0.4)'
                 : `0 6px 0 0 ${section.dark}, 0 8px 20px rgba(0,0,0,0.45)`,
             }}
