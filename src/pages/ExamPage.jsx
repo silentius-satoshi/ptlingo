@@ -27,6 +27,7 @@ import MotivationBreak from '../components/drill/MotivationBreak'
 import CasualQuizView from '../components/exam/CasualQuizView'
 import MobilePanelSheet from '../components/exam/MobilePanelSheet'
 import PostSessionFlow from '../components/exam/PostSessionFlow'
+import { calculateNextReview } from '../lib/spacedRepetition'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
@@ -334,6 +335,34 @@ export default function ExamPage() {
     }, 1000)
   }, [user?.id])
 
+  // ── Spaced repetition upsert (fire-and-forget) ─────────────────────────────
+  const upsertReview = useCallback((questionId, wasCorrect) => {
+    if (!user?.id) return
+    supabase
+      .from('question_reviews')
+      .select('interval_days, repetitions, ease_factor')
+      .eq('user_id', user.id)
+      .eq('question_id', questionId)
+      .maybeSingle()
+      .then(({ data: existing }) => {
+        const current = existing ?? { interval_days: 1, repetitions: 0, ease_factor: 2.5 }
+        const next = calculateNextReview(wasCorrect, current.interval_days, current.repetitions, current.ease_factor)
+        const nextReviewAt = new Date()
+        nextReviewAt.setDate(nextReviewAt.getDate() + next.interval)
+        return supabase.from('question_reviews').upsert({
+          user_id:          user.id,
+          question_id:      questionId,
+          interval_days:    next.interval,
+          repetitions:      next.repetitions,
+          ease_factor:      next.easeFactor,
+          next_review_at:   nextReviewAt.toISOString(),
+          last_answered_at: new Date().toISOString(),
+          last_correct:     wasCorrect,
+        }, { onConflict: 'user_id,question_id' })
+      })
+      .catch(err => console.error('Review upsert failed:', err))
+  }, [user?.id])
+
   // ── Derived state ──────────────────────────────────────────────────────────
   const currentQuestion   = questions[currentIndex]
   const currentQuestionId = currentQuestion?.id
@@ -366,6 +395,7 @@ export default function ExamPage() {
       const q = questions.find((q) => q.id === currentQuestionId)
       if (q) {
         const isCorrect = i === q.correct_index
+        upsertReview(q.id, isCorrect)
         if (isCorrect) {
           awardXP(10, 'Correct answer')
           advanceMission('questions', q.subject)
@@ -389,7 +419,7 @@ export default function ExamPage() {
       }
     }
     scheduleSave()
-  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductEnergy, incrementStreak, resetStreak])
+  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductEnergy, incrementStreak, resetStreak, upsertReview])
 
   // Reset sheet + explain state whenever the question changes
   useEffect(() => {

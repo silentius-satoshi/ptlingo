@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
+import { fetchDueReviews } from '../lib/reviewQueue'
 import Button from '../components/shared/Button'
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard']
@@ -48,6 +49,8 @@ export default function QuestionBankPage() {
   const prefilledMode       = searchParams.get('mode')
   const prefilledCount      = searchParams.get('count')
   const prefilledDifficulty = searchParams.get('difficulty')
+  const isReviewMode        = prefilledMode === 'review'
+  const reviewLimit         = parseInt(searchParams.get('limit') ?? '10')
   const filtersRef = useRef(null)
 
   const [allQuestions, setAllQuestions] = useState([])
@@ -62,6 +65,7 @@ export default function QuestionBankPage() {
   const [error, setError]               = useState('')
   const [filterHighlight, setFilterHighlight] = useState(false)
   const [missionBanner, setMissionBanner] = useState(null)
+  const [reviewQuestionIds, setReviewQuestionIds] = useState([])
 
   useEffect(() => {
     supabase
@@ -72,6 +76,13 @@ export default function QuestionBankPage() {
         setLoadingQ(false)
       })
   }, [])
+
+  useEffect(() => {
+    if (!isReviewMode || !user) return
+    fetchDueReviews(user.id, supabase).then(dueReviews => {
+      setReviewQuestionIds(dueReviews.slice(0, reviewLimit).map(r => r.question_id))
+    })
+  }, [isReviewMode, user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const subjects = useMemo(
     () => [...new Set(allQuestions.map((q) => q.subject).filter(Boolean))].sort(),
@@ -144,6 +155,37 @@ export default function QuestionBankPage() {
     )
 
   const handleStart = async () => {
+    if (isReviewMode) {
+      if (reviewQuestionIds.length === 0) return
+      setStarting(true)
+      setError('')
+      try {
+        const { data: session, error: sErr } = await supabase
+          .from('sessions')
+          .insert({
+            user_id:         user.id,
+            type:            'quiz',
+            mode:            'practice',
+            time_multiplier: 1,
+            subjects:        ['Review Queue'],
+            difficulty:      [],
+            question_ids:    reviewQuestionIds,
+            total_questions: reviewQuestionIds.length,
+            time_remaining:  9 * 3600,
+            current_index:   0,
+            status:          'in_progress',
+          })
+          .select()
+          .single()
+        if (sErr) throw sErr
+        navigate(`/exam/${session.id}`)
+      } catch (err) {
+        setError(err.message)
+        setStarting(false)
+      }
+      return
+    }
+
     if (actualCount === 0) return
     setStarting(true)
     setError('')

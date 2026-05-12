@@ -10,6 +10,7 @@ import MissionCard from '../components/gamification/MissionCard'
 import StreakBadge from '../components/gamification/StreakBadge'
 import AllMissionsBanner from '../components/gamification/AllMissionsBanner'
 import { PATH_SECTIONS, getNodeState } from '../lib/pathSections'
+import { getDueCount } from '../lib/reviewQueue'
 
 // X-position pattern: nodeIndex % 4
 const JUSTIFY = ['justify-center', 'justify-start pl-8', 'justify-center', 'justify-end pr-8']
@@ -35,6 +36,7 @@ export default function ThePathPage() {
   const [generatingMissions, setGeneratingMissions] = useState(false)
   const [showAllMissionsBanner, setShowAllMissionsBanner] = useState(false)
   const [claimedSystems, setClaimedSystems] = useState(() => new Set())
+  const [dueCount, setDueCount] = useState(0)
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
@@ -86,6 +88,14 @@ export default function ThePathPage() {
         if (data) setClaimedSystems(new Set(data.map(r => r.system_name)))
       })
   }, [loaded, user])
+
+  // Load due review count
+  useEffect(() => {
+    if (!user) return
+    getDueCount(user.id, supabase)
+      .then(setDueCount)
+      .catch(err => console.error('getDueCount error:', err))
+  }, [user?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const allAbove60 = PATH_SECTIONS.every((s) => {
     const pct = subjectMastery[s.masteryKey]?.pct ?? subjectMastery[s.masteryKey] ?? 0
@@ -192,6 +202,24 @@ export default function ThePathPage() {
           </div>
         )}
       </section>
+
+      {/* Due for Review banner */}
+      {dueCount > 0 && (
+        <div
+          className="mb-6 rounded-xl p-4 flex items-center justify-between cursor-pointer active:opacity-80"
+          style={{ background: '#1C1F2E', border: '2px solid #EF4444' }}
+          onClick={() => navigate(`/question-bank?mode=review&limit=${Math.min(dueCount, 10)}`)}
+        >
+          <div>
+            <p className="text-xs text-red-400 font-semibold uppercase tracking-wide">Due for Review</p>
+            <p className="text-white font-bold text-lg">
+              {dueCount} question{dueCount !== 1 ? 's' : ''} waiting
+            </p>
+            <p className="text-slate-400 text-xs mt-0.5">Review now to lock in what you've learned</p>
+          </div>
+          <div className="text-3xl">🔁</div>
+        </div>
+      )}
 
       {/* The Path */}
       <section>
