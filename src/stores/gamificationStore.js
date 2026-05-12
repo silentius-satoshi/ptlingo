@@ -8,6 +8,7 @@ import {
 import { generateDailyMissions } from '../lib/missionGenerator'
 import { getLevelFromXP, xpForLevel } from '../lib/xpFormulas'
 import { ACHIEVEMENTS } from '../lib/achievements'
+import { rollXP } from '../lib/rewardEngine'
 
 const SYSTEM_WEIGHTS = {
   'Musculoskeletal':            0.32,
@@ -199,7 +200,7 @@ const useGamificationStore = create((set, get) => ({
   },
 
   // ── XP + Level ────────────────────────────────────────────────────────────
-  awardXP: async (amount, source) => {
+  awardXP: async (amount, source, tier = 'standard') => {
     const { userId, xp: oldXP, level: oldLevel, xpBoostActive } = get()
     const multiplied = xpBoostActive ? amount * 2 : amount
     const newXP    = oldXP + multiplied
@@ -213,7 +214,7 @@ const useGamificationStore = create((set, get) => ({
       ...(xpBoostActive ? { xp_boost_active: false } : {}),
     })
 
-    get()._enqueueToast({ amount: multiplied, source, levelUp: leveledUp, oldLevel, newLevel })
+    get()._enqueueToast({ amount: multiplied, source, tier, levelUp: leveledUp, oldLevel, newLevel })
     get().checkAchievements()
   },
 
@@ -324,12 +325,14 @@ const useGamificationStore = create((set, get) => ({
     missions.forEach((m, i) => {
       const old = dailyMissions.missions[i]
       if (m.completed && !old.completed) {
-        get().awardXP(m.xp_reward, `Mission: ${m.description}`)
+        const mReward = rollXP(m.xp_reward ?? 30)
+        get().awardXP(mReward.xp, `Mission: ${m.description}`, mReward.tier)
       }
     })
 
     if (all_complete && !dailyMissions.all_complete) {
-      await get().awardXP(50, 'all_missions_complete')
+      const allReward = rollXP(50)
+      await get().awardXP(allReward.xp, 'all_missions_complete', allReward.tier)
       await get().advanceStreak()
     }
   },

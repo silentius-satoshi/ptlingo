@@ -10,6 +10,7 @@ import PathNode, { HexNode } from '../components/gamification/PathNode'
 import TreasureChest from '../components/gamification/TreasureChest'
 import { PATH_SECTIONS, getNodeState } from '../lib/pathSections'
 import { getDueCount } from '../lib/reviewQueue'
+import { rollXP } from '../lib/rewardEngine'
 import ActiveSectionBanner from '../components/path/ActiveSectionBanner'
 
 
@@ -126,7 +127,8 @@ export default function ThePathPage() {
   const handleChestClaim = useCallback(async (sectionSystem, sectionLabel) => {
     if (claimedSystems.has(sectionSystem)) return
     setClaimedSystems(prev => new Set([...prev, sectionSystem]))
-    awardXP(50, `${sectionLabel} Milestone! 🎉`)
+    const reward = rollXP(50)
+    awardXP(reward.xp, `${sectionLabel} Milestone! 🎉`, reward.tier)
     await supabase.from('path_milestones').insert({
       user_id: user.id,
       system_name: sectionSystem,
