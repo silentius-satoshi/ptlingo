@@ -4,16 +4,16 @@ import { getSystemConfig } from '../../constants/systemConfig'
 import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
+import { useAuthStore } from '../../store/authStore'
 import StreakModal from '../streak/StreakModal'
-
-const EXAM_DATE = new Date('2026-07-29')
 
 export default function TopStatsBar() {
   const navigate = useNavigate()
   const { streak, energy, coins, ptLingoScore, activeSystem } = useGamificationStore()
+  const { examDate } = useAuthStore()
   const [showStreak, setShowStreak] = useState(false)
 
-  const daysLeft = Math.ceil((EXAM_DATE - new Date()) / (1000 * 60 * 60 * 24))
+  const daysLeft = Math.ceil((new Date(examDate ?? '2026-07-29') - new Date()) / (1000 * 60 * 60 * 24))
   const pillColor = daysLeft <= 14 ? '#EF4444' : daysLeft <= 30 ? '#F97316' : '#6B7280'
 
   return (

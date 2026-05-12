@@ -28,8 +28,6 @@ import MotivationBreak from '../components/drill/MotivationBreak'
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
 const SECTION_END = new Set([44, 89, 134, 179])
 
-const EXAM_DATE_MB = new Date('2026-07-29')
-
 function getMotivationBreak({
   consecutiveCorrect, prevMaxWrong, correctCount, answerHistory, shownBreaks,
   energy, maxEnergy, streak, questionsRemaining, currentSystem, currentIndex, questionsTotal,
@@ -39,7 +37,7 @@ function getMotivationBreak({
   const half       = Math.floor(questionsTotal / 2)
   const quarter    = Math.floor(questionsTotal / 4)
   const threeQ     = Math.floor(questionsTotal * 0.75)
-  const daysUntil  = Math.ceil((EXAM_DATE_MB - new Date()) / (1000 * 60 * 60 * 24))
+  const daysUntil  = Math.ceil((new Date(useAuthStore.getState().examDate ?? '2026-07-29') - new Date()) / (1000 * 60 * 60 * 24))
   const last5      = answerHistory.slice(-5)
   const prev5      = answerHistory.slice(-10, -5)
   const last5Acc   = last5.length ? last5.filter(Boolean).length / last5.length : 0

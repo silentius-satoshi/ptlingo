@@ -22,6 +22,7 @@ import AchievementsPage from './pages/AchievementsPage'
 import TutorPage from './pages/TutorPage'
 import ProfilePage from './pages/ProfilePage'
 import ShopPage from './pages/ShopPage'
+import SettingsPage from './pages/SettingsPage'
 import RationalePage from './pages/RationalePage'
 import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
@@ -81,12 +82,18 @@ export default function App() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) loadGamification(session.user.id)
+      if (session?.user) {
+        loadGamification(session.user.id)
+        useAuthStore.getState().loadProfile(session.user.id)
+      }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) loadGamification(session.user.id)
+      if (session?.user) {
+        loadGamification(session.user.id)
+        useAuthStore.getState().loadProfile(session.user.id)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -121,6 +128,7 @@ export default function App() {
           <Route path="exam/:examId/start" element={<MockExamStartPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="shop" element={<ShopPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         {/* Full-screen routes — auth + MFA required, no sidebar */}

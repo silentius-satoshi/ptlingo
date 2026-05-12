@@ -4,17 +4,17 @@ import { AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import useGamificationStore from '../../stores/gamificationStore'
 import { useUiStore } from '../../store/uiStore'
+import { useAuthStore } from '../../store/authStore'
 import StreakModal from '../streak/StreakModal'
-
-const EXAM_DATE = new Date('2026-07-29')
 
 export default function SidebarHeader() {
   const navigate = useNavigate()
   const { streak, xp, energy, maxEnergy, coins, loaded } = useGamificationStore()
   const { darkMode, toggleDarkMode } = useUiStore()
+  const { examDate } = useAuthStore()
   const [showStreak, setShowStreak] = useState(false)
 
-  const daysLeft = Math.max(0, Math.ceil((EXAM_DATE - new Date()) / 86400000))
+  const daysLeft = Math.max(0, Math.ceil((new Date(examDate ?? '2026-07-29') - new Date()) / 86400000))
   const pillColor = daysLeft < 30 ? 'bg-red-500' : 'bg-amber-500'
 
   return (
@@ -41,7 +41,7 @@ export default function SidebarHeader() {
       {/* Row 2: Exam countdown pill */}
       <div className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-white text-xs font-semibold ${pillColor}`}>
         <span>🗓</span>
-        <span>{daysLeft} days to exam · July 29, 2026</span>
+        <span>{daysLeft} days to exam · {new Date(examDate ?? '2026-07-29').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
       </div>
 
       {/* Row 3: Stats strip — streak | coins | energy */}
