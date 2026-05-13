@@ -108,7 +108,7 @@ function MasteryRingsRow({ subjectMastery }) {
         {SUBJECTS.map((s) => (
           <MasteryRing
             key={s}
-            pct={subjectMastery[s] ?? 0}
+            pct={subjectMastery[s]?.pct ?? 0}
             size={64}
             label={SUBJECT_ABBR[s] ?? s}
             accentColor={getSystemConfig(s)?.primary}
