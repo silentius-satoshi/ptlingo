@@ -314,8 +314,31 @@ export default function SettingsPage() {
       showNotif('Push not configured — missing VAPID key', '#6B7280')
       return
     }
+    if (!('Notification' in window)) {
+      showNotif('Notifications not supported on this device', '#6B7280')
+      return
+    }
+    const permission = await Notification.requestPermission()
+    if (permission !== 'granted') {
+      showNotif('Notification permission denied', '#EF4444')
+      setPushOn(false)
+      return
+    }
     try {
       const reg = await navigator.serviceWorker.ready
+
+      const existingSub = await reg.pushManager.getSubscription()
+      if (existingSub) {
+        await supabase.from('push_subscriptions').upsert(
+          { user_id: user.id, subscription: JSON.parse(JSON.stringify(existingSub)) },
+          { onConflict: 'user_id' }
+        )
+        localStorage.setItem('ptlingo_push_enabled', 'true')
+        setPushOn(true)
+        showNotif('Push notifications enabled')
+        return
+      }
+
       let sub
       try {
         sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid) })
