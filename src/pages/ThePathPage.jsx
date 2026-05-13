@@ -46,7 +46,9 @@ export default function ThePathPage() {
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
   const prevAllCompleteRef = useRef(false)
+  const stickyBannerRef = useRef(null)
   const sectionMarkersRef = useRef({})
+  const sectionDividerRefs = useRef({})
   const scrollContainerRef = useRef(null)
 
   // Generate missions if stale
@@ -111,16 +113,27 @@ export default function ThePathPage() {
     const container = scrollContainerRef.current ?? document.querySelector('main')
     if (!container) return
 
-    const BANNER_HEIGHT = 80
-
     const handleScroll = () => {
-      const scrollTop = container.scrollTop + BANNER_HEIGHT
+      const bannerBottom = stickyBannerRef.current
+        ? stickyBannerRef.current.getBoundingClientRect().bottom
+        : 80
       let currentSystem = PATH_SECTIONS[0].system
       for (const [system, el] of Object.entries(sectionMarkersRef.current)) {
-        if (el && el.offsetTop <= scrollTop) {
+        if (!el) continue
+        const rect = el.getBoundingClientRect()
+        if (rect.top <= bannerBottom) {
           currentSystem = system
         }
       }
+      PATH_SECTIONS.forEach((section, i) => {
+        if (i === 0) return
+        const dividerEl = sectionDividerRefs.current[section.system]
+        if (!dividerEl) return
+        const rect = dividerEl.getBoundingClientRect()
+        if (rect.top <= bannerBottom + 60) {
+          currentSystem = section.system
+        }
+      })
       setVisibleSystem(currentSystem)
     }
 
@@ -268,7 +281,7 @@ export default function ThePathPage() {
     <div className="flex-1 flex flex-col w-full">
 
         {/* Sticky section banner */}
-        <div className="sticky top-0 z-[35] px-4 pt-3 pb-2 bg-[#080d18] w-full">
+        <div ref={stickyBannerRef} className="sticky top-0 z-[35] px-4 pt-3 pb-2 bg-[#080d18] w-full">
           <ActiveSectionBanner
             systemLabel={bannerSection.label}
             systemColor={bannerSection.color}
@@ -312,20 +325,31 @@ export default function ThePathPage() {
 
               return (
                 <Fragment key={section.system}>
-                  {groupIndex > 0 && (
-                    <div className="flex items-center gap-3 my-6 px-2">
-                      <div className="flex-1 h-px bg-slate-700/60" />
-                      <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest whitespace-nowrap">
-                        {section.label}
-                      </span>
-                      <div className="flex-1 h-px bg-slate-700/60" />
-                    </div>
-                  )}
+                  {groupIndex > 0 ? (
+                    <>
+                      <div
+                        data-system={section.system}
+                        ref={el => { sectionMarkersRef.current[section.system] = el }}
+                      />
+                      <div
+                        ref={el => { sectionDividerRefs.current[section.system] = el }}
+                        className="flex items-center gap-3 my-6 px-2"
+                      >
+                        <div className="flex-1 h-px bg-slate-700/60" />
+                        <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                          {section.label}
+                        </span>
+                        <div className="flex-1 h-px bg-slate-700/60" />
+                      </div>
+                    </>
+                  ) : null}
                   <div>
-                    <div
-                      data-system={section.system}
-                      ref={el => { sectionMarkersRef.current[section.system] = el }}
-                    />
+                    {groupIndex === 0 && (
+                      <div
+                        data-system={section.system}
+                        ref={el => { sectionMarkersRef.current[section.system] = el }}
+                      />
+                    )}
                     <div className="flex items-start">
                       {/* Left mascot column */}
                       <div className="w-[95px] md:w-[160px] flex-shrink-0 pt-8">
