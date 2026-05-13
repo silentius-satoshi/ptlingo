@@ -12,6 +12,8 @@ export default function PathNode({
   masteryPct,
   wasLocked,
   sessionsCompleted,
+  isJumpTarget = false,
+  jumpSide = 'right',
   onPress,
 }) {
   const [showLockedTip, setShowLockedTip] = useState(false)
@@ -85,6 +87,43 @@ export default function PathNode({
             </motion.div>
           )}
         </AnimatePresence>
+
+        {isJumpTarget && (
+          <motion.div
+            className="absolute pointer-events-none whitespace-nowrap"
+            style={{
+              top: '50%',
+              ...(jumpSide === 'right'
+                ? { left: 'calc(100% + 12px)' }
+                : { right: 'calc(100% + 12px)' }),
+              zIndex: 30,
+            }}
+            initial={{ opacity: 0, y: '-50%' }}
+            animate={{ opacity: 1, y: '-50%', x: jumpSide === 'right' ? [0, 4, 0] : [0, -4, 0] }}
+            transition={{
+              opacity: { duration: 0.2 },
+              x: { repeat: Infinity, duration: 1.5, ease: 'easeInOut' },
+            }}
+          >
+            <div className="rounded-lg px-4 py-1.5 relative" style={{ background: '#1C1F2E' }}>
+              <span className="text-xs font-black tracking-widest uppercase text-slate-300">
+                Jump here?
+              </span>
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 0,
+                height: 0,
+                borderTop: '5px solid transparent',
+                borderBottom: '5px solid transparent',
+                ...(jumpSide === 'right'
+                  ? { left: -6, borderRight: '6px solid #1C1F2E' }
+                  : { right: -6, borderLeft: '6px solid #1C1F2E' }),
+              }} />
+            </div>
+          </motion.div>
+        )}
 
         {/* Main node button */}
         <div className="relative flex-shrink-0" style={{ overflow: 'visible' }}>
@@ -196,12 +235,6 @@ export default function PathNode({
             )
           })()}
 
-          {nodeLevel >= 1 && (
-            <div className="absolute -top-1 -right-1 bg-amber-500 rounded-full px-1.5 py-0.5
-              text-[8px] font-black text-white leading-none pointer-events-none z-10">
-              Lv{nodeLevel}
-            </div>
-          )}
         </div>
       </div>
 

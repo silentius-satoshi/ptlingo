@@ -219,6 +219,10 @@ export default function ThePathPage() {
     currentGroup.items.push(item)
   }
 
+  const activeSectionIdx = sectionGroups.findIndex(
+    ({ items }) => items.some(i => i.isGlobalActive)
+  )
+
   const handleNodePress = async (section) => {
     if (nodeStarting) return
     setNodeStarting(true)
@@ -281,6 +285,7 @@ export default function ThePathPage() {
           <div className="max-w-sm mx-auto flex flex-col mt-4">
             {sectionGroups.map(({ section, pathSectionIdx, items }, groupIndex) => {
               const mascotSide = pathSectionIdx % 2 === 0 ? 'left' : 'right'
+              const jumpSide = mascotSide === 'left' ? 'right' : 'left'
               const isActiveSection = visibleSystem === section.system
                 || (!visibleSystem && section === activeSection)
               const sectionNodes = items.filter(it => it.type === 'node')
@@ -339,6 +344,9 @@ export default function ThePathPage() {
                             )
                           }
 
+                          const isJumpTarget = groupIndex > activeSectionIdx
+                            && activeSectionIdx >= 0
+                            && sectionNodes.indexOf(item) === 0
                           const nodeInSection = sectionNodes.indexOf(item)
                           const t = totalNodes > 1 ? nodeInSection / (totalNodes - 1) : 0.5
                           const bell = 4 * t * (1 - t)
@@ -365,6 +373,8 @@ export default function ThePathPage() {
                                 isGlobalActive={item.isGlobalActive}
                                 wasLocked={item.wasLocked}
                                 sessionsCompleted={item.sessionsCompleted}
+                                isJumpTarget={isJumpTarget}
+                                jumpSide={jumpSide}
                                 onPress={() => {
                                   if (item.state === 'active' || item.state === 'unlocked') {
                                     handleNodePress(item.section)
