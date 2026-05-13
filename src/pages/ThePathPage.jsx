@@ -277,6 +277,55 @@ export default function ThePathPage() {
     }
   }
 
+  const handleReviewPress = async () => {
+    if (nodeStarting) return
+    setNodeStarting(true)
+    try {
+      const { user } = useAuthStore.getState()
+
+      const { data: dueReviews } = await supabase
+        .from('question_reviews')
+        .select('question_id')
+        .eq('user_id', user.id)
+        .lte('next_review_at', new Date().toISOString())
+        .order('next_review_at', { ascending: true })
+        .limit(10)
+
+      if (!dueReviews?.length) {
+        setNodeStarting(false)
+        return
+      }
+
+      const questionIds = dueReviews.map(r => r.question_id)
+
+      const { data: session } = await supabase
+        .from('sessions')
+        .insert({
+          user_id:         user.id,
+          type:            'quiz',
+          mode:            'practice',
+          status:          'in_progress',
+          question_ids:    questionIds,
+          total_questions: questionIds.length,
+          current_index:   0,
+          time_remaining:  9 * 3600,
+          time_multiplier: 1,
+          subjects:        ['Review Queue'],
+          difficulty:      [],
+          answers:         {},
+          marked:          [],
+        })
+        .select()
+        .single()
+
+      if (session) navigate(`/exam/${session.id}`)
+    } catch (err) {
+      console.error('Review start error:', err)
+    } finally {
+      setNodeStarting(false)
+    }
+  }
+
   return (
     <div className="flex-1 flex flex-col w-full">
 
@@ -291,7 +340,7 @@ export default function ThePathPage() {
             onToggleMissions={() => setMissionsOpen(o => !o)}
             onSwitcherOpen={() => setShowSwitcher(true)}
             dueCount={dueCount}
-            onReviewTap={() => navigate(`/question-bank?mode=review&limit=${Math.min(dueCount, 10)}`)}
+            onReviewTap={handleReviewPress}
           />
         </div>
 
@@ -480,7 +529,7 @@ export default function ThePathPage() {
                   className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-bold"
                   onClick={() => {
                     setShowReviewAlert(false)
-                    navigate(`/question-bank?mode=review&limit=${Math.min(dueCount, 10)}`)
+                    handleReviewPress()
                   }}
                 >
                   Review Now
