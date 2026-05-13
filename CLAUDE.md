@@ -1,5 +1,5 @@
 # PT Lingo — Project Reference
-Step 36 complete. Step 37 next (PostSessionFlow).
+Current state: Step 38 complete + path polish. Next: exam content focus (July 29, 2026)
 
 ## Stack
 React 18 + Vite 5 | Tailwind 3 | React Router v6 | Zustand
@@ -23,8 +23,13 @@ vite-plugin-pwa + Workbox — PWA/iOS
 34: Shop page (energy/XP boost/freeze/shield) ✅
 35: Settings page (/settings, avatar, profile, notifications, security) ✅
 36: PT Lingo casual quiz mode + onboarding modal ✅
-37: PostSessionFlow ⬜ next
-38: Retention engine (spaced rep, variable rewards, smart notifs) ⬜
+37: PostSessionFlow ✅
+38-A: Spaced repetition engine ✅
+38-B: Path UI polish (mascots, bell curve) ✅
+38-C: Variable reward engine ✅
+38-D: Smart push notifications (iOS PWA) ✅
+38-E: Progressive path session sizes ✅
+38-F: Streak 5-day lap calendar ✅
 
 ## Routes
 /auth AuthPage standalone
@@ -52,10 +57,13 @@ notes: user_id, question_id, content
 fsbpt_attempts: id, user_id, attempt_number, exam_date, scale_score,
   section_scores(jsonb), body_system_scores(jsonb), work_activity_scores(jsonb)
 study_plans: id, user_id, attempt_id, plan_content, generated_at, duration_days
+question_reviews: id, user_id, question_id, interval_days, repetitions, ease_factor,
+  next_review_at, last_answered_at, last_correct — UNIQUE(user_id, question_id)
 user_gamification: user_id, xp, level, streak, longest_streak, last_activity_date,
   hearts, energy(def 25), max_energy(def 25), last_energy_update(timestamptz),
   coins(def 0), xp_boost_active(bool), streak_freeze_count(int),
-  streak_shield_expiry(timestamptz), subject_mastery(jsonb {subject:{pct,correct,total}})
+  streak_shield_expiry(timestamptz), subject_mastery(jsonb {subject:{pct,correct,total}}),
+  path_node_levels(jsonb def {})
 daily_missions: id, user_id, mission_type, target, progress, completed, date
 achievements: id, user_id, achievement_key, unlocked_at
 path_milestones: id, user_id, system_name, claimed_at, xp_awarded — UNIQUE(user_id,system_name)
@@ -71,6 +79,8 @@ ptlingo_quiz_mode        'standard'|'ptlingo'
 ptlingo_quiz_mode_set    'true' — onboarding shown flag
 ptlingo_profile          JSON — profile cache (no flash on refresh)
 ptlingo_gam              JSON — gamification cache (no flash on refresh)
+                           caches: xp, streak, energy, coins, ptLingoScore,
+                           level, subjectMastery, pathNodeLevels
 ptlingo_reminders_enabled 'true'|'false'
 ptlingo_push_enabled     'true'|'false'
 ptlingo_email_reminders  'true'|'false'
@@ -80,12 +90,14 @@ gamificationStore (src/stores/gamificationStore.js)
   state: xp, level, streak, longestStreak, energy, maxEnergy,
     lastEnergyUpdate, coins, hearts(alias=energy), xpBoostActive,
     streakFreezeCount, streakShieldExpiry, subjectMastery,
-    ptLingoScore, activeSystem, dailyMissions, achievements, loaded
+    ptLingoScore, activeSystem, dailyMissions, achievements, loaded,
+    pathNodeLevels
   actions: load, awardXP, deductEnergy, deductHeart(alias),
     rechargeEnergy, rechargeEnergyWithCoins, addCoins,
     purchaseXpBoost, purchaseStreakFreeze, purchaseStreakShield,
     advanceStreak, advanceMission, refreshSubjectMastery,
-    updateSubjectMastery, checkQuestionCountAchievements
+    updateSubjectMastery, checkQuestionCountAchievements,
+    getNodeSessionSize, incrementNodeLevel
   cache: localStorage('ptlingo_gam') seeded on init, written after load()
 
 authStore (src/store/authStore.js)
@@ -190,6 +202,9 @@ src/components/layout/
 - Import script: needs --- before first question or Q1 skipped
 - React StrictMode streaming double-fire: use refs, not state updaters
 - ptlingo_quiz_mode_set: clear to re-trigger onboarding
-- VITE_VAPID_PUBLIC_KEY not yet set — push notifs show graceful fallback
+- VAPID keys: public in Vercel env vars (VITE_VAPID_PUBLIC_KEY), private in Supabase Edge Function secrets
 - VS Code extension may revert to Opus silently — run /context to verify
-- question_reviews table not yet created — needed for Step 38
+- question field is 'stem' not 'content'
+- Path node sessions pass { source: 'path', subject } via location.state — not URL params
+- getNodeSessionSize: level 0→2q, 1→5q, 2→10q, 3+→15q
+- pg_cron fires daily at 0 13 * * * (8am CST) calling send-review-notifications Edge Function
