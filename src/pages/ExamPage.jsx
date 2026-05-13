@@ -886,7 +886,7 @@ export default function ExamPage() {
                     question={currentQuestion}
                     selectedAnswer={selectedAnswer}
                     onSelectAnswer={handleSelectAnswer}
-                    isAnswered={selectedAnswer !== null}
+                    isAnswered={readOnly || selectedAnswer !== null}
                     currentSystem={currentQuestion?.subject}
                     questionNumber={currentIndex + 1}
                     totalQuestions={questions.length}

@@ -9,6 +9,7 @@ import LoadingSpinner from '../components/shared/LoadingSpinner'
 import useGamificationStore from '../stores/gamificationStore'
 import { getSystemConfig } from '../constants/systemConfig'
 import confetti from 'canvas-confetti'
+import { ChevronDown } from 'lucide-react'
 
 const statContainerVariants = {
   hidden: {},
@@ -182,6 +183,16 @@ export default function ResultsPage() {
       return () => clearTimeout(t)
     }
   }, [session?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-expand first wrong answer when data loads
+  useEffect(() => {
+    if (!questions.length || !session) return
+    const firstWrong = questions.find(
+      q => session.answers?.[q.id] !== q.correct_index
+        && session.answers?.[q.id] !== undefined
+    )
+    setExpandedId(firstWrong?.id ?? null)
+  }, [questions.length, session])
 
   // Reset page when filter/sort changes
   useEffect(() => { setPage(0) }, [filter, sortField, sortDir])
@@ -473,6 +484,9 @@ export default function ResultsPage() {
             </div>
 
             {/* Table */}
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+              Tap any row to view the full rationale
+            </p>
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800">
               <table className="w-full table-fixed text-sm">
                 <colgroup>
@@ -562,7 +576,15 @@ export default function ResultsPage() {
                         </td>
                         {/* Time */}
                         <td className="px-3 py-3 text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-                          {formatTime(q.timeSpent)}
+                          <div className="flex items-center justify-between gap-1">
+                            <span>{formatTime(q.timeSpent)}</span>
+                            <ChevronDown
+                              size={14}
+                              className={`text-slate-400 transition-transform duration-200 flex-shrink-0 ${
+                                expandedId === q.id ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </div>
                         </td>
                       </tr>
 
