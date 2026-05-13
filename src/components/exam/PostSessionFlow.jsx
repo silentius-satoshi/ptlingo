@@ -115,11 +115,14 @@ function ScoreUpdateScreen({ subScreen, mascot, primary, ptLingoScore, prevPtLin
 }
 
 function StreakScreen({ subScreen, streakCount }) {
+  const checksInWindow = streakCount % 5 === 0 ? 5 : streakCount % 5
+  const isLapComplete  = streakCount > 0 && streakCount % 5 === 0
   const today = new Date()
   const days = Array.from({ length: 5 }, (_, i) => {
+    const daysFromToday = i - (checksInWindow - 1)
     const d = new Date(today)
-    d.setDate(today.getDate() + i)
-    return { label: DAY_ABBR[d.getDay()], practiced: i === 0 }
+    d.setDate(today.getDate() + daysFromToday)
+    return { label: DAY_ABBR[d.getDay()], practiced: i < checksInWindow }
   })
 
   if (subScreen === 0) {
@@ -141,13 +144,26 @@ function StreakScreen({ subScreen, streakCount }) {
         {streakCount}
       </p>
       <p className="text-base font-bold text-slate-300">day streak!</p>
+
+      {isLapComplete && (
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-2xl">🏆</span>
+          <p className="text-amber-400 font-bold text-sm">5-Day Streak Complete!</p>
+          <span className="text-2xl">🏆</span>
+        </div>
+      )}
+
       <div className="flex gap-3 mt-2">
         {days.map(({ label, practiced }, i) => (
           <div key={i} className="flex flex-col items-center gap-1">
             <span className="text-xs text-slate-400">{label}</span>
             <div
               className={`w-9 h-9 rounded-full flex items-center justify-center ${
-                practiced ? 'bg-[#FF9600]' : 'bg-slate-700'
+                practiced && isLapComplete
+                  ? 'bg-amber-400'
+                  : practiced
+                  ? 'bg-[#FF9600]'
+                  : 'bg-slate-700'
               }`}
             >
               {practiced && <span className="text-white text-sm font-bold">✓</span>}
@@ -155,13 +171,20 @@ function StreakScreen({ subScreen, streakCount }) {
           </div>
         ))}
       </div>
-      {streakCount < 3 && (
+
+      {isLapComplete ? (
+        <div className="w-full max-w-xs rounded-xl p-4 mt-4 bg-[#1C1F2E]">
+          <p className="text-sm text-amber-300 text-center font-medium">
+            🔥 You're on fire! Keep the streak going.
+          </p>
+        </div>
+      ) : streakCount < 3 ? (
         <div className="w-full max-w-xs rounded-xl p-4 mt-2 bg-[#1C1F2E]">
           <p className="text-sm text-slate-300 text-center">
             But your streak will reset if you don't practice tomorrow. Watch out!
           </p>
         </div>
-      )}
+      ) : null}
     </>
   )
 }
