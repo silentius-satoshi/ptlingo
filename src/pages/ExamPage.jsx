@@ -208,7 +208,7 @@ export default function ExamPage() {
   } = useSessionStore()
 
   const quizMode = localStorage.getItem('ptlingo_quiz_mode') ?? 'standard'
-  const isCasual = quizMode === 'ptlingo' && type === 'quiz'
+  const isCasual = quizMode === 'ptlingo' && type === 'quiz' && !readOnly
 
   // ── Load session + questions ───────────────────────────────────────────────
   useEffect(() => {
