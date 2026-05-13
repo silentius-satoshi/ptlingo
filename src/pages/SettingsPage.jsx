@@ -68,9 +68,10 @@ function Toggle({ on, onChange }) {
   return (
     <button
       onClick={() => onChange(!on)}
-      className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${on ? 'bg-teal-500' : 'bg-slate-600'}`}
+      className="w-11 h-6 rounded-full transition-colors relative flex-shrink-0"
+      style={{ backgroundColor: on ? '#22C55E' : '#374151' }}
     >
-      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-5' : 'translate-x-0.5'}`} />
+      <span className={`absolute left-0 top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
   )
 }
@@ -302,12 +303,28 @@ export default function SettingsPage() {
       setPushOn(false)
       return
     }
+    if (!user?.id) {
+      console.error('No user ID — cannot save subscription')
+      return
+    }
     const vapid = import.meta.env.VITE_VAPID_PUBLIC_KEY
-    if (!vapid) { showNotif('Push notifications are not yet configured', '#6B7280'); return }
+    console.log('VAPID key:', vapid)
+    if (!vapid) {
+      console.error('VAPID key missing from env')
+      showNotif('Push not configured — missing VAPID key', '#6B7280')
+      return
+    }
     try {
       const reg = await navigator.serviceWorker.ready
-      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid) })
-      await supabase.from('push_subscriptions').upsert({ user_id: user.id, subscription: JSON.parse(JSON.stringify(sub)) }, { onConflict: 'user_id' })
+      let sub
+      try {
+        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid) })
+      } catch (err) {
+        console.error('Subscribe error:', err)
+        throw err
+      }
+      const { data, error } = await supabase.from('push_subscriptions').upsert({ user_id: user.id, subscription: JSON.parse(JSON.stringify(sub)) }, { onConflict: 'user_id' })
+      console.log('Upsert result:', data, error)
       localStorage.setItem('ptlingo_push_enabled', 'true')
       setPushOn(true)
       showNotif('Push notifications enabled')
