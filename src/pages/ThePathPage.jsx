@@ -13,6 +13,7 @@ import { getDueCount } from '../lib/reviewQueue'
 import { rollXP } from '../lib/rewardEngine'
 import { ANIMATION } from '../constants/design'
 import ActiveSectionBanner from '../components/path/ActiveSectionBanner'
+import NodePreviewCard from '../components/gamification/NodePreviewCard'
 
 
 function todayStr() {
@@ -40,6 +41,7 @@ export default function ThePathPage() {
   const [visibleSystem, setVisibleSystem] = useState(PATH_SECTIONS[0].system)
   const [showReviewAlert, setShowReviewAlert] = useState(false)
   const [nodeStarting, setNodeStarting] = useState(false)
+  const [previewNode, setPreviewNode] = useState(null)
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
@@ -298,7 +300,7 @@ export default function ThePathPage() {
                   style={{
                     width: '100%',
                     height: 'auto',
-                    maxHeight: 120,
+                    maxHeight: 180,
                     objectFit: 'contain',
                     objectPosition: 'top center',
                     opacity: isActiveSection ? 1 : 0.35,
@@ -326,7 +328,7 @@ export default function ThePathPage() {
                     />
                     <div className="flex items-start">
                       {/* Left mascot column */}
-                      <div className="w-[72px] md:w-[120px] flex-shrink-0 pt-8">
+                      <div className="w-[95px] md:w-[160px] flex-shrink-0 pt-8">
                         {mascotSide === 'left' && mascotImg}
                       </div>
 
@@ -375,9 +377,10 @@ export default function ThePathPage() {
                                 sessionsCompleted={item.sessionsCompleted}
                                 isJumpTarget={isJumpTarget}
                                 jumpSide={jumpSide}
+                                previewOpen={previewNode !== null}
                                 onPress={() => {
-                                  if (item.state === 'active' || item.state === 'unlocked') {
-                                    handleNodePress(item.section)
+                                  if (item.state !== 'locked') {
+                                    setPreviewNode({ section: item.section, masteryPct: item.masteryPct })
                                   }
                                 }}
                               />
@@ -387,7 +390,7 @@ export default function ThePathPage() {
                       </div>
 
                       {/* Right mascot column */}
-                      <div className="w-[72px] md:w-[120px] flex-shrink-0 pt-8">
+                      <div className="w-[88px] md:w-[148px] flex-shrink-0 pt-8">
                         {mascotSide === 'right' && mascotImg}
                       </div>
                     </div>
@@ -583,6 +586,22 @@ export default function ThePathPage() {
           <p className="text-slate-400 text-sm">Loading session...</p>
         </div>
       )}
+
+      <AnimatePresence>
+        {previewNode && (
+          <NodePreviewCard
+            key="preview"
+            section={previewNode.section}
+            masteryPct={previewNode.masteryPct}
+            onStart={() => {
+              const section = previewNode.section
+              setPreviewNode(null)
+              handleNodePress(section)
+            }}
+            onDismiss={() => setPreviewNode(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

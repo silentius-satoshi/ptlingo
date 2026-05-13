@@ -14,6 +14,7 @@ export default function PathNode({
   sessionsCompleted,
   isJumpTarget = false,
   jumpSide = 'right',
+  previewOpen = false,
   onPress,
 }) {
   const [showLockedTip, setShowLockedTip] = useState(false)
@@ -50,16 +51,17 @@ export default function PathNode({
     <div ref={nodeRef} className="relative flex flex-col items-center gap-1">
       <div className="relative">
         {/* START bubble — absolute, centered above node */}
-        <AnimatePresence>
-          {isGlobalActive && (
+        <AnimatePresence mode="wait">
+          {isGlobalActive && !previewOpen && (
             <motion.div
+              key="start-bubble"
               className="absolute pointer-events-none whitespace-nowrap"
               style={{ bottom: 'calc(100% + 8px)', left: '50%', zIndex: 30 }}
-              initial={{ opacity: 0, x: '-50%' }}
+              initial={{ opacity: 0, x: '-50%', y: 8 }}
               animate={{ opacity: 1, x: '-50%', y: [0, -4, 0] }}
-              exit={{ opacity: 0, x: '-50%' }}
+              exit={{ opacity: 0, x: '-50%', y: 8 }}
               transition={{
-                opacity: { duration: 0.2 },
+                opacity: { duration: 0.15 },
                 y: { repeat: Infinity, duration: 1.5, ease: 'easeInOut' },
               }}
             >
