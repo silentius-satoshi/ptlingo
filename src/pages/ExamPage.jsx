@@ -848,6 +848,7 @@ export default function ExamPage() {
         paused={breakState === 'mandatory' || readOnly}
         readOnly={readOnly}
         onBack={() => {
+          if (readOnly) { navigate(-1); return }
           const questionsRemaining = questions.length - currentIndex - 1
           if (type === 'quiz' && questionsRemaining > 0) {
             setShowQuitModal(true)
@@ -1002,6 +1003,7 @@ export default function ExamPage() {
               onPause={() => setShowPauseModal(true)}
               onSubmit={type === 'exam' ? handleGoToReview : () => setShowSubmitModal(true)}
               onEnd={() => {
+                if (readOnly) { navigate(-1); return }
                 const questionsRemaining = questions.length - currentIndex - 1
                 if (type === 'quiz' && questionsRemaining > 0) {
                   setShowQuitModal(true)
