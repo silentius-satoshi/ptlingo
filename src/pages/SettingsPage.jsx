@@ -289,6 +289,13 @@ export default function SettingsPage() {
     setRemindersOn(val)
   }
 
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4)
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+    const rawData = window.atob(base64)
+    return Uint8Array.from([...rawData], c => c.charCodeAt(0))
+  }
+
   async function handlePushToggle(val) {
     if (!val) {
       localStorage.setItem('ptlingo_push_enabled', 'false')
@@ -299,8 +306,8 @@ export default function SettingsPage() {
     if (!vapid) { showNotif('Push notifications are not yet configured', '#6B7280'); return }
     try {
       const reg = await navigator.serviceWorker.ready
-      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: vapid })
-      await supabase.from('push_subscriptions').upsert({ user_id: user.id, subscription: sub.toJSON() })
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(vapid) })
+      await supabase.from('push_subscriptions').upsert({ user_id: user.id, subscription: JSON.parse(JSON.stringify(sub)) }, { onConflict: 'user_id' })
       localStorage.setItem('ptlingo_push_enabled', 'true')
       setPushOn(true)
       showNotif('Push notifications enabled')
