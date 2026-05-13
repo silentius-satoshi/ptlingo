@@ -39,6 +39,7 @@ export default function ThePathPage() {
   const [showSwitcher, setShowSwitcher] = useState(false)
   const [visibleSystem, setVisibleSystem] = useState(PATH_SECTIONS[0].system)
   const [showReviewAlert, setShowReviewAlert] = useState(false)
+  const [nodeStarting, setNodeStarting] = useState(false)
 
   const prevNodeStatesRef = useRef({})
   const globalActiveRef = useRef(null)
@@ -218,6 +219,45 @@ export default function ThePathPage() {
     currentGroup.items.push(item)
   }
 
+  const handleNodePress = async (section) => {
+    if (nodeStarting) return
+    setNodeStarting(true)
+    try {
+      const { user } = useAuthStore.getState()
+      const sessionSize = useGamificationStore.getState().getNodeSessionSize(section.masteryKey)
+      const { data: questions } = await supabase
+        .from('questions')
+        .select('id')
+        .eq('subject', section.masteryKey)
+        .limit(sessionSize)
+      if (!questions?.length) { setNodeStarting(false); return }
+      const { data: session } = await supabase
+        .from('sessions')
+        .insert({
+          user_id:         user.id,
+          type:            'quiz',
+          mode:            'practice',
+          status:          'in_progress',
+          question_ids:    questions.map(q => q.id),
+          total_questions: questions.length,
+          current_index:   0,
+          time_remaining:  9 * 3600,
+          time_multiplier: 1,
+          subjects:        [section.masteryKey],
+          difficulty:      [],
+          answers:         {},
+          marked:          [],
+        })
+        .select()
+        .single()
+      if (session) navigate(`/exam/${session.id}`, { state: { source: 'path', subject: section.masteryKey } })
+    } catch (err) {
+      console.error('Node start error:', err)
+    } finally {
+      setNodeStarting(false)
+    }
+  }
+
   return (
     <div className="flex-1 flex flex-col w-full">
 
@@ -325,7 +365,11 @@ export default function ThePathPage() {
                                 isGlobalActive={item.isGlobalActive}
                                 wasLocked={item.wasLocked}
                                 sessionsCompleted={item.sessionsCompleted}
-                                onPress={() => navigate(`/question-bank?subject=${encodeURIComponent(item.section.masteryKey)}`)}
+                                onPress={() => {
+                                  if (item.state === 'active' || item.state === 'unlocked') {
+                                    handleNodePress(item.section)
+                                  }
+                                }}
                               />
                             </div>
                           )
@@ -522,6 +566,13 @@ export default function ThePathPage() {
           </>
         )}
       </AnimatePresence>
+
+      {nodeStarting && (
+        <div className="fixed inset-0 z-50 bg-[#080d18] flex items-center justify-center flex-col gap-4">
+          <div className="animate-spin text-4xl">⚡</div>
+          <p className="text-slate-400 text-sm">Loading session...</p>
+        </div>
+      )}
     </div>
   )
 }

@@ -69,6 +69,7 @@ const useGamificationStore = create((set, get) => ({
   xpBoostActive: false,
   streakFreezeCount: 0,
   streakShieldExpiry: null,
+  pathNodeLevels: _c.pathNodeLevels ?? {},
 
   // XP toast queue: [{ id, amount, source, levelUp, oldTitle, newTitle }]
   toastQueue: [],
@@ -103,6 +104,7 @@ const useGamificationStore = create((set, get) => ({
         xpBoostActive:     row.xp_boost_active      ?? false,
         streakFreezeCount: row.streak_freeze_count   ?? 0,
         streakShieldExpiry: row.streak_shield_expiry ?? null,
+        pathNodeLevels:    row.path_node_levels      ?? {},
         loaded: true,
       })
       localStorage.setItem('ptlingo_gam', JSON.stringify({
@@ -113,6 +115,7 @@ const useGamificationStore = create((set, get) => ({
         ptLingoScore:   computePtLingoScore(coercedMastery),
         level:          getLevelFromXP(row.xp ?? 0),
         subjectMastery: coercedMastery,
+        pathNodeLevels: row.path_node_levels ?? {},
       }))
 
       get().rechargeEnergy()
@@ -225,6 +228,26 @@ const useGamificationStore = create((set, get) => ({
 
   dismissToast: (id) => {
     set((s) => ({ toastQueue: s.toastQueue.filter((t) => t.id !== id) }))
+  },
+
+  // ── Path node progressive sizing ──────────────────────────────────────────
+  getNodeSessionSize: (subject) => {
+    const levels = get().pathNodeLevels ?? {}
+    const level = levels[subject?.toLowerCase()] ?? 0
+    if (level === 0) return 2
+    if (level === 1) return 5
+    if (level === 2) return 10
+    return 15
+  },
+
+  incrementNodeLevel: async (subject, userId) => {
+    const levels = get().pathNodeLevels ?? {}
+    const key = subject?.toLowerCase()
+    const newLevels = { ...levels, [key]: (levels[key] ?? 0) + 1 }
+    set({ pathNodeLevels: newLevels })
+    const cached = JSON.parse(localStorage.getItem('ptlingo_gam') ?? '{}')
+    localStorage.setItem('ptlingo_gam', JSON.stringify({ ...cached, pathNodeLevels: newLevels }))
+    await upsertGamification(userId, { path_node_levels: newLevels })
   },
 
   // ── Streak ────────────────────────────────────────────────────────────────

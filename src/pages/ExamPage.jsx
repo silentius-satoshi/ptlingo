@@ -122,7 +122,9 @@ export default function ExamPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const readOnly  = location.state?.readOnly ?? false
+  const readOnly      = location.state?.readOnly ?? false
+  const isPathSession = location.state?.source === 'path'
+  const pathSubject   = location.state?.subject ?? null
   const { user } = useAuthStore()
 
   // ── Gamification ──────────────────────────────────────────────────────────
@@ -624,6 +626,10 @@ export default function ExamPage() {
         return
       }
 
+      if (isPathSession && pathSubject) {
+        await useGamificationStore.getState().incrementNodeLevel(pathSubject, user.id)
+      }
+
       const gam = useGamificationStore.getState()
       setPostFlowData({
         sessionId,
@@ -646,7 +652,7 @@ export default function ExamPage() {
     } finally {
       setSubmitting(false)
     }
-  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion])
+  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion, isPathSession, pathSubject])
 
   const handleSheetContinue = useCallback(() => {
     if (currentIndex >= questions.length - 1) {
