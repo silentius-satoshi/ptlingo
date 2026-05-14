@@ -1,96 +1,42 @@
-import { useState } from 'react'
-import { Sun, Moon, Flame, Zap, Gem, Trophy } from 'lucide-react'
-import { AnimatePresence } from 'framer-motion'
+import { Sun, Moon, Trophy } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import useGamificationStore from '../../stores/gamificationStore'
 import { useUiStore } from '../../store/uiStore'
-import { useAuthStore } from '../../store/authStore'
-import StreakModal from '../streak/StreakModal'
 
 export default function SidebarHeader() {
   const navigate = useNavigate()
-  const { streak, xp, energy, maxEnergy, coins, loaded } = useGamificationStore()
   const { darkMode, toggleDarkMode } = useUiStore()
-  const { examDate } = useAuthStore()
-  const [showStreak, setShowStreak] = useState(false)
-
-  const daysLeft = Math.max(0, Math.ceil((new Date(examDate ?? '2026-07-29') - new Date()) / 86400000))
-  const pillColor = daysLeft < 30 ? 'bg-red-500' : 'bg-amber-500'
 
   return (
-    <>
-    <div className="mx-3 mt-3 mb-2 p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-3">
+    <div className="mx-3 mt-3 mb-2 p-3 md:mx-1 md:p-1.5 lg:mx-3 lg:p-3 bg-slate-800/50 border border-slate-700 rounded-xl space-y-2">
       {/* Row 1: Logo + dark mode toggle */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center md:justify-center lg:justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-teal-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-[10px] font-bold">PT</span>
-          </div>
-          <span className="text-sm font-bold text-white">
+          <img
+            src="/icons/manifest-icon-192.maskable.png"
+            alt="PT Lingo"
+            className="w-8 h-8 rounded-lg object-contain flex-shrink-0"
+          />
+          <span className="hidden lg:inline text-sm font-bold text-white">
             PT <span className="font-normal text-slate-400">Lingo</span>
           </span>
         </div>
         <button
           onClick={toggleDarkMode}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+          className="hidden lg:block p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
         >
           {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* Row 2: Exam countdown pill */}
-      <div className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-white text-xs font-semibold ${pillColor}`}>
-        <span>🗓</span>
-        <span>{daysLeft} days to exam · {new Date(examDate ?? '2026-07-29').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-      </div>
-
-      {/* Row 3: Stats strip — streak | coins | energy */}
-      {loaded && (
-        <div className="flex items-center justify-around px-2 py-2 rounded-lg">
-          <button
-            onClick={() => setShowStreak(true)}
-            className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-1 text-orange-400">
-              <Flame className="w-3.5 h-3.5" />
-              <span className="text-sm font-bold text-white">{streak}</span>
-            </div>
-          </button>
-          <button
-            onClick={() => navigate('/profile')}
-            className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-1" style={{ color: '#F59E0B' }}>
-              <Gem className="w-3.5 h-3.5" />
-              <span className="text-sm font-bold text-white">{coins}</span>
-            </div>
-          </button>
-          <button
-            onClick={() => navigate('/profile')}
-            className="flex flex-col items-center gap-0.5 hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-1 text-yellow-300">
-              <Zap className="w-3.5 h-3.5" />
-              <span className="text-sm font-bold text-white">{energy}/{maxEnergy}</span>
-            </div>
-          </button>
-        </div>
-      )}
-
-      {/* Row 4: Trophy row → /achievements */}
+      {/* Row 2: Achievements link */}
       <button
         onClick={() => navigate('/achievements')}
-        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors text-xs font-medium"
+        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors text-xs font-medium md:justify-center lg:justify-start"
       >
         <Trophy className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-        <span className="flex-1 text-left">Achievements</span>
-        <span className="text-slate-600">›</span>
+        <span className="hidden lg:block flex-1 text-left">Achievements</span>
+        <span className="hidden lg:block text-slate-600">›</span>
       </button>
     </div>
-
-    <AnimatePresence>
-      {showStreak && <StreakModal streak={streak} onClose={() => setShowStreak(false)} />}
-    </AnimatePresence>
-    </>
   )
 }

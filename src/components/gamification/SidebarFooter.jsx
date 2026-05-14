@@ -36,10 +36,10 @@ export default function SidebarFooter() {
       {/* Sign Out */}
       <button
         onClick={handleSignOut}
-        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-red-400 hover:bg-slate-700/50 transition-colors"
+        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs text-red-400 hover:bg-slate-700/50 transition-colors md:justify-center lg:justify-start"
       >
-        <LogOut className="w-3.5 h-3.5" />
-        Sign Out
+        <LogOut className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="hidden lg:block">Sign Out</span>
       </button>
     </div>
   )

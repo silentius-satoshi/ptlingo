@@ -49,10 +49,10 @@ export default function ActiveSectionBanner({
           </div>
         </button>
 
-        <div className="w-px self-stretch bg-white/20" />
+        <div className="w-px self-stretch bg-white/20 md:hidden" />
 
         {/* Right: missions toggle */}
-        <div className="relative">
+        <div className="relative md:hidden">
           <button
             className="rounded-lg p-2.5 bg-white/20 active:opacity-70 transition-opacity"
             onClick={onToggleMissions}
@@ -65,7 +65,8 @@ export default function ActiveSectionBanner({
         </div>
       </div>
 
-      {/* Missions dropdown */}
+      {/* Missions dropdown — mobile only */}
+      <div className="md:hidden">
       <AnimatePresence>
         {missionsOpen && (
           <motion.div
@@ -155,6 +156,7 @@ export default function ActiveSectionBanner({
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   )
 }

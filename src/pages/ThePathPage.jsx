@@ -14,6 +14,7 @@ import { rollXP } from '../lib/rewardEngine'
 import { ANIMATION } from '../constants/design'
 import ActiveSectionBanner from '../components/path/ActiveSectionBanner'
 import NodePreviewCard from '../components/gamification/NodePreviewCard'
+import PathStatsPanel from '../components/path/PathStatsPanel'
 
 
 function todayStr() {
@@ -31,7 +32,7 @@ export default function ThePathPage() {
     awardXP,
   } = useGamificationStore()
 
-  const { user } = useAuthStore()
+  const { user, isAnonymous } = useAuthStore()
 
   const [claimedSystems, setClaimedSystems] = useState(() => new Set())
   const [dueCount, setDueCount] = useState(0)
@@ -340,7 +341,10 @@ export default function ThePathPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col w-full">
+    <div className="flex flex-1 min-w-0">
+
+      {/* Center: path content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
 
         {/* Sticky section banner */}
         <div ref={stickyBannerRef} className="sticky top-0 z-[35] px-4 pt-3 pb-2 bg-[#080d18] w-full">
@@ -503,6 +507,22 @@ export default function ThePathPage() {
             </div>
           </div>
         </section>
+
+      </div>{/* end center column */}
+
+      {/* Right stats column — desktop only */}
+      <aside
+        className="hidden md:flex flex-col w-80 flex-shrink-0 sticky top-0 h-screen overflow-y-auto pl-4 pr-2 py-4 gap-3"
+      >
+        <PathStatsPanel
+          visibleSection={bannerSection}
+          masteryPct={bannerMasteryPct}
+          missions={dailyMissions?.missions ?? []}
+          dueCount={dueCount}
+          onReviewTap={handleReviewPress}
+          isAnonymous={isAnonymous}
+        />
+      </aside>
 
       {/* Due for Review alert modal */}
       <AnimatePresence>
