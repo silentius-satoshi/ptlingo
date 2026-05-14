@@ -25,9 +25,6 @@ export default function PathNode({
   const isActive = state === 'active'
   const isLocked = state === 'locked'
 
-  const nodeLevel   = useGamificationStore(s => s.pathNodeLevels?.[section?.masteryKey?.toLowerCase()] ?? 0)
-  const sessionSize = nodeLevel === 0 ? 2 : nodeLevel === 1 ? 5 : nodeLevel === 2 ? 10 : 15
-
   useEffect(() => {
     if (isGlobalActive && nodeRef.current) {
       nodeRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -66,14 +63,9 @@ export default function PathNode({
               }}
             >
               <div className="rounded-lg px-4 py-1.5 relative" style={{ background: '#1C1F2E' }}>
-                <div className="flex flex-col items-center leading-tight">
-                  <span className="text-xs font-black tracking-widest uppercase" style={{ color: section.color }}>
-                    START
-                  </span>
-                  <span className="text-[9px] opacity-70 font-medium" style={{ color: section.color }}>
-                    {sessionSize}q
-                  </span>
-                </div>
+                <span className="text-xs font-black tracking-widest uppercase" style={{ color: section.color }}>
+                  START
+                </span>
                 <div style={{
                   position: 'absolute',
                   bottom: -6,
