@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '../../lib/supabase'
 
 const USER_TYPES = [
   { id: 'highschool', emoji: '🏫', label: 'High school student', desc: 'Exploring PT as a career' },
@@ -73,6 +75,7 @@ function ContinueBtn({ onClick, disabled, label = 'Continue' }) {
 }
 
 export default function OnboardingFlow({ onComplete }) {
+  const navigate = useNavigate()
   const [screenIndex, setScreenIndex] = useState(0)
   const [userType, setUserType] = useState(null)
   const [dailyGoal, setDailyGoal] = useState(10)
@@ -84,7 +87,12 @@ export default function OnboardingFlow({ onComplete }) {
     setScreenIndex(next)
   }
 
-  const goBack = () => {
+  const goBack = async () => {
+    if (screenIndex === 0) {
+      await supabase.auth.signOut()
+      navigate('/')
+      return
+    }
     // Skip exam_date screen (index 3) for non-NPTE users when going back
     const prev = screenIndex === 4 && userType !== 'npte' ? 2 : screenIndex - 1
     setScreenIndex(prev)
@@ -103,9 +111,7 @@ export default function OnboardingFlow({ onComplete }) {
     ? Math.ceil((new Date(examDate) - new Date()) / 86400000)
     : null
 
-  const showBack = screenIndex >= 1 && screenIndex <= 4
-
-  const progressPct = Math.round((screenIndex / 5) * 100)
+  const showBack = screenIndex >= 0 && screenIndex <= 4
 
   return (
     <div
@@ -113,12 +119,16 @@ export default function OnboardingFlow({ onComplete }) {
       style={{ background: '#080d18', zIndex: 200 }}
     >
       {/* Progress bar */}
-      <div className="w-full h-1 bg-slate-800 flex-shrink-0">
-        <motion.div
-          className="h-full rounded-full"
-          style={{ background: '#22C55E' }}
-          animate={{ width: `${progressPct}%` }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+      <div
+        className="w-full h-1.5 rounded-full overflow-hidden flex-shrink-0"
+        style={{ background: 'rgba(255,255,255,0.08)' }}
+      >
+        <div
+          className="h-full rounded-full transition-all duration-300 ease-out"
+          style={{
+            width: `${((screenIndex + 1) / 6) * 100}%`,
+            background: '#22C55E',
+          }}
         />
       </div>
 
