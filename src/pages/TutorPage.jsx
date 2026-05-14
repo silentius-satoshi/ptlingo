@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { buildTutorContext, formatSystemPrompt } from '../lib/tutorContext'
 import { streamTutorResponse } from '../lib/tutorApi'
@@ -21,6 +21,7 @@ export default function TutorPage() {
   const { user } = useAuthStore()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const location = useLocation()
 
   const [sessionMode, setSessionMode] = useState(searchParams.get('mode') || 'free')
   const [messages, setMessages] = useState([])
@@ -40,6 +41,8 @@ export default function TutorPage() {
   const abortControllerRef = useRef(null)
   const isSendingRef = useRef(false)
   const messagesRef = useRef([])
+  const questionContextRef = useRef(location.state?.questionContext ?? null)
+  const autoPromptRef      = useRef(location.state?.autoPrompt ?? false)
   // Keep ref in sync every render so sendMessage can read current messages without a closure
   messagesRef.current = messages
 
@@ -69,7 +72,20 @@ export default function TutorPage() {
       systemPromptRef.current = prompt
 
       // Fire welcome / Ask Max opening
-      if (askMaxQuestion) {
+      if (autoPromptRef.current && questionContextRef.current) {
+        const qc = questionContextRef.current
+        const choices = qc.choices ?? []
+        const selectedLabel = choices[qc.selectedIndex] ?? 'Not answered'
+        const correctLabel  = choices[qc.correctIndex]  ?? 'Unknown'
+        const message =
+          `I need help understanding this NPTE question (${qc.subject}, ${qc.difficulty}).\n\n` +
+          `**Question:** ${qc.stem}\n\n` +
+          `**My answer:** ${selectedLabel}\n` +
+          `**Correct answer:** ${correctLabel}\n\n` +
+          (qc.rationale ? `**Rationale given:** ${qc.rationale}\n\n` : '') +
+          `Can you explain the reasoning behind the correct answer and help me understand the underlying concept?`
+        sendMessage(message)
+      } else if (askMaxQuestion) {
         fireAskMaxOpening(ctx, askMaxQuestion, askMaxWrong, prompt)
       } else {
         fireWelcome(ctx, prompt)
@@ -84,6 +100,11 @@ export default function TutorPage() {
       abortControllerRef.current?.abort()
     }
   }, [])
+
+  // Clear location.state so navigating back to /tutor later doesn't re-trigger auto-send
+  useEffect(() => {
+    if (location.state) window.history.replaceState({}, '')
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Welcome message ────────────────────────────────────────────────────────
   function fireWelcome(ctx, prompt) {

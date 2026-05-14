@@ -91,7 +91,20 @@ export default function RationalePanel({ question, selectedAnswer }) {
         {selectedAnswer !== null && selectedAnswer !== question.correct_index && (
           <div className="pt-2">
             <button
-              onClick={() => navigate(`/tutor?question=${question.id}&wrong=${selectedAnswer}`)}
+              onClick={() => navigate('/tutor', {
+                state: {
+                  questionContext: {
+                    stem: question.stem,
+                    choices: question.choices,
+                    correctIndex: question.correct_index,
+                    selectedIndex: selectedAnswer,
+                    rationale: question.rationale_map?.[String(question.correct_index)] || question.rationale || '',
+                    subject: question.subject,
+                    difficulty: question.difficulty,
+                  },
+                  autoPrompt: true,
+                }
+              })}
               className="flex items-center gap-2 px-3 py-2 rounded-xl border border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 text-xs font-medium transition-colors"
             >
               <MascotPNG mascot="sparky" size={36} className="flex-shrink-0" />
