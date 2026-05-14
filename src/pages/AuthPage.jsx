@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
 import Button from '../components/shared/Button'
@@ -19,14 +19,19 @@ function getPasswordStrength(password) {
 }
 
 export default function AuthPage() {
-  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
+  const [searchParams] = useSearchParams()
+  const isUpgrade = searchParams.get('upgrade') === 'true'
+
+  const { signIn, signUp, user } = useAuthStore()
+  const isCurrentlyAnonymous = user?.is_anonymous ?? false
+
+  const [mode, setMode] = useState(isUpgrade ? 'signup' : 'signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [forgotMessage, setForgotMessage] = useState('')
-  const { signIn, signUp } = useAuthStore()
   const navigate = useNavigate()
 
   // Conditional UI: surfaces registered passkeys as autofill suggestions
@@ -54,8 +59,15 @@ export default function AuthPage() {
         await signIn(email, password)
         navigate('/')
       } else {
-        await signUp(email, password)
-        setMessage('Check your email to confirm your account.')
+        if (isCurrentlyAnonymous) {
+          // Upgrade anonymous account — preserves user_id and all data
+          const { error: err } = await supabase.auth.updateUser({ email, password })
+          if (err) throw err
+          navigate('/')
+        } else {
+          await signUp(email, password)
+          setMessage('Check your email to confirm your account.')
+        }
       }
     } catch (err) {
       setError(err.message || 'Something went wrong.')
@@ -77,6 +89,13 @@ export default function AuthPage() {
     setTimeout(() => setForgotMessage(''), 5000)
   }
 
+  const handleGuestLogin = async () => {
+    setLoading(true)
+    const { error: err } = await supabase.auth.signInAnonymously()
+    if (err) { setError(err.message); setLoading(false) }
+    // auth listener in App.jsx handles navigation
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
@@ -87,9 +106,18 @@ export default function AuthPage() {
             alt="PT Lingo"
             className="w-24 h-24 rounded-xl mb-3"
           />
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-            {mode === 'signin' ? 'Sign in to PT Lingo' : 'Create your account on PT Lingo'}
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight text-center">
+            {isUpgrade
+              ? 'Save your progress!'
+              : mode === 'signin'
+              ? 'Sign in to PT Lingo'
+              : 'Create your account on PT Lingo'}
           </h1>
+          {isUpgrade && (
+            <p className="text-sm text-slate-400 text-center mt-1">
+              Create a free account to keep your streak, XP, and review queue.
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -183,29 +211,31 @@ export default function AuthPage() {
           </Button>
         </form>
 
-        <div className="mt-5 text-center">
-          {mode === 'signin' ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Don't have an account?{' '}
-              <button
-                onClick={() => { setMode('signup'); setError(''); setMessage(''); setForgotMessage('') }}
-                className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
-              >
-                Create Account
-              </button>
-            </p>
-          ) : (
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Already have an account?{' '}
-              <button
-                onClick={() => { setMode('signin'); setError(''); setMessage(''); setForgotMessage('') }}
-                className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
-              >
-                Sign In
-              </button>
-            </p>
-          )}
-        </div>
+        {!isUpgrade && (
+          <div className="mt-5 text-center">
+            {mode === 'signin' ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Don't have an account?{' '}
+                <button
+                  onClick={() => { setMode('signup'); setError(''); setMessage(''); setForgotMessage('') }}
+                  className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
+                >
+                  Create Account
+                </button>
+              </p>
+            ) : (
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Already have an account?{' '}
+                <button
+                  onClick={() => { setMode('signin'); setError(''); setMessage(''); setForgotMessage('') }}
+                  className="text-teal-600 dark:text-teal-400 font-medium hover:underline"
+                >
+                  Sign In
+                </button>
+              </p>
+            )}
+          </div>
+        )}
 
         {/* "or" divider */}
         <div className="relative my-5">
@@ -225,6 +255,17 @@ export default function AuthPage() {
           </div>
         ) : (
           <GoogleSignInButton />
+        )}
+
+        {/* Guest login — only when not in upgrade mode and not already anonymous */}
+        {!isUpgrade && !isCurrentlyAnonymous && (
+          <button
+            onClick={handleGuestLogin}
+            disabled={loading}
+            className="w-full py-3 rounded-xl border border-slate-600 text-slate-300 text-sm font-medium mt-2"
+          >
+            Explore as guest
+          </button>
         )}
       </div>
     </div>

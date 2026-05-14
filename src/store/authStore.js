@@ -4,13 +4,14 @@ import { supabase } from '../lib/supabase'
 export const useAuthStore = create((set) => ({
   user: null,
   loading: true,
+  isAnonymous: false,
   profile: (() => {
     try { return JSON.parse(localStorage.getItem('ptlingo_profile') ?? '{}') }
     catch { return {} }
   })(),
   examDate: '2026-07-29',
 
-  setUser: (user) => set({ user, loading: false }),
+  setUser: (user) => set({ user, loading: false, isAnonymous: user?.is_anonymous ?? false }),
   setLoading: (loading) => set({ loading }),
 
   loadProfile: async (userId) => {
