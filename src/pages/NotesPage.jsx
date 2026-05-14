@@ -240,6 +240,7 @@ export default function NotesPage() {
         .from('questions')
         .select('id, stem, subject')
         .in('id', qIds)
+        .eq('quarantined', false)
 
       const qMap = Object.fromEntries((qData || []).map((q) => [q.id, q]))
       setNotes(notesData.map((n) => ({ ...n, question: qMap[n.question_id] || null })))

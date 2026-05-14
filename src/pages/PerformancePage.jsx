@@ -151,6 +151,7 @@ export default function PerformancePage() {
           .from('questions')
           .select('id, stem, choices, subject, difficulty, tags, correct_index, section, rationale, rationale_map')
           .in('id', allQIds)
+          .eq('quarantined', false)
         setQuestions(qData || [])
       }
       setLoading(false)

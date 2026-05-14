@@ -39,6 +39,7 @@ export default function MockExamStartPage() {
         .from('questions')
         .select('id, section')
         .eq('exam_series', series)
+        .eq('quarantined', false)
         .order('section', { ascending: true })
 
       if (qErr) throw qErr

@@ -248,6 +248,7 @@ export default function ThePathPage() {
         .from('questions')
         .select('id')
         .eq('subject', section.masteryKey)
+        .eq('quarantined', false)
         .limit(sessionSize)
       if (!questions?.length) { setNodeStarting(false); return }
       const { data: session } = await supabase
@@ -298,6 +299,18 @@ export default function ThePathPage() {
 
       const questionIds = dueReviews.map(r => r.question_id)
 
+      const { data: validQuestions } = await supabase
+        .from('questions')
+        .select('id')
+        .in('id', questionIds)
+        .eq('quarantined', false)
+
+      const filteredIds = validQuestions?.map(q => q.id) ?? []
+      if (!filteredIds.length) {
+        setNodeStarting(false)
+        return
+      }
+
       const { data: session } = await supabase
         .from('sessions')
         .insert({
@@ -305,8 +318,8 @@ export default function ThePathPage() {
           type:            'quiz',
           mode:            'practice',
           status:          'in_progress',
-          question_ids:    questionIds,
-          total_questions: questionIds.length,
+          question_ids:    filteredIds,
+          total_questions: filteredIds.length,
           current_index:   0,
           time_remaining:  9 * 3600,
           time_multiplier: 1,

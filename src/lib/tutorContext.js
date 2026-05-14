@@ -21,6 +21,7 @@ export async function buildTutorContext(userId) {
     .from('questions')
     .select('id, stem, choices, correct_index, rationale, rationale_map, subject, difficulty, tags')
     .in('id', allQIds)
+    .eq('quarantined', false)
 
   const qMap = Object.fromEntries((questions || []).map((q) => [q.id, q]))
 
@@ -72,6 +73,7 @@ export async function buildTutorContext(userId) {
       .from('questions')
       .select('id, stem, choices, correct_index, rationale, rationale_map, subject, difficulty, tags')
       .eq('subject', weakSubject)
+      .eq('quarantined', false)
       .limit(20)
     weakSubjectQuestions = (wqs || []).map((q) => ({ ...q, times_incorrect: 0, last_selected_index: null }))
   }

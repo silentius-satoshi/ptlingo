@@ -439,6 +439,7 @@ export default function DashboardPage() {
           .from('questions')
           .select('id, subject')
           .in('id', allQIds)
+          .eq('quarantined', false)
         setQuestions(qData || [])
       }
 

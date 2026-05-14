@@ -71,6 +71,7 @@ export default function QuestionBankPage() {
     supabase
       .from('questions')
       .select('id, subject, difficulty')
+      .eq('quarantined', false)
       .then(({ data }) => {
         setAllQuestions(data || [])
         setLoadingQ(false)

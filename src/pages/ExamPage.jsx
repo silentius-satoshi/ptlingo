@@ -246,6 +246,7 @@ export default function ExamPage() {
             .from('questions')
             .select('*')
             .in('id', session.question_ids)
+            .eq('quarantined', false)
 
           if (qErr) throw qErr
 

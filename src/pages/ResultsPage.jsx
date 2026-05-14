@@ -127,6 +127,7 @@ export default function ResultsPage() {
             .from('questions')
             .select('id, stem, choices, subject, difficulty, correct_index, rationale, rationale_map')
             .in('id', sess.question_ids)
+            .eq('quarantined', false)
           if (qErr) throw qErr
 
           const qMap = Object.fromEntries((qs || []).map((q) => [q.id, q]))

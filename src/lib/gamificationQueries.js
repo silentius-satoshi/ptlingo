@@ -66,6 +66,7 @@ export async function fetchAccuracyBySubject(userId) {
     .from('questions')
     .select('id, subject, correct_index')
     .in('id', allQIds)
+    .eq('quarantined', false)
 
   if (!questions?.length) return {}
 
