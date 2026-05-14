@@ -1232,8 +1232,9 @@ export default function ExamPage() {
         <ProfileGate
           correctCount={profileGateData.correctCount}
           totalQuestions={profileGateData.totalQuestions}
-          onSignUp={() => navigate('/auth?upgrade=true')}
           onLater={() => navigate('/path')}
+          onSuccess={() => navigate('/path')}
+          onSignIn={() => navigate('/auth')}
         />
       )}
     </div>

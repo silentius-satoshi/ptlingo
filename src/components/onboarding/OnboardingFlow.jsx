@@ -103,7 +103,7 @@ export default function OnboardingFlow({ onComplete }) {
     ? Math.ceil((new Date(examDate) - new Date()) / 86400000)
     : null
 
-  const showBack = screenIndex >= 2 && screenIndex <= 4
+  const showBack = screenIndex >= 1 && screenIndex <= 4
 
   const progressPct = Math.round((screenIndex / 5) * 100)
 
