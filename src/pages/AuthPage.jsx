@@ -89,13 +89,6 @@ export default function AuthPage() {
     setTimeout(() => setForgotMessage(''), 5000)
   }
 
-  const handleGuestLogin = async () => {
-    setLoading(true)
-    const { error: err } = await supabase.auth.signInAnonymously()
-    if (err) { setError(err.message); setLoading(false) }
-    // auth listener in App.jsx handles navigation
-  }
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
@@ -257,16 +250,6 @@ export default function AuthPage() {
           <GoogleSignInButton />
         )}
 
-        {/* Guest login — only when not in upgrade mode and not already anonymous */}
-        {!isUpgrade && !isCurrentlyAnonymous && (
-          <button
-            onClick={handleGuestLogin}
-            disabled={loading}
-            className="w-full py-3 rounded-xl border border-slate-600 text-slate-300 text-sm font-medium mt-2"
-          >
-            Explore as guest
-          </button>
-        )}
       </div>
     </div>
   )

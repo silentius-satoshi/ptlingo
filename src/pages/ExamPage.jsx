@@ -27,6 +27,7 @@ import MotivationBreak from '../components/drill/MotivationBreak'
 import CasualQuizView from '../components/exam/CasualQuizView'
 import MobilePanelSheet from '../components/exam/MobilePanelSheet'
 import PostSessionFlow from '../components/exam/PostSessionFlow'
+import ProfileGate from '../components/exam/ProfileGate'
 import { calculateNextReview } from '../lib/spacedRepetition'
 
 // 0-indexed last-question indices for each of the 5 sections in a 225-question exam
@@ -125,7 +126,9 @@ export default function ExamPage() {
   const readOnly      = location.state?.readOnly ?? false
   const isPathSession = location.state?.source === 'path'
   const pathSubject   = location.state?.subject ?? null
+  const isDemo        = new URLSearchParams(location.search).get('demo') === 'true'
   const { user } = useAuthStore()
+  const isAnonymous = useAuthStore(s => s.isAnonymous)
 
   // ── Gamification ──────────────────────────────────────────────────────────
   const { awardXP, deductEnergy, advanceMission, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, energy, maxEnergy, streak } = useGamificationStore()
@@ -148,8 +151,10 @@ export default function ExamPage() {
   const [focusedChoice, setFocusedChoice]     = useState(null)
 
   // ── Post-session flow ─────────────────────────────────────────────────────
-  const [showPostFlow,  setShowPostFlow]  = useState(false)
-  const [postFlowData,  setPostFlowData]  = useState(null)
+  const [showPostFlow,    setShowPostFlow]    = useState(false)
+  const [postFlowData,    setPostFlowData]    = useState(null)
+  const [showProfileGate, setShowProfileGate] = useState(false)
+  const [profileGateData, setProfileGateData] = useState(null)
 
   // ── Modals ─────────────────────────────────────────────────────────────────
   const [showPauseModal, setShowPauseModal]   = useState(false)
@@ -647,13 +652,20 @@ export default function ExamPage() {
         missions:        gam.dailyMissions?.missions ?? [],
         coinsEarned:     5,
       })
+      // Demo session: show ProfileGate instead of PostSessionFlow
+      if (isDemo && isAnonymous) {
+        setProfileGateData({ correctCount: correct, totalQuestions: questions.length })
+        setShowProfileGate(true)
+        setSubmitting(false)
+        return
+      }
       setShowPostFlow(true)
     } catch (err) {
       console.error('Submit error:', err)
     } finally {
       setSubmitting(false)
     }
-  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion, isPathSession, pathSubject])
+  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion, isPathSession, pathSubject, isDemo, isAnonymous])
 
   const handleSheetContinue = useCallback(() => {
     if (currentIndex >= questions.length - 1) {
@@ -1213,6 +1225,15 @@ export default function ExamPage() {
           {...postFlowData}
           onReview={()   => navigate(`/results/${postFlowData.sessionId}`)}
           onComplete={() => navigate(`/results/${postFlowData.sessionId}`)}
+        />
+      )}
+
+      {showProfileGate && profileGateData && (
+        <ProfileGate
+          correctCount={profileGateData.correctCount}
+          totalQuestions={profileGateData.totalQuestions}
+          onSignUp={() => navigate('/auth?upgrade=true')}
+          onLater={() => navigate('/path')}
         />
       )}
     </div>

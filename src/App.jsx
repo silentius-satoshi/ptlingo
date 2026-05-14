@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import { supabase } from './lib/supabase'
 import { useAuthStore } from './store/authStore'
 import { useUiStore } from './store/uiStore'
 import useGamificationStore from './stores/gamificationStore'
 import AppLayout from './components/layout/AppLayout'
+import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import MFAChallenge from './components/auth/MFAChallenge'
 import AuthCallback from './pages/AuthCallback'
@@ -31,12 +32,12 @@ import LoadingSpinner from './components/shared/LoadingSpinner'
 import XPToast from './components/gamification/XPToast'
 import IosInstallHint from './components/IosInstallHint'
 
-// Checks user only — used for /mfa-challenge (user exists but may not be AAL2)
+// Checks user only — used for /mfa-challenge and /onboarding (user exists, anonymous ok)
 function RequireAuth({ children }) {
   const { user, loading } = useAuthStore()
   const location = useLocation()
   if (loading) return <LoadingSpinner size="lg" className="h-screen" />
-  if (!user) return <Navigate to="/auth" state={{ from: location }} replace />
+  if (!user) return <Navigate to="/" state={{ from: location }} replace />
   return children
 }
 
@@ -44,59 +45,84 @@ function RequireAuth({ children }) {
 function RequireFullAuth({ children }) {
   const { user, loading } = useAuthStore()
   const location = useLocation()
-  const [mfaOk, setMfaOk] = useState(null) // null=checking, true=ok, false=needs-mfa
+  const [mfaOk, setMfaOk] = useState(null)
 
   useEffect(() => {
     if (!user || !supabase) { setMfaOk(true); return }
     supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data, error }) => {
-      if (error || !data) { setMfaOk(true); return } // fail open
+      if (error || !data) { setMfaOk(true); return }
       setMfaOk(data.currentLevel === data.nextLevel)
     })
   }, [user])
 
   if (loading) return <LoadingSpinner size="lg" className="h-screen" />
-  if (!user) return <Navigate to="/auth" state={{ from: location }} replace />
+  if (!user) return <Navigate to="/" state={{ from: location }} replace />
   if (mfaOk === null) return <LoadingSpinner size="lg" className="h-screen" />
   if (!mfaOk) return <Navigate to="/mfa-challenge" replace />
   return children
 }
 
-export default function App() {
+// Inner component — owns useNavigate and all auth/onboarding state
+function AppInner() {
+  const navigate = useNavigate()
   const { setUser, setLoading } = useAuthStore()
-  const authUser = useAuthStore(s => s.user)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [onboardingComplete, setOnboardingComplete] = useState(
     () => !!localStorage.getItem('ptlingo_onboarding_complete')
   )
-  const { darkMode } = useUiStore()
-  const loadGamification = useGamificationStore((s) => s.load)
-  const rechargeEnergy   = useGamificationStore((s) => s.rechargeEnergy)
+  const loadGamification = useGamificationStore(s => s.load)
+  const rechargeEnergy   = useGamificationStore(s => s.rechargeEnergy)
 
-  // Apply dark mode class on mount
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [darkMode])
+  const startDemoSession = async (user) => {
+    const { data: questions } = await supabase
+      .from('questions')
+      .select('id')
+      .eq('quarantined', false)
+      .limit(3)
+
+    if (!questions?.length) { navigate('/path'); return }
+
+    const { data: session } = await supabase
+      .from('sessions')
+      .insert({
+        user_id:         user.id,
+        type:            'quiz',
+        mode:            'practice',
+        status:          'in_progress',
+        question_ids:    questions.map(q => q.id),
+        total_questions: 3,
+        current_index:   0,
+        time_remaining:  9 * 3600,
+        time_multiplier: 1,
+        subjects:        ['Demo'],
+        difficulty:      [],
+        answers:         {},
+        marked:          [],
+      })
+      .select()
+      .single()
+
+    if (session) navigate(`/exam/${session.id}?demo=true`)
+    else navigate('/path')
+  }
 
   const handleOnboardingComplete = async ({ userType, dailyGoal, examDate }) => {
     localStorage.setItem('ptlingo_onboarding_complete', '1')
     setOnboardingComplete(true)
-    // Show quiz mode onboarding next if not already seen
     if (!localStorage.getItem('ptlingo_quiz_mode_set')) setShowOnboarding(true)
-    // Persist to Supabase (columns user_type, daily_goal must exist on profiles table)
+
     const user = useAuthStore.getState().user
     if (user && supabase) {
       const patch = { id: user.id, user_type: userType, daily_goal: dailyGoal }
       if (examDate) patch.exam_date = examDate
       await supabase.from('profiles').upsert(patch, { onConflict: 'id' })
       if (examDate) useAuthStore.getState().updateExamDate(examDate)
+      await startDemoSession(user)
+    } else {
+      navigate('/path')
     }
   }
 
-  // Bootstrap Supabase auth listener
   useEffect(() => {
     if (!supabase) {
       setUser(null)
@@ -120,12 +146,10 @@ export default function App() {
             if ((count ?? 0) > 0) {
               localStorage.setItem('ptlingo_onboarding_complete', '1')
               setOnboardingComplete(true)
-              // Quiz mode onboarding for existing users
               if (!localStorage.getItem('ptlingo_quiz_mode_set')) setShowOnboarding(true)
             }
           })
       } else {
-        // Already onboarded — show quiz mode onboarding if needed
         if (!localStorage.getItem('ptlingo_quiz_mode_set')) setShowOnboarding(true)
       }
     }
@@ -137,9 +161,8 @@ export default function App() {
     })
 
     return () => subscription.unsubscribe()
-  }, [setUser, setLoading, loadGamification])
+  }, [setUser, setLoading, loadGamification]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Recharge energy whenever the user returns to the app
   useEffect(() => {
     const handler = () => rechargeEnergy()
     window.addEventListener('focus', handler)
@@ -147,18 +170,27 @@ export default function App() {
   }, [rechargeEnergy])
 
   return (
-    <BrowserRouter>
+    <>
       <Routes>
+        {/* Public routes — no auth required */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Onboarding — requires a session (anonymous ok) */}
+        <Route path="/onboarding" element={
+          <RequireAuth>
+            <OnboardingFlow onComplete={handleOnboardingComplete} />
+          </RequireAuth>
+        } />
 
         {/* MFA challenge — requires auth but not yet AAL2 */}
         <Route path="/mfa-challenge" element={<RequireAuth><MFAChallenge /></RequireAuth>} />
 
         {/* Sidebar app layout */}
         <Route element={<RequireFullAuth><AppLayout /></RequireFullAuth>}>
-          <Route index element={<ThePathPage />} />
+          <Route path="path" element={<ThePathPage />} />
           <Route path="submissions" element={<SubmissionsPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="question-bank" element={<QuestionBankPage />} />
@@ -188,22 +220,20 @@ export default function App() {
           <QuizModeOnboarding onComplete={() => setShowOnboarding(false)} />
         )}
       </AnimatePresence>
-      {/* OnboardingFlow — full-screen overlay for new users */}
-      <AnimatePresence>
-        {!onboardingComplete && !!authUser && (
-          <motion.div
-            key="onboarding-flow"
-            className="fixed inset-0"
-            style={{ zIndex: 200 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <OnboardingFlow onComplete={handleOnboardingComplete} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    </>
+  )
+}
+
+export default function App() {
+  const { darkMode } = useUiStore()
+
+  useEffect(() => {
+    document.documentElement.classList[darkMode ? 'add' : 'remove']('dark')
+  }, [darkMode])
+
+  return (
+    <BrowserRouter>
+      <AppInner />
     </BrowserRouter>
   )
 }
