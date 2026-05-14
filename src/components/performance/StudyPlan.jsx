@@ -200,9 +200,265 @@ function DailyMissionsStrip() {
   )
 }
 
+// ── Shared helper cards ────────────────────────────────────────────────────────
+
+function SummaryCard({ text }) {
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Overview</p>
+      <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">{text}</p>
+    </div>
+  )
+}
+
+function InfoCard({ label, text }) {
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">{label}</p>
+      <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">{text}</p>
+    </div>
+  )
+}
+
+// ── DPT renderer ───────────────────────────────────────────────────────────────
+
+function DptWeekAccordion({ week }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-5 py-4 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-left"
+      >
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-slate-800 dark:text-white">{week.theme}</p>
+          {week.curriculum_alignment && (
+            <p className="text-xs text-cyan-500 dark:text-cyan-400 mt-0.5">{week.curriculum_alignment}</p>
+          )}
+        </div>
+        <svg
+          className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ml-4 ${open ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
+          {(week.daily_targets || []).map((t, i) => (
+            <div key={i} className="flex items-start gap-3 py-3 px-5">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{t.day}</span>
+                  {t.question_count > 0 && (
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">{t.question_count}Q</span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">{t.activity}</p>
+                {t.focus && (
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{t.focus}</p>
+                )}
+              </div>
+            </div>
+          ))}
+          {week.milestone && (
+            <div className="px-5 py-3 bg-teal-50 dark:bg-teal-900/10">
+              <p className="text-xs text-teal-700 dark:text-teal-400 font-medium">✓ {week.milestone}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function DptPlan({ activePlan, onRegenerate }) {
+  const plan = activePlan?.plan
+  return (
+    <div className="flex flex-col gap-6">
+      <StudyPlanHeader plan={activePlan} onRegenerate={onRegenerate} />
+      {plan.summary && <SummaryCard text={plan.summary} />}
+      {plan.current_focus && <InfoCard label="Current Focus" text={plan.current_focus} />}
+      {plan.weeks?.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Weekly Plan ({plan.weeks.length} week{plan.weeks.length !== 1 ? 's' : ''})
+          </p>
+          {plan.weeks.map((w) => (
+            <DptWeekAccordion key={w.week_number} week={w} />
+          ))}
+        </div>
+      )}
+      {plan.practical_prep_notes && <InfoCard label="Practical Prep Notes" text={plan.practical_prep_notes} />}
+    </div>
+  )
+}
+
+// ── Pre-PT renderer ────────────────────────────────────────────────────────────
+
+function TaskSection({ icon, label, items }) {
+  if (!items?.length) return null
+  return (
+    <div>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">
+        {icon} {label}
+      </p>
+      <ul className="space-y-1">
+        {items.map((item, i) => (
+          <li key={i} className="flex gap-2 text-xs text-slate-600 dark:text-slate-300">
+            <span className="text-slate-400 flex-shrink-0">•</span>{item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function MonthCard({ month }) {
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+        <p className="text-sm font-semibold text-slate-800 dark:text-white">{month.month}</p>
+        {month.theme && (
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{month.theme}</p>
+        )}
+      </div>
+      <div className="px-5 py-4 space-y-4">
+        <TaskSection icon="📚" label="Academic" items={month.tasks?.academic} />
+        <TaskSection icon="🏥" label="Clinical" items={month.tasks?.clinical} />
+        <TaskSection icon="📝" label="Application" items={month.tasks?.application} />
+      </div>
+      {month.milestone && (
+        <div className="px-5 pb-4">
+          <span className="inline-block text-xs font-bold px-2.5 py-1 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400">
+            ✓ {month.milestone}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PreptPlan({ activePlan, onRegenerate }) {
+  const plan = activePlan?.plan
+  return (
+    <div className="flex flex-col gap-6">
+      <StudyPlanHeader plan={activePlan} onRegenerate={onRegenerate} />
+      {plan.summary && <SummaryCard text={plan.summary} />}
+      {plan.application_readiness && <InfoCard label="Application Readiness" text={plan.application_readiness} />}
+      {plan.months?.map((m, i) => <MonthCard key={i} month={m} />)}
+      {plan.prereqs_remaining?.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+            Prereqs Remaining
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {plan.prereqs_remaining.map((r, i) => (
+              <span
+                key={i}
+                className="text-xs px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30"
+              >
+                {r}
+              </span>
+            ))}
+          </div>
+          {plan.observation_hours_gap > 0 && (
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+              Observation hours gap:{' '}
+              <span className="font-semibold text-slate-700 dark:text-slate-200">
+                {plan.observation_hours_gap}h remaining
+              </span>
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── High school renderer ───────────────────────────────────────────────────────
+
+const ROADMAP_SECTIONS = [
+  { key: 'now',              label: 'Now' },
+  { key: 'next_year',        label: 'Next Year' },
+  { key: 'senior_year',      label: 'Senior Year' },
+  { key: 'after_graduation', label: 'After Graduation' },
+]
+
+function RoadmapSectionCard({ section, data }) {
+  if (!data) return null
+  return (
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
+      <p className="text-xs font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-1">
+        {section.label}
+      </p>
+      {data.title && (
+        <p className="text-sm font-semibold text-slate-800 dark:text-white mb-3">{data.title}</p>
+      )}
+      <div className="space-y-2">
+        {(data.actions || []).map((action, i) => (
+          <div key={i} className="flex items-start gap-2.5">
+            <span className="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-slate-600 dark:text-slate-300">{action}</p>
+          </div>
+        ))}
+      </div>
+      {data.college_note && (
+        <p className="text-xs text-slate-400 dark:text-slate-500 italic mt-3">{data.college_note}</p>
+      )}
+    </div>
+  )
+}
+
+function HighSchoolRoadmap({ activePlan, onRegenerate }) {
+  const plan = activePlan?.plan
+  return (
+    <div className="flex flex-col gap-6">
+      <StudyPlanHeader plan={activePlan} onRegenerate={onRegenerate} />
+      {plan.summary && <SummaryCard text={plan.summary} />}
+      {plan.career_fit_message && <InfoCard label="Career Fit" text={plan.career_fit_message} />}
+      {ROADMAP_SECTIONS.map((s) => (
+        <RoadmapSectionCard key={s.key} section={s} data={plan.roadmap?.[s.key]} />
+      ))}
+      {plan.specialties_to_explore?.length > 0 && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+            Specialties to Explore
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {plan.specialties_to_explore.map((s, i) => (
+              <span
+                key={i}
+                className="text-xs px-2.5 py-1 rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-100 dark:border-teal-900/30"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      {plan.did_you_know && (
+        <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-500 dark:text-blue-400 mb-2">
+            Did You Know?
+          </p>
+          <p className="text-sm text-blue-800 dark:text-blue-200">{plan.did_you_know}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Main (NPTE default + plan_type router) ─────────────────────────────────────
+
 export default function StudyPlan({ activePlan, onRegenerate }) {
   const plan = activePlan?.plan
   if (!plan) return null
+
+  const planType = activePlan?.plan_type ?? 'npte'
+  if (planType === 'dpt')        return <DptPlan activePlan={activePlan} onRegenerate={onRegenerate} />
+  if (planType === 'prept')      return <PreptPlan activePlan={activePlan} onRegenerate={onRegenerate} />
+  if (planType === 'highschool') return <HighSchoolRoadmap activePlan={activePlan} onRegenerate={onRegenerate} />
 
   const daysRemaining = activePlan.exam_date ? getDaysRemaining(activePlan.exam_date) : null
   const openIdx = currentWeekIndex(plan.weeks)

@@ -140,23 +140,9 @@ Return your response as valid JSON with this exact shape — no markdown, no pre
   "what_not_to_do": ["Specific pitfall given this candidate's history"]
 }`
 
-export async function generateStudyPlan({ attempts, practiceAccuracy, config, previousPlan }) {
+async function callClaude(systemPrompt, userMessage) {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
   if (!apiKey) throw new Error('VITE_ANTHROPIC_API_KEY is not set in .env.local')
-
-  const weeksRemaining     = getWeeksRemaining(config.examDate)
-  const isRegeneration     = !!previousPlan
-  const currentWeekNumber  = isRegeneration ? (previousPlan.weeks?.length ?? weeksRemaining) - weeksRemaining + 1 : null
-
-  const userMessage = assemblePrompt({
-    attempts,
-    practiceAccuracy,
-    config,
-    weeksRemaining,
-    isRegeneration,
-    currentWeekNumber,
-  })
-
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -168,22 +154,160 @@ export async function generateStudyPlan({ attempts, practiceAccuracy, config, pr
     body: JSON.stringify({
       model:      'claude-sonnet-4-6',
       max_tokens: 8000,
-      system:     SYSTEM_PROMPT,
+      system:     systemPrompt,
       messages:   [{ role: 'user', content: userMessage }],
     }),
   })
-
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(err?.error?.message || `API error ${res.status}`)
   }
-
   const data = await res.json()
   const raw  = data.content?.[0]?.text ?? ''
-
   try {
-    return { ...JSON.parse(raw), weeksRemaining, generatedAt: new Date().toISOString() }
+    return JSON.parse(raw)
   } catch {
     throw new Error('Plan generation failed — model returned invalid JSON. Try again.')
   }
+}
+
+export async function generateStudyPlan({ attempts, practiceAccuracy, config, previousPlan }) {
+  const weeksRemaining    = getWeeksRemaining(config.examDate)
+  const isRegeneration    = !!previousPlan
+  const currentWeekNumber = isRegeneration ? (previousPlan.weeks?.length ?? weeksRemaining) - weeksRemaining + 1 : null
+
+  const userMessage = assemblePrompt({
+    attempts,
+    practiceAccuracy,
+    config,
+    weeksRemaining,
+    isRegeneration,
+    currentWeekNumber,
+  })
+
+  const result = await callClaude(SYSTEM_PROMPT, userMessage)
+  return { ...result, weeksRemaining, generatedAt: new Date().toISOString() }
+}
+
+// ── DPT ───────────────────────────────────────────────────────────────────────
+
+const DPT_SYSTEM_PROMPT = `You are a DPT academic coach helping a student reinforce their coursework and prepare for upcoming practicals.
+Generate a week-by-week study schedule aligned with their current curriculum. Prioritize systems they are currently studying. Frame everything as reinforcing class content, not board prep.
+
+Return only valid JSON:
+{
+  "summary": "string",
+  "current_focus": "string",
+  "weeks": [{
+    "week_number": 1,
+    "theme": "string",
+    "curriculum_alignment": "string",
+    "daily_targets": [{
+      "day": "string",
+      "activity": "string",
+      "question_count": 0,
+      "focus": "string"
+    }],
+    "milestone": "string"
+  }],
+  "practical_prep_notes": "string"
+}`
+
+function assembleDptPrompt({ config, practiceAccuracy }) {
+  const lines = (practiceAccuracy || [])
+    .map((p) => `  ${p.subject}: ${Math.round(p.accuracy * 100)}% accuracy`)
+    .join('\n')
+  return `Year in program: ${config.programYear}
+Current semester: ${config.semester}
+Upcoming milestone: ${config.milestone}${config.milestoneWeeks ? ` (${config.milestoneWeeks} weeks away)` : ''}
+Systems currently in curriculum: ${(config.currentSystems || []).join(', ') || 'not specified'}
+Daily study time: ${config.dailyHours} hours
+
+In-App Practice Accuracy (last 30 days):
+${lines || '  No practice data yet.'}`
+}
+
+// ── Pre-PT ────────────────────────────────────────────────────────────────────
+
+const PREPT_SYSTEM_PROMPT = `You are a pre-PT advisor helping an undergraduate student get into a DPT program.
+Generate a monthly milestone roadmap covering prerequisite coursework, observation hours, and DPT application timeline.
+
+Return only valid JSON:
+{
+  "summary": "string",
+  "application_readiness": "string",
+  "months": [{
+    "month": "string",
+    "theme": "string",
+    "tasks": {
+      "academic": ["string"],
+      "clinical": ["string"],
+      "application": ["string"]
+    },
+    "milestone": "string"
+  }],
+  "prereqs_remaining": ["string"],
+  "observation_hours_gap": 0
+}`
+
+function assemblePreptPrompt({ config }) {
+  return `Undergrad year: ${config.undergradYear}
+Expected graduation: ${config.graduationDate || 'not specified'}
+Application cycle target: ${config.applicationCycle}
+Completed prerequisites: ${(config.completedPrereqs || []).join(', ') || 'none yet'}
+Observation hours completed: ${config.obsHoursCompleted ?? 0}
+Target observation hours: ${config.obsHoursTarget ?? 80}
+PT specialty interests: ${(config.specialtyInterests || []).join(', ') || 'not specified'}`
+}
+
+// ── High School ───────────────────────────────────────────────────────────────
+
+const HIGHSCHOOL_SYSTEM_PROMPT = `You are a PT career counselor for a high school student exploring physical therapy as a career.
+Generate a personalized PT career exploration roadmap with concrete activities for each stage.
+
+Return only valid JSON:
+{
+  "summary": "string",
+  "career_fit_message": "string",
+  "roadmap": {
+    "now": { "title": "string", "actions": ["string"] },
+    "next_year": { "title": "string", "actions": ["string"] },
+    "senior_year": { "title": "string", "actions": ["string"] },
+    "after_graduation": { "title": "string", "actions": ["string"], "college_note": "string" }
+  },
+  "specialties_to_explore": ["string"],
+  "did_you_know": "string"
+}`
+
+function assembleHighschoolPrompt({ config }) {
+  return `Current grade: ${config.grade}
+PT specialty interests: ${(config.ptInterests || []).join(', ') || 'not specified'}
+State: ${config.state || 'not specified'}
+Related activities: ${config.relatedActivities || 'none mentioned'}`
+}
+
+// ── Dispatcher ────────────────────────────────────────────────────────────────
+
+export async function generatePlan(userType, config, context) {
+  if (userType === 'npte') {
+    return generateStudyPlan({
+      attempts:        context.attempts,
+      practiceAccuracy: context.practiceAccuracy,
+      config,
+      previousPlan:    context.previousPlan,
+    })
+  }
+  if (userType === 'dpt') {
+    const msg = assembleDptPrompt({ config, practiceAccuracy: context.practiceAccuracy })
+    return { ...await callClaude(DPT_SYSTEM_PROMPT, msg), generatedAt: new Date().toISOString() }
+  }
+  if (userType === 'prept') {
+    const msg = assemblePreptPrompt({ config })
+    return { ...await callClaude(PREPT_SYSTEM_PROMPT, msg), generatedAt: new Date().toISOString() }
+  }
+  if (userType === 'highschool') {
+    const msg = assembleHighschoolPrompt({ config })
+    return { ...await callClaude(HIGHSCHOOL_SYSTEM_PROMPT, msg), generatedAt: new Date().toISOString() }
+  }
+  throw new Error(`Unknown userType: ${userType}`)
 }

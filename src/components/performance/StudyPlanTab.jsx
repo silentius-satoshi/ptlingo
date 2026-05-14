@@ -6,7 +6,8 @@ import StudyPlan from './StudyPlan'
 import PlanHistory from './PlanHistory'
 
 export default function StudyPlanTab({ practiceAccuracy }) {
-  const { user } = useAuthStore()
+  const { user, profile } = useAuthStore()
+  const userType = profile?.user_type ?? 'npte'
   const [activePlan, setActivePlan] = useState(null)
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(true)
@@ -51,6 +52,7 @@ export default function StudyPlanTab({ practiceAccuracy }) {
       {showGenerator ? (
         <StudyPlanGenerator
           userId={user.id}
+          userType={userType}
           practiceAccuracy={practiceAccuracy}
           activePlan={activePlan}
           onPlanGenerated={handlePlanGenerated}
