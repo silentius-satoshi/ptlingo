@@ -210,10 +210,6 @@ export default function ProfilePage() {
       .finally(() => setPlanLoading(false))
   }, [user?.id])
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    navigate('/auth')
-  }
 
   return (
     <div className="min-h-full bg-slate-950 text-white overflow-x-hidden">
@@ -278,41 +274,9 @@ export default function ProfilePage() {
                     <p className="text-xs text-slate-400">days left</p>
                   </div>
                 </div>
-                <div className="h-2 rounded-full bg-slate-700 overflow-hidden mt-4 mb-2">
-                  <div
-                    className="h-full rounded-full bg-amber-500 transition-all duration-700"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-                <p className="text-xs text-slate-500">Score needed: 600 · Current best: 585</p>
               </div>
             </div>
 
-            {/* Section F: Quick Actions */}
-            <div>
-              <SectionHeader label="Quick Actions" />
-              <div className="space-y-2">
-                <button
-                  onClick={() => navigate('/achievements')}
-                  className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-teal-600 transition-colors"
-                >
-                  <span className="flex items-center gap-3 text-sm font-medium text-white">
-                    <Trophy className="w-5 h-5 text-amber-400" />
-                    View Achievements
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-slate-500" />
-                </button>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl bg-slate-800 border border-slate-700 hover:border-red-600 transition-colors text-sm font-medium text-red-400"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Sign Out
-                </button>
-              </div>
-            </div>
 
           </div>
 

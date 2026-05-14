@@ -4,7 +4,6 @@ import {
   Home, FileText, PenLine, BookOpen, BarChart2,
   Lightbulb, Award, ClipboardList, User, ChevronDown,
 } from 'lucide-react'
-import SidebarHeader from './SidebarHeader'
 import SidebarFooter from '../gamification/SidebarFooter'
 
 const MOCK_EXAMS = ['Mock Exam 1', 'Mock Exam 2']
@@ -33,7 +32,16 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden md:flex md:flex-col h-full flex-shrink-0 md:w-14 lg:w-60 overflow-hidden transition-all duration-200 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700">
-      <SidebarHeader />
+      <div className="flex items-center justify-center lg:justify-start lg:px-3 py-4 flex-shrink-0">
+        <img
+          src="/icons/manifest-icon-192.maskable.png"
+          alt="PT Lingo"
+          className="w-8 h-8 rounded-lg object-contain flex-shrink-0"
+        />
+        <span className="hidden lg:inline ml-2 text-sm font-bold text-white">
+          PT <span className="font-normal text-slate-400">Lingo</span>
+        </span>
+      </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-0 py-2 space-y-0.5">

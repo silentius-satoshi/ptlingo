@@ -512,7 +512,7 @@ export default function ThePathPage() {
 
       {/* Right stats column — desktop only */}
       <aside
-        className="hidden md:flex flex-col w-80 flex-shrink-0 sticky top-0 h-screen overflow-y-auto pl-4 pr-2 py-4 gap-3"
+        className="hidden md:flex flex-col w-80 flex-shrink-0 sticky top-0 h-screen overflow-y-auto pl-4 pr-0 py-4 gap-3 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-slate-600"
       >
         <PathStatsPanel
           visibleSection={bannerSection}
