@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────
+# PT Lingo — Commit Message
+# ─────────────────────────────────────────────
+# Format: <type>: <description>
+# Types: Step | Fix | Feature | Polish | Refactor | Docs | Chore
+#
+# Examples:
+#   Step 42: Nostr onboarding flow — Path A/B/C/D
+#   Fix: quarantined filter missing from review queue fetch
+#   Feature: PathStatsPanel desktop right column
+#
+# ─────────────────────────────────────────────
+# CLAUDE.md: updated / not needed / TODO
+# ─────────────────────────────────────────────
+# If updated, confirm:
+#   [ ] Completed steps table reflects this change
+#   [ ] Current State section is accurate
+#   [ ] New architectural decisions documented
+#   [ ] New bug patterns / fixes captured
+#   [ ] Next available step updated
+# ─────────────────────────────────────────────
