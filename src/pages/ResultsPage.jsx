@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useUiStore } from '../store/uiStore'
 import CountdownRing from '../components/exam/CountdownRing'
 import RationalePanel from '../components/exam/RationalePanel'
+import QuestionImage from '../components/exam/QuestionImage'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import useGamificationStore from '../stores/gamificationStore'
 import { getSystemConfig } from '../constants/systemConfig'
@@ -238,7 +239,7 @@ export default function ResultsPage() {
         if (sess.question_ids?.length > 0) {
           const { data: qs, error: qErr } = await supabase
             .from('questions')
-            .select('id, stem, choices, subject, section, difficulty, correct_index, rationale, rationale_map')
+            .select('id, stem, choices, subject, section, question_number, difficulty, correct_index, rationale, rationale_map, image_url')
             .in('id', sess.question_ids)
             .eq('quarantined', false)
           if (qErr) throw qErr
@@ -938,6 +939,7 @@ export default function ResultsPage() {
                                 <p className="text-sm leading-relaxed text-slate-800 dark:text-slate-100 font-[450]">
                                   {q.stem}
                                 </p>
+                                <QuestionImage src={q.image_url} className="mt-3" maxHeightClass="max-h-64" />
                               </div>
                               <RationalePanel question={q} selectedAnswer={q.userAnswer} />
                             </div>

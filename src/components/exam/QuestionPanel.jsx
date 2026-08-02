@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react'
+import QuestionImage from './QuestionImage'
 
 // Walk all text nodes in container to convert a (node, offset) DOM position
 // into an absolute character offset within the container's plain text.
@@ -162,6 +163,9 @@ export default function QuestionPanel({
             )
           )}
         </p>
+
+        {/* Exhibit (media-dependent items) */}
+        <QuestionImage src={question.image_url} className="mt-4" />
       </div>
     </div>
   )

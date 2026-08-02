@@ -578,7 +578,28 @@ export default function ExamPage() {
     scheduleSave()
   }, [currentQuestionId, highlights, setHighlights, scheduleSave])
 
-  const goTo = useCallback((index) => {
+  // ── Section-locked navigation (mock-exam fidelity) ─────────────────────────
+  // On the real NPTE you move freely WITHIN the current section but can never
+  // cross a section boundary from the navigation UI — earlier sections are
+  // closed, later ones not yet open. Bounds are held in a ref so goTo keeps a
+  // stable identity. Sections only advance through the break flow, which
+  // passes force: true.
+  const sectionBoundsRef = useRef(null)
+  const sectionBounds = useMemo(() => {
+    if (readOnly || type !== 'exam' || sectionEnds.size === 0) return null
+    const ends = [...sectionEnds].sort((a, b) => a - b)
+    let start = 0
+    for (const e of ends) {
+      if (currentIndex <= e) return { start, end: e }
+      start = e + 1
+    }
+    return { start, end: questions.length - 1 }
+  }, [readOnly, type, sectionEnds, currentIndex, questions.length])
+  useEffect(() => { sectionBoundsRef.current = sectionBounds }, [sectionBounds])
+
+  const goTo = useCallback((index, { force = false } = {}) => {
+    const b = sectionBoundsRef.current
+    if (!force && b && (index < b.start || index > b.end)) return
     setCurrentIndex(index)
     scheduleSave({ current_index: index })
     setFocusedChoice(null)
@@ -636,7 +657,9 @@ export default function ExamPage() {
     setBreakSection(null)
     const idx = breakResumeIndexRef.current
     breakResumeIndexRef.current = null
-    if (idx != null) goTo(idx)
+    // force: the break flow is the ONE legitimate way a section boundary is
+    // crossed — section-locked navigation would otherwise block this jump.
+    if (idx != null) goTo(idx, { force: true })
     // Re-anchor the persisted deadline the instant the clock restarts. Passed
     // explicitly because clockPausedRef is updated by an effect and still holds
     // its pre-resume value at this point in the handler. Harmless on an
@@ -1098,6 +1121,7 @@ export default function ExamPage() {
                     marked={marked}
                     currentIndex={currentIndex}
                     onJump={goTo}
+                    bounds={sectionBounds}
                   />
                 )}
                 {toolbarPanel === 'calculator' && <Calculator />}
@@ -1146,6 +1170,7 @@ export default function ExamPage() {
           total={questions.length}
           onPrev={goPrev}
           onNext={goNext}
+          minIndex={sectionBounds?.start ?? 0}
         />
       )}
 
@@ -1180,7 +1205,8 @@ export default function ExamPage() {
               setBreakSection(null)
               const idx = breakResumeIndexRef.current
               breakResumeIndexRef.current = null
-              if (idx != null) goTo(idx)
+              // force: declining the offered break still advances the section.
+              if (idx != null) goTo(idx, { force: true })
             }}
           >
             Continue Exam
@@ -1324,6 +1350,7 @@ export default function ExamPage() {
         marked={marked}
         currentIndex={currentIndex}
         onJump={handleMobileJump}
+        bounds={sectionBounds}
         questionNumber={currentIndex + 1}
         note={currentNote}
         onChange={handleNoteChange}

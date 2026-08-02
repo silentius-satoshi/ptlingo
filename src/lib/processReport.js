@@ -50,8 +50,13 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
     return {
       idx,
       qid: q.id,
+      // question_number lets offline analysis join each item back to the
+      // source form text (e.g. for work-activity classification, which the
+      // app's data cannot express).
+      question_number: q.question_number ?? null,
       section: q.section != null ? Number(q.section) : 1,
       subject: q.subject ?? null,
+      difficulty: q.difficulty ?? null,
       answered,
       correct_index: q.correct_index ?? null,
       correct: answered !== null && answered === q.correct_index,
@@ -96,6 +101,22 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
       return { subject: j, n: items.length, correct: c, raw_pct: pct1(c, items.length) }
     })
     .sort((a, b) => (a.raw_pct ?? 0) - (b.raw_pct ?? 0))
+
+  const difficulties = [...new Set(perItem.map((it) => it.difficulty).filter(Boolean))]
+  const scoreByDifficulty = difficulties.map((d) => {
+    const items = perItem.filter((it) => it.difficulty === d)
+    const c = items.filter((it) => it.correct).length
+    return { difficulty: d, n: items.length, correct: c, raw_pct: pct1(c, items.length) }
+  })
+
+  const markedItems = perItem.filter((it) => it.marked)
+  const unmarkedItems = perItem.filter((it) => !it.marked)
+  const markedSplit = {
+    marked:   { n: markedItems.length,   correct: markedItems.filter((it) => it.correct).length,
+                raw_pct: pct1(markedItems.filter((it) => it.correct).length, markedItems.length) },
+    unmarked: { n: unmarkedItems.length, correct: unmarkedItems.filter((it) => it.correct).length,
+                raw_pct: pct1(unmarkedItems.filter((it) => it.correct).length, unmarkedItems.length) },
+  }
 
   const scoreFlags = scoreBySection
     .filter((r) => r.raw_pct != null && rawPct != null && rawPct - r.raw_pct > 8)
@@ -278,6 +299,8 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
       raw_pct: rawPct,
       by_section: scoreBySection,
       by_subject: scoreBySubject,
+      by_difficulty: scoreByDifficulty,
+      marked_split: markedSplit,
       flags: scoreFlags,
     },
 
@@ -286,6 +309,11 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
       over_ceiling_150s: overCeiling,
       rushed_under_30s: rushed,
       by_section: pacingBySection,
+      by_subject: subjects.map((j) => {
+        const t = perItem.filter((it) => it.subject === j).map((it) => it.seconds)
+        return { subject: j, n: t.length, median_seconds: median(t),
+                 over_ceiling_150s: t.filter((x) => x > 150).length }
+      }),
       flags: pacingFlags,
     },
 

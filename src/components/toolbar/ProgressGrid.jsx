@@ -8,7 +8,11 @@ function boxClass(isAnswered, isMarked, isCurrent) {
   return 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'
 }
 
-export default function ProgressGrid({ questions, answers, marked, currentIndex, onJump }) {
+// `bounds` ({ start, end }, 0-indexed, inclusive) section-locks the grid for
+// mock-exam mode: items outside the current section are visible (the overall
+// map stays informative) but not navigable — the real exam never allows a
+// jump across a section boundary. Omit bounds for quiz/review behavior.
+export default function ProgressGrid({ questions, answers, marked, currentIndex, onJump, bounds }) {
   const total      = questions.length
   const answered   = questions.filter((q) => answers[q.id] !== undefined).length
   const markedCount = marked.length
@@ -33,15 +37,19 @@ export default function ProgressGrid({ questions, answers, marked, currentIndex,
             const isAnswered = answers[q.id] !== undefined
             const isMarked   = marked.includes(q.id)
             const isCurrent  = i === currentIndex
+            const isLocked   = bounds != null && (i < bounds.start || i > bounds.end)
 
             return (
               <button
                 key={q.id}
-                onClick={() => onJump(i)}
-                title={`Question ${i + 1}${isMarked ? ' (marked)' : ''}${isAnswered ? ' (answered)' : ''}`}
+                onClick={isLocked ? undefined : () => onJump(i)}
+                disabled={isLocked}
+                title={isLocked
+                  ? `Question ${i + 1} — locked (outside current section)`
+                  : `Question ${i + 1}${isMarked ? ' (marked)' : ''}${isAnswered ? ' (answered)' : ''}`}
                 className={`aspect-square rounded text-[9px] font-bold transition-all flex items-center justify-center ${boxClass(isAnswered, isMarked, isCurrent)} ${
                   isCurrent ? 'text-blue-600 dark:text-blue-400' : isMarked || isAnswered ? 'text-white' : 'text-slate-500 dark:text-slate-400'
-                }`}
+                } ${isLocked ? 'opacity-30 cursor-not-allowed' : ''}`}
               >
                 {i + 1}
               </button>

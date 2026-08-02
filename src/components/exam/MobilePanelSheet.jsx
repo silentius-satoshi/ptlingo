@@ -8,7 +8,7 @@ const TITLES = { progress: 'Progress', calculator: 'Calculator', notes: 'Notes' 
 
 export default function MobilePanelSheet({
   panel, onClose,
-  questions, answers, marked, currentIndex, onJump,
+  questions, answers, marked, currentIndex, onJump, bounds,
   questionNumber, note, onChange,
 }) {
   return (
@@ -51,7 +51,7 @@ export default function MobilePanelSheet({
               {panel === 'progress' && (
                 <ProgressGrid
                   questions={questions} answers={answers} marked={marked}
-                  currentIndex={currentIndex} onJump={onJump}
+                  currentIndex={currentIndex} onJump={onJump} bounds={bounds}
                 />
               )}
               {panel === 'calculator' && <Calculator />}

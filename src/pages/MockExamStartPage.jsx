@@ -40,7 +40,11 @@ export default function MockExamStartPage() {
         .select('id, section')
         .eq('exam_series', series)
         .eq('quarantined', false)
+        // Secondary sort matters: section alone leaves within-section order to
+        // Postgres, which serves items in arbitrary (insertion) order. The form
+        // should run in its own question order.
         .order('section', { ascending: true })
+        .order('question_number', { ascending: true })
 
       if (qErr) throw qErr
 

@@ -20,6 +20,8 @@ Object.entries(SECTION_SIZES).forEach(([sec, count]) => {
       id: `q-${sec}-${i}`,
       section: Number(sec),
       subject: i % 3 === 0 ? 'Neuromuscular' : 'Musculoskeletal',
+      difficulty: ['Easy', 'Medium', 'Hard'][i % 3],
+      question_number: (Number(sec) - 1) * 45 + i + 1,
       correct_index: 2,
     })
   }
@@ -112,6 +114,12 @@ ok(r0.answer_changes.total === 0 && r0.answer_changes.net === 0 && r0.answer_cha
 ok(r0.score.correct === 0 && r0.score.unanswered === 218, 'all-blank session handled')
 ok(buildProcessReport({ session: null, questions, changeLog: [] }) === null, 'null session → null')
 ok(buildProcessReport({ session, questions: [], changeLog: [] }) === null, 'no questions → null')
+
+// ── FSBPT-style breakdowns ──
+ok(r.raw.per_item[0].question_number === 1 && r.raw.per_item[0].difficulty === 'Easy', 'per_item carries question_number + difficulty for offline joins')
+ok(r.score.by_difficulty.length === 3 && r.score.by_difficulty.reduce((a, d) => a + d.n, 0) === 218, 'difficulty breakdown covers all items')
+ok(r.score.marked_split.marked.n + r.score.marked_split.unmarked.n === 218, 'marked split partitions the form')
+ok(r.pacing.by_subject.length === 2 && r.pacing.by_subject.every((s) => s.median_seconds != null), 'pacing by subject computed')
 
 // change record with null correct_index falls back to the question row
 const rFallback = buildProcessReport({

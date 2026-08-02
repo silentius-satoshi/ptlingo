@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getSystemConfig } from '../../constants/systemConfig'
+import QuestionImage from './QuestionImage'
 
 const LETTERS = ['A', 'B', 'C', 'D']
 
@@ -80,6 +81,7 @@ export default function CasualQuizView({
             <p className="text-white leading-relaxed" style={{ fontSize: 15, fontWeight: 500 }}>
               {question?.stem ?? ''}
             </p>
+            <QuestionImage src={question?.image_url} className="mt-2" maxHeightClass="max-h-32" />
           </div>
         </div>
       </div>
