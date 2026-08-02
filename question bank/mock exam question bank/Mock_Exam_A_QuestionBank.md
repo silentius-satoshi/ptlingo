@@ -1,4 +1,742 @@
-# Series 3 Form A – Mock Exam A Complete (All 5 Sections)
+# NPTE Series 3 — Form A: Complete Question Bank
+
+**Retired Form A study guide — all 5 sections, 224 items.**
+Questions are numbered continuously, Q1–Q225, matching the Form B bank.
+Section 4 has 44 items: its item 26 (**Q161**) was never captured in the source screenshots and does not exist in any file.
+
+Options are lettered A–D. The source software numbers them 1–4; the mapping is 1→A, 2→B, 3→C, 4→D.
+Every answer key in this document has been verified item-by-item against the original
+`Series 3.A Answers copy` screenshots.
+
+| Section | Questions | Items |
+|---|---|---|
+| 1 | Q1–Q45 | 45 |
+| 2 | Q46–Q90 | 45 |
+| 3 | Q91–Q135 | 45 |
+| 4 | Q136–Q180 | 44 (no Q161) |
+| 5 | Q181–Q225 | 45 |
+
+---
+
+## Section 1 — Questions Q1–Q45
+
+---
+
+**Q1.** A patient who is 8 months pregnant has an abdominal diastasis recti with a separation of 1.5 inches (3.8 cm). Which of the following exercises would be **MOST** appropriate **INITIALLY** for abdominal strengthening in a supine position?
+
+A. Trunk curls
+B. Hooklying head lifts
+C. Pelvic-tilt leg sliding
+D. Bilateral leg lowering
+
+**Correct Answer:**
+- **B.** Supine hooklying head lifts emphasize the rectus abdominis muscle and are least likely to increase the separation of the diastasis recti (p. 947).
+
+**Incorrect Answers:**
+- **A.** Trunk curls are contraindicated for a patient who has diastasis recti (p. 948).
+- **C.** Pelvic-tilt leg sliding is more advanced than head lifts and would not be the most appropriate exercise to use initially (p. 947).
+- **D.** Bilateral leg-lowering is an advanced abdominal strengthening exercise that causes excessive low back strain and should not be performed during pregnancy (p. 951).
+
+---
+
+**Q2.** A patient with a chronic stroke walks with a hemiparetic gait pattern at a velocity of 1.31 ft (0.4 m)/second. Which of the following interventions will **MOST** improve the patient's gait speed?
+
+A. Practicing individual components of walking
+B. Body-weight supported gait training at fast speeds
+C. Body-weight supported gait training at slow speeds
+D. Hip flexor and plantar flexor muscle strength training
+
+**Correct Answer:**
+- **B.** Studies support the effectiveness of body-weight supported gait training for improving the gait speed of individuals who have chronic stroke. Additionally, practicing at a fast speed produces greater gains in gait speed, compared to practicing at slower speeds.
+
+**Incorrect Answers:**
+- **A.** Practicing components of walking in isolation is not as effective as practicing the entire task of gait for improving gait speed.
+- **C.** Practicing at a fast speed produces greater gains in gait speed, compared to practicing at slower speeds.
+- **D.** Improving muscle strength and power by resistance training is not associated with improved gait speeds in patients who have chronic stroke.
+
+---
+
+**Q3.** A physical therapist is positioning a patient for postural drainage. To **BEST** drain the posterior segment of both lower lobes, the patient should be placed in which of the following positions?
+
+A. Prone, head down at a 45° angle
+B. Supine, flat surface
+C. Sidelying, head elevated at a 30° angle
+D. Sitting, leaning forward
+
+**Correct Answer:**
+- **A.** The best position for draining the posterior segment of both lower lobes would be prone lying with the head down and the lower extremities and hips elevated to about 45°.
+
+**Incorrect Answers:**
+- **B.** Supine on a flat surface is the position used to drain the anterior segments of the upper lobes.
+- **C.** Sidelying with the head elevated is not a standard position used in postural drainage. Sidelying with the head down is used to drain the lateral segments of the lower lobes.
+- **D.** Sitting while leaning forward is the position used for draining the apical segments of the upper lobes.
+
+---
+
+**Q4.** A patient who has right hemiplegia is unable to avoid obstacles on the right side of the hallway while walking with a walker. During meals, the patient does not eat foods placed on the right side of the plate. Which of the following tests is **MOST** appropriate to perform?
+
+A. Patient looks at a fixed target in front while turning the head side to side.
+B. Patient detects therapist's fingers from the side while looking straight ahead.
+C. Patient shifts gaze from one object to another quickly with the head stationary.
+D. Patient tracks therapist's finger moving vertically, horizontally, and diagonally.
+
+**Correct Answer:**
+- **B.** Ignoring foods on one side of a plate and difficulty orienting to stimuli in a specific area of space are symptoms of visual field loss. Disruption of the sensory input provided by the optic nerve (CN II) will result in loss of vision in some or all of a field of view. To examine the visual field, the examiner brings his or her fingers from behind the patient's head at eye level while the patient looks straight ahead.
+
+**Incorrect Answers:**
+- **A.** A test that involves moving the head rapidly while focusing on a fixed target directly in front is used to examine function of the vestibuloocular reflex (VOR).
+- **C.** Shifting gaze back and forth quickly between two targets is a test for saccadic eye movement.
+- **D.** A test that involves following a moving target in different directions is used to assess pursuits, which stimulate all pairs of eye muscles.
+
+---
+
+**Q5.** A patient has difficulty palpating the carotid pulse during exercise. The patient should be instructed in alternate methods of self-monitoring, because repeated palpation is likely to result in:
+
+A. an increase in the heart rate.
+B. a decrease in the heart rate.
+C. an irregular heart rhythm.
+D. an increase in blood pressure.
+
+**Correct Answer:**
+- **B.** Manual pressure on the carotid sinus can cause a reflexive drop in heart rate, blood pressure, or both.
+
+**Incorrect Answers:**
+- **A.** Heart rate is expected to decrease, not increase when the carotid sinus is overstimulated.
+- **C.** Heart rate, not rhythm, is expected to change due to manual pressure on the carotid sinus.
+- **D.** Blood pressure is expected to decrease, not increase, due to pressure on the carotid sinus.
+
+---
+
+**Q6.** A physical therapist is monitoring the exercise of a patient who has type 1 diabetes. The patient's blood glucose level would be **BEST** for safe exercise at which of the following values?
+
+A. 60 mg/dL (3.3 mmol/L)
+B. 175 mg/dL (9.7 mmol/L)
+C. 260 mg/dL (14.4 mmol/L)
+D. 345 mg/dL (19.1 mmol/L)
+
+**Correct Answer:**
+- **B.** Patients who have type 1 diabetes use insulin. Blood glucose levels should be between 100 and 250 mg/dL for patient safety.
+
+**Incorrect Answers:**
+- **A.** A blood glucose level of 60 mg/dL (3.3 mmol/L) is considered hypoglycemic and is not safe for exercise.
+- **C.** A blood glucose level of 260 mg/dL (14.4 mmol/L) is hyperglycemic and is not safe for exercise.
+- **D.** A blood glucose level of 345 mg/dL (19.1 mmol/L) is hyperglycemic and is not safe for exercise.
+
+---
+
+**Q7.** [The photographs show a reflex being tested at the plantar surface of the foot.] A physical therapist is conducting a reflex text as shown in the photographs. The arrow indicates the path of the applied stimulus. The results of the test are **MOST** likely to indicate:
+
+A. a peripheral nerve injury.
+B. a lesion of the anterior horn cells.
+C. a normal response.
+D. an injury to the spinal cord.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 1/Q7.png`.
+
+**Correct Answer:**
+- **D.** The therapist is testing for a positive Babinski sign. When the Babinski sign is positive, the toes flare at the end of the test. The presence of a positive Babinski sign indicates an upper motor neuron lesion such as a spinal cord injury.
+
+**Incorrect Answers:**
+- **A.** The presence of a positive Babinski sign indicates an upper motor neuron lesion such as a spinal cord injury. Peripheral nerve injuries are lower motor neuron lesions.
+- **B.** The presence of a positive Babinski sign indicates an upper motor neuron lesion such as a spinal cord injury. Lesions of the anterior horn cells are lower motor neuron lesions.
+- **C.** The presence of a positive Babinski response is indicative of an upper motor neuron lesion, which is not normal. If no upper motor neuron lesion is present, the toes will flex.
+
+---
+
+**Q8.** A patient with the diagnosis of astrocytoma malignancy is receiving physical therapy in the patient's home. While sitting in a chair at the dining room table, the patient begins to have a grand mal seizure. The physical therapist lowers the patient to the floor. Which of the following actions is the **MOST** appropriate **NEXT** step for the therapist?
+
+A. Activate the emergency response system.
+B. Protect the patient from biting the tongue by inserting a tongue blade.
+C. Roll the patient to a sidelying position.
+D. Extend the patient's neck for airway clearance.
+
+**Correct Answer:**
+- **C.** During a seizure, injury should be prevented. Rolling the patient to sidelying position will help prevent aspiration.
+
+**Incorrect Answers:**
+- **A.** Activating the emergency response system is not the first step and may not be indicated until further assessment is completed after the seizure.
+- **B.** There is no need to try to keep the patient from biting the tongue or to insert an object into the mouth, which could cause damage to the patient's teeth.
+- **D.** Extending the patient's neck for airway clearance is not an appropriate response when a patient is having a seizure.
+
+---
+
+**Q9.** In the capsular pattern associated with adhesive capsulitis of the shoulder, the **GREATEST** percentage of loss of range of motion is in:
+
+A. medial (internal) rotation, followed by lateral (external) rotation.
+B. lateral (external) rotation, followed by abduction and medial (internal) rotation.
+C. abduction, followed by lateral (external) rotation and medial (internal) rotation.
+D. medial (internal) rotation, followed by abduction.
+
+**Correct Answer:**
+- **B.** Classic glenohumeral capsular pattern has the greatest loss of range of motion in lateral (external) rotation followed by abduction and medial (internal) rotation.
+
+**Incorrect Answers:**
+- **A.** In adhesive capsulitis, lateral (external) rotation is typically more limited than medial (internal) rotation.
+- **C.** In adhesive capsulitis, lateral (external) rotation is typically more limited than abduction.
+- **D.** In adhesive capsulitis, abduction is typically more limited than medial (internal) rotation.
+
+---
+
+**Q10.** Small-amplitude oscillations performed at the limit of the available motion and into tissue resistance would be **MOST** appropriate to address which of the following end-feels?
+
+A. Bony
+B. Empty
+C. Spasm
+D. Capsular
+
+**Correct Answer:**
+- **D.** Small-amplitude oscillations performed at the limit of the available motion and into tissue resistance describes Grade IV joint mobilization. Grade IV mobilizations are appropriate to address restrictions associated with capsular end-feels.
+
+**Incorrect Answers:**
+- **A.** Manual techniques are not appropriate for bony end-feels.
+- **B.** Manual techniques are not appropriate for empty end-feels.
+- **C.** Manual techniques are not appropriate for spasm end-feels.
+
+---
+
+**Q11.** The physical therapist for a college track team is evaluating a hurdler. One week earlier, the patient had to stop suddenly during a race because of sharp, severe buttock pain. The patient now reports swelling in the buttock and pain with straight-leg raising and resisted knee flexion. The **MOST** likely cause of this patient's symptoms is an avulsion fracture at the:
+
+A. ischial tuberosity.
+B. inferior pubic ramus.
+C. lesser trochanter.
+D. anterior inferior iliac spine.
+
+**Correct Answer:**
+- **A.** An avulsion fracture of the ischial tuberosity is usually associated with an acute traumatic incident. The pain is usually local but may also radiate down the thigh. Active or resisted knee flexion would increase the pain.
+
+**Incorrect Answers:**
+- **B.** Inferior pubic ramus fractures are associated with a gradual onset of groin pain that increases with weight-bearing and walking.
+- **C.** Fractures in the trochanter region are associated with groin pain and tenderness in the area.
+- **D.** Anterior inferior iliac spine fractures would not be associated with buttock pain or pain with resisted knee flexion, because the muscles that attach at these locations are the knee extensors and hip flexors.
+
+---
+
+**Q12.** A 22-year-old patient is hospitalized awaiting a lung transplant due to cystic fibrosis. The patient's physician is interested in an objective measure of the patient's preoperative endurance. Which of the following tests is **MOST** appropriate for the physical therapist to administer to this patient?
+
+A. VO₂ Max Treadmill Test
+B. Two-Step Exercise Test
+C. Submaximal Exercise Test on a cycle ergometer
+D. 6-Minute Walk Test
+
+**Correct Answer:**
+- **D.** The 6-Minute Walk Test is designed to measure endurance for acutely ill individuals who have cardiovascular and pulmonary dysfunction (Hillegass, pp. 683, 688).
+
+**Incorrect Answers:**
+- **A.** The VO₂ Max Treadmill Test examines functional cardiovascular capacity, not necessarily endurance (Kauffman, pp. 37-38).
+- **B.** The Two-Step Exercise Test is the clinical standard for assessing exercise-induced ischemia. While taking this test, it is possible to reach VO₂ max or near VO₂ max, which is not the most appropriate clinical situation for the patient described in the stem. (Ehrman, p. 61)
+- **C.** The Submaximal Exercise Test is used to help estimate VO₂ max and assessed aerobic power, not endurance (Miller, pp. 114-117).
+
+---
+
+**Q13.** A patient suspected of having hypoglycemia is **MOST** likely to show which of the following signs?
+
+A. Fruity smelling breath
+B. Thirst, nausea, and vomiting
+C. Dry, crusty mucous membranes
+D. Difficulty speaking and concentrating
+
+**Correct Answer:**
+- **D.** A common mental state manifestation of hypoglycemia is difficulty speaking and concentrating.
+
+**Incorrect Answers:**
+- **A.** Fruity smelling breath is a sign of hyperglycemia and not a sign of hypoglycemia.
+- **B.** Thirst, nausea, and vomiting are all signs of hyperglycemia and not signs of hypoglycemia.
+- **C.** Dry, crusty mucous membranes are a sign of hyperglycemia and not a sign of hypoglycemia.
+
+---
+
+**Q14.** Upon removal of a wet-to-dry dressing from a patient's draining wound, a physical therapist observes that the skin immediately surrounding the wound is macerated. What should the therapist recommend for future wound care?
+
+A. Continue using the current dressing type.
+B. Change to a more absorbent dressing.
+C. Leave the dressing on longer between dressing changes.
+D. Change to a pressure-type dressing.
+
+**Correct Answer:**
+- **B.** If a wound is too moist, periwound tissue might become macerated. Macerated skin is more fragile than healthy skin (pp. 27-28). A draining wound should be covered with a dressing that absorbs moisture well enough to protect periwound tissue from maceration. (p. 140)
+
+**Incorrect Answers:**
+- **A.** If a wound develops periwound maceration, healing will be impaired (p. 27). The dressing type should be changed to prevent maceration. (p. 140)
+- **C.** Maceration indicates that the dressing is not absorbent enough to control the wound drainage. Leaving the current dressing on for longer periods of time will worsen the maceration. The dressing type should be changed, or the current dressing should be changed more frequently. (p. 140)
+- **D.** If skin is macerated, the dressing should be changed to a more absorbent type, not one that increases pressure (p. 140).
+
+---
+
+**Q15.** A patient who has a T₇ spinal cord injury (ASIA Impairment Scale D) exhibits decreased motor function in the right lower extremity and loss of pain sensation over the left distal trunk and lower extremity. Which of the following syndromes is **MOST** likely present?
+
+A. Central cord
+B. Anterior cord
+C. Posterior cord
+D. Brown-Séquard
+
+**Correct Answer:**
+- **D.** The patient has decreased motor function on one side and loss of pain sensation several levels below the level of the lesion, on the opposite side, consistent with Brown-Séquard syndrome. This syndrome is characterized by ipsilateral loss of motor function and position sense and contralateral loss of pain sensation several levels below the lesion. (Umphred p. 462)
+
+**Incorrect Answers:**
+- **A.** The patient has decreased motor function on one side and loss of pain sensation several levels below the level of the lesion, on the opposite side. In central cord syndrome, there is damage to the most central aspects of the spinal cord and there is characteristically more severe neurological involvement and impairment of function in the upper extremities than in the lower extremities. Varying degrees of sensory impairment occur but tend to be less severe than motor deficits. (Umphred, p. 462; O'Sullivan, p. 894)
+- **B.** The patient has decreased motor function on one side and loss of pain sensation several levels below the level of the lesion, on the opposite side. Anterior cord syndrome or anterior spinal artery syndrome is characterized by loss of motor function and loss of the sense of pain and temperature bilaterally below the level of the lesion (O'Sullivan, p. 894; Umphred, p. 462).
+- **C.** The patient has decreased motor function on one side and loss of pain sensation several levels below the level of the lesion, on the opposite side. Posterior cord syndrome is rare, and the clinical picture includes preservation of motor function, sense of pain, and light touch. There is loss of proprioception, stereognosis, two-point discrimination, and vibration below the level of the lesion. (Umphred, p. 462; O'Sullivan, p. 894)
+
+---
+
+**Q16.** A physical therapist is evaluating a patient who has a vascular lesion in the brainstem affecting the oculomotor nerve (CN III). During the cranial nerve examination, which of the following signs would be the **MOST** significant?
+
+A. Inability to close the eyelid
+B. Medial strabismus
+C. Ptosis of the eyelid
+D. Difficulty looking inferomedially
+
+**Correct Answer:**
+- **C.** The oculomotor nerve (CN III) innervates the levator palpebrae superioris muscle which elevates the upper eyelid, and the pupillary constrictor muscle. Therefore, a lesion of the oculomotor nerve would make it difficult, if not impossible, for the patient to fully raise the lid (open the eye) and would cause a condition termed ptosis.
+
+**Incorrect Answers:**
+- **A.** Inability to fully close the eye would be seen with a lesion of the facial nerve (CN VII) (Bell palsy).
+- **B.** Medial strabismus would be caused by damage to the abducent nerve (CN VI), innervating the lateral rectus, causing a medial strabismus.
+- **D.** Difficulty looking inferomedially is due to a trochlear nerve (CN IV) problem.
+
+---
+
+**Q17.** A patient demonstrates a right thoracolumbar scoliosis in standing position but no scoliosis in sitting position. Which of the following dysfunctions is **MOST** likely the cause of the patient's scoliosis?
+
+A. Lumbar facet dysfunction
+B. Unilaterally weak gluteus medius
+C. Short iliopsoas muscle
+D. Leg-length discrepancy
+
+**Correct Answer:**
+- **D.** Leg length discrepancy is correct because when the patient is sitting, the leg length does not affect the spinal posture; however, a leg length discrepancy could affect posture in standing position.
+
+**Incorrect Answers:**
+- **A.** A facet dysfunction would remain in sitting and in standing position.
+- **B.** A weak gluteus medius would result in more problems during gait or movement.
+- **C.** Although the iliopsoas is passively shortened in sitting position, a short iliopsoas is not a common cause of scoliosis, especially not thoracolumbar scoliosis.
+
+---
+
+**Q18.** Which of the following methods is **MOST** appropriate for handling a 1-year-old child who has cerebral palsy and who exhibits strong extensor tone in the trunk and extremities?
+
+A. Carrying the child in sitting position
+B. Carrying the child over one's shoulder
+C. Keeping contact with the back of the child's head
+D. Picking the child up under the upper extremities
+
+**Correct Answer:**
+- **A.** The sitting position promotes visual attending, use of the upper extremities, and social interaction (Martin, pp. 98-100). A flexed posture is preferred so the shoulders are forward. A child who exhibits extensor posturing should be carried in a symmetric position that does not allow axial hyperextension and keeps the hips and knees flexed (Palisano).
+
+**Incorrect Answers:**
+- **B.** Carrying the child over one's shoulder would inhibit visual attending and social interaction. It is better to carry the child in such a way that allows the child to look around and see what is ahead. (Martin, p. 101)
+- **C.** Carrying positions should accentuate the strengths of the infant and should avoid as much abnormal posturing as possible. The infant should be allowed to control as much of his or her body as possible for as long as possible before external support is given (Martin, p. 148). Contact to the back of the child's head may facilitate extensor posturing. When carrying a child, one should encourage as much head and trunk control as the child can demonstrate. The child should be carried so that the neck and trunk muscles are used to maintain the head and trunk upright against gravity. This allows the child to look around and see what is ahead. (Martin, p. 101)
+- **D.** Picking the child up under the upper extremities would be more likely to facilitate extensor posturing. The legs stiffen into extension and may even cross or scissor. (Martin, pp. 98, 100)
+
+---
+
+**Q19.** In a research study, a correlation coefficient of 0.30 was found for the relationship between two variables. Which of the following interpretations of this finding is **MOST** appropriate?
+
+A. The variables have a low correlation.
+B. Thirty percent of the variability in one variable can be accounted for by the other variable.
+C. There are no significant differences between the variables.
+D. There is low positive predictive value between the variables.
+
+**Correct Answer:**
+- **A.** A correlation coefficient of 0.26 to 0.49 is considered low (p. 321).
+
+**Incorrect Answers:**
+- **B.** Correlation is not causation. When a high correlation exists, an individual's score on one variable is related to the score of the other variable. A correlation coefficient of 0.30 indicates a low correlation. (pp. 318-319)
+- **C.** Correlation only determines if there is a relationship between two variables. Significant differences are calculated using p values. (p. 272)
+- **D.** Correlation is not used in determining positive predictive values. Positive predictive value is the likelihood that a condition is present if a test has a positive result. (pp. 187-188)
+
+---
+
+**Q20.** A patient recovering from a cervical spine injury is performing stabilization exercises that focus on the lower cervical and upper thoracic extensor muscles. Which of the following exercises would provide the **GREATEST** cervical spine protection?
+
+A. In prone position, elevate the upper extremities in full flexion.
+B. In standing position, reach forward, outward, and upward in functional patterns.
+C. In standing position with no support, perform pushing, pulling, and lifting activities.
+D. In prone position with the upper extremities abducted and laterally (externally) rotated, horizontally abduct the shoulders and adduct the scapulae.
+
+**Correct Answer:**
+- **D.** Prone position provides greater cervical spine support than standing position. Maximal protection is provided by having the upper extremities abducted and laterally (externally) rotated, the shoulders horizontally abducted, and the scapulae adducted, whereas elevating the shoulders in prone position provides moderate to minimum protection.
+
+**Incorrect Answers:**
+- **A.** Elevating the shoulders in prone position provides less protection to the cervical spine than the upper extremities abducted and laterally (externally) rotated, the shoulders horizontally abducted, and the scapulae adducted.
+- **B.** Prone position provides greater cervical spine support than standing position.
+- **C.** Prone position provides greater cervical spine support than standing position.
+
+---
+
+**Q21.** A patient with Guillain-Barré syndrome who is experiencing progressive paralysis is admitted to an intensive care unit. Which of the following interventions is **MOST** appropriate for a physical therapist to perform as a member of the interdisciplinary team managing the patient's care?
+
+A. Alter the patient's mechanical ventilation settings.
+B. Develop the patient's medication schedule.
+C. Perform airway clearance techniques.
+D. Discuss the patient's medical prognosis with the family.
+
+**Correct Answer:**
+- **C.** The key term in this question is "interdisciplinary." Of all the options provided, only airway clearance is within the scope of practice for physical therapists. Patients who have Guillain-Barré syndrome may experience respiratory muscle fatigue or paralysis and are susceptible to pulmonary infection. Pulmonary hygiene is a critical role in their care.
+
+**Incorrect Answers:**
+- **A.** Altering the mechanical ventilator settings would be outside the scope of practice for a physical therapist.
+- **B.** Developing a medication schedule would be outside the scope of practice for a physical therapist.
+- **D.** Discussing the medical prognosis would be outside the scope of practice for a physical therapist.
+
+---
+
+**Q22.** When examining a patient with a history of alcohol abuse, a physical therapist notes that the patient demonstrates fine resting tremors and hyperactive reflexes. The patient reports frequent right upper quadrant pain. Which of the following additional signs is **MOST** likely to be present?
+
+A. Jaundice
+B. Hyperhidrosis
+C. Hypotension
+D. Nocturnal cough
+
+**Correct Answer:**
+- **A.** With a history of alcohol abuse and the presence of fine resting tremors and right upper quadrant pain, the patient is presenting a history and signs and symptoms consistent with liver disease. Jaundice is a skin change associated with disease of the hepatic system. (Goodman, p. 363)
+
+**Incorrect Answers:**
+- **B.** Hyperhidrosis, or excessive sweating, can be present with several conditions, such as endocrine disorders, but is not associated with liver disease (Taber's, p. 1164).
+- **C.** Hypotension is not listed as a sign of liver disorders (Goodman, p. 363).
+- **D.** A nocturnal cough can be associated with rheumatic fever, but is not characteristic of liver disease (Goodman, p. 260).
+
+---
+
+**Q23.** A physical therapist is providing intervention to a patient with lower extremity peripheral neuropathy who is confined to bed. When providing education to the patient and caregivers, which of the following suggestions should the therapist emphasize?
+
+A. Position foam cushions under the calves.
+B. Visually inspect the skin every other day.
+C. Place a soft pillow under the heels.
+D. Change the patient's position every 4 hours.
+
+**Correct Answer:**
+- **A.** Cutaneous areas lacking sensation are at the highest risk for skin breakdown from trauma or pressure. Heels should be elevated off the supporting surfaces. (p. 267)
+
+**Incorrect Answers:**
+- **B.** Visual inspection should occur daily and throughout the day (p. 310).
+- **C.** Individuals with distal neuropathy are at a great risk for development of pressure injuries over weight-bearing surfaces of the feet. Heel pressure on all surfaces should be minimized. (p. 267)
+- **D.** Positioning is dependent on the specific condition of each individual patient. Positioning requires relieving pressure from bony prominences, which is more important than changing positions at timed intervals. (p. 267)
+
+---
+
+**Q24.** A patient with a recent onset of rheumatoid arthritis is **MOST** likely to report which of the following symptoms?
+
+A. Heat intolerance
+B. Malaise and fatigue
+C. Tension headaches
+D. Nausea and diarrhea
+
+**Correct Answer:**
+- **B.** Malaise and fatigue are common symptoms during the beginning stages of rheumatoid arthritis.
+
+**Incorrect Answers:**
+- **A.** Heat intolerance is not associated with rheumatoid arthritis. Heat intolerance is more indicative of metabolic and endocrine dysfunction.
+- **C.** Tension headaches are not associated with rheumatoid arthritis. This type of headache is most often caused by stress or anxiety.
+- **D.** Nausea and diarrhea are not associated with rheumatoid arthritis. Nausea and diarrhea would be more indicative of gastrointestinal dysfunction or another type of systemic illness.
+
+---
+
+**Q25.** A patient with chest pain from myocardial ischemia will **MOST** likely exhibit:
+
+A. increased pain upon chest-wall palpation.
+B. increased pain with deep breathing.
+C. relief with nitroglycerin (Nitrostat).
+D. relief with antacid.
+
+**Correct Answer:**
+- **C.** Nitroglycerin (Nitrostat) is a common vasodilator that is prescribed for patients who have angina. A vasodilator will improve myocardial blood flow and help relieve ischemia and its manifestations.
+
+**Incorrect Answers:**
+- **A.** Increased pain with chest-wall palpation is more indicative of a musculoskeletal origin of pain.
+- **B.** Increased pain with deep breathing is more indicative of a pulmonary origin of pain.
+- **D.** Relief of pain with antacid ingestion is more indicative of referred pain from peptic ulcer disease.
+
+---
+
+**Q26.** A 6-month-old infant who has Erb palsy is **MOST** likely to demonstrate which of the following impairments?
+
+A. Flaccid bilateral upper extremities
+B. Involved forearm positioned in supination
+C. Elbow flexion contracture of the involved arm
+D. Involved arm positioned in shoulder medial (internal) rotation
+
+**Correct Answer:**
+- **D.** Erb palsy is characterized by shoulder weakness resulting in the involved arm postured in medial (internal) rotation of the shoulder.
+
+**Incorrect Answers:**
+- **A.** Erb palsy involves injury to the upper roots of the brachial plexus at C₅ and C₆ and results in unilateral paralysis, not bilateral paralysis.
+- **B.** Erb palsy involves injury to the upper roots of the brachial plexus at C₅ and C₆. Erb palsy results in positioning the affected limb in pronation, not supination.
+- **C.** Erb palsy involves injury to the upper roots of the brachial plexus at C₅ and C₆. It is unilateral and involves paralysis, not spasticity that would result in a contracture.
+
+---
+
+**Q27.** A patient is being evaluated for possible carpal tunnel syndrome, and a nerve conduction velocity test is performed. Which of the following findings would **MOST** strongly support the diagnosis?
+
+A. Decreased latency at the elbow
+B. Decreased latency at the carpal tunnel
+C. Increased latency at the carpal tunnel
+D. Increased latency at the forearm
+
+**Correct Answer:**
+- **C.** Latency is typically increased across the carpal tunnel compression site.
+
+**Incorrect Answers:**
+- **A.** Nerve conduction above and below the local nerve compression is usually normal in a patient who has carpal tunnel syndrome. Therefore, latency at the elbow should be normal, not decreased.
+- **B.** Latency is typically increased, not decreased, across the carpal tunnel compression site.
+- **D.** Nerve conduction above and below the local nerve compression is usually normal in a patient who has carpal tunnel syndrome. Therefore, latency at the forearm should be normal, not increased.
+
+---
+
+**Q28.** A physical therapist is setting up a home program of electrical stimulation for a patient who has Bell palsy. Which of the following muscles should be stimulated as part of the home program?
+
+A. Sternocleidomastoid
+B. Masseter
+C. Temporalis
+D. Frontalis
+
+**Correct Answer:**
+- **D.** Bell palsy involves the facial nerve (CN VII). The frontalis is the only muscle listed that is innervated by the facial nerve (CN VII).
+
+**Incorrect Answers:**
+- **A.** The sternocleidomastoid is innervated by the spinal accessory nerve (CN XI).
+- **B.** The masseter is innervated by the trigeminal nerve (CN V).
+- **C.** The temporalis is innervated by the trigeminal nerve (CN V).
+
+---
+
+**Q29.** To avoid the appearance of increased motion, what movement **MUST** be prevented during goniometric measurement of shoulder abduction?
+
+A. Upward rotation of the scapula
+B. Medial (internal) rotation of the shoulder
+C. Lateral (external) rotation of the shoulder
+D. Lateral flexion of the trunk to the opposite side
+
+**Correct Answer:**
+- **D.** During measurement of shoulder abduction, the trunk should be kept straight. If the patient is allowed to laterally flex the trunk, it will give the appearance of increased shoulder abduction, but the motion would be occurring in the spine and not in the shoulder.
+
+**Incorrect Answers:**
+- **A.** Upward rotation of the scapula would normally accompany the motion of shoulder abduction.
+- **B.** Medial (internal) rotation of the shoulder would decrease the available abduction.
+- **C.** Lateral (external) rotation of the shoulder would normally accompany the motion of shoulder abduction.
+
+---
+
+**Q30.** A patient reports weakness and tingling in the lower extremities over the past 2 weeks. The physical therapist suspects that the patient may have Guillain-Barré syndrome. Which of the following examination findings would **MOST** likely occur with this diagnosis?
+
+A. Hypertonicity in the affected muscles
+B. Presence of clonus with rapid passive foot dorsiflexion
+C. Diminished tendon reflexes
+D. Ataxic gait pattern
+
+**Correct Answer:**
+- **C.** Guillain-Barré syndrome is a lower motor neuron disorder. Diminished reflexes are expected with lower motor neuron disease.
+
+**Incorrect Answers:**
+- **A.** Hypertonicity is expected with upper motor neuron disease. Guillain-Barré syndrome is a lower motor neuron disease and is characterized by flaccidity.
+- **B.** Clonus is expected with upper motor neuron disease. Guillain-Barré syndrome is a lower motor neuron disease and is characterized by hyporeflexia.
+- **D.** Ataxia would be much more common with cerebellar disorders.
+
+---
+
+**Q31.** Cool-down exercises are performed immediately after a general aerobic exercise program **PRIMARILY** to prevent:
+
+A. venous pooling.
+B. cardiac arrhythmia.
+C. decreased body temperature.
+D. muscle tightening.
+
+**Correct Answer:**
+- **A.** During aerobic exercise, vascular dilation occurs in order to optimize blood flow and the venous system relies on muscular pumping in order to return blood back to the heart. Without a cool-down period, there would be no muscular pumping and, therefore, blood would pool in the venous system.
+
+**Incorrect Answers:**
+- **B.** Cardiac arrhythmia may occur during exercise but is not specifically addressed with cool-down exercises.
+- **C.** Cessation of activity by itself would result in a gradual decrease in body temperature, and specific cool-down exercises are not necessary.
+- **D.** Muscle tightening may occur as a result of metabolites accumulating in the circulatory system, but this would occur as a result of the venous pooling.
+
+---
+
+**Q32.** During a five-position grip strength test, the **HIGHEST** grip strength measurement is **MOST** likely to result from use of which handle position of a hand-held dynamometer?
+
+A. 1
+B. 2
+C. 4
+D. 5
+
+**Correct Answer:**
+- **B.** The widest grips (4 and 5) use mostly the flexor digitorum profundus muscle; the smallest grip (1) prevents much use of the flexor digitorum profundus and superficialis because they are maximally shortened. In healthy and motivated patients, maximum grip strength occurs at the second or third grip width.
+
+**Incorrect Answers:**
+- **A.** The smallest grip (1) prevents much use of the flexor digitorum profundus and superficialis because they are maximally shortened.
+- **C.** The widest grips (4 and 5) use mostly the flexor digitorum profundus muscle.
+- **D.** The widest grips (4 and 5) use mostly the flexor digitorum profundus muscle.
+
+---
+
+**Q33.** A patient who has a hiatal hernia is receiving physical therapy. Which of the following exercises would **MOST** likely worsen the symptoms related to the hernia?
+
+A. Wall sits
+B. Overhead press
+C. Bilateral leg lifts
+D. Hamstring stretch
+
+**Correct Answer:**
+- **C.** Individuals who have a hiatal hernia should avoid supine position and avoid the Valsalva maneuver. Bilateral leg lifts must be performed in supine position and require strong contractions of the stomach muscles, encouraging the Valsalva maneuver, which would worsen the hiatal hernia.
+
+**Incorrect Answers:**
+- **A.** Wall sits are performed in an upright position and would not exacerbate a hiatal hernia.
+- **B.** An overhead press is typically performed in seated, semireclined, or standing position and would not exacerbate a hiatal hernia.
+- **D.** Hamstring stretching can be modified to be done in a position other than supine to avoid exacerbating a hiatal hernia.
+
+---
+
+**Q34.** Which of the following subjective reports from a patient with rheumatoid arthritis indicates the need for further medical examination by a physician?
+
+A. Morning pain in both lower extremities
+B. Numbness in both lower extremities
+C. Increased pain during activities of daily living
+D. Warmth and tenderness in the hand joints
+
+**Correct Answer:**
+- **B.** Symmetrical numbness could be indicative of myelopathy from either infectious or neoplastic causes. A patient who has this symptom would require examination by a physician.
+
+**Incorrect Answers:**
+- **A.** Morning pain is a typical finding in rheumatoid arthritis.
+- **C.** Increased pain during activities of daily living is also a typical finding in rheumatoid arthritis.
+- **D.** Tender, warm, swollen joints are typical features of an inflammatory arthritis. If the joint was hot and swollen, it would be suggestive of an infection and would require further medical evaluation.
+
+---
+
+**Q35.** A patient involved in a motor vehicle accident 1 week ago has multiple fractures of the lower extremities and has bilateral non-weight-bearing status. The patient lives with an elderly parent and is scheduled for discharge soon. Which of the following transfers is **MOST** appropriate in this situation?
+
+A. Standing pivot
+B. One-person lift
+C. Sliding board
+D. Two-person lift
+
+**Correct Answer:**
+- **C.** The sliding-board transfer is the best choice of the options because the caregiver is elderly and the patient is non-weight-bearing bilaterally.
+
+**Incorrect Answers:**
+- **A.** The standing-pivot transfer is contraindicated because the patient is non-weight-bearing bilaterally.
+- **B.** A one-person lift would not be the safest or most appropriate option because the patient's primary caregiver will be an elderly parent.
+- **D.** A two-person lift would not be the safest or most appropriate option because the patient's primary caregiver will be one elderly parent.
+
+---
+
+**Q36.** What is the close-packed position of the radiocarpal joint of the wrist?
+
+A. Flexion with ulnar deviation
+B. Flexion with radial deviation
+C. Extension with ulnar deviation
+D. Extension with radial deviation
+
+**Correct Answer:**
+- **D.** The close-packed position for the radiocarpal joint is extension with radial deviation or full extension.
+
+**Incorrect Answers:**
+- **A.** The closed-packed position of the radiocarpal joint of the wrist is extension with radial deviation, not flexion with ulnar deviation.
+- **B.** The closed-packed position of the radiocarpal joint of the wrist is extension with radial deviation, not flexion.
+- **C.** The closed-packed position of the radiocarpal joint of the wrist is extension with radial deviation, not ulnar deviation.
+
+---
+
+**Q37.** In splinting or immobilization, the functional position of the hand includes wrist extension, phalangeal:
+
+A. flexion, and abduction of the thumb (1st digit).
+B. extension, and abduction of the thumb (1st digit).
+C. extension, and adduction of the thumb (1st digit).
+D. flexion, and adduction of the thumb (1st digit).
+
+**Correct Answer:**
+- **A.** The functional position of the wrist and hand describes the position from which the optimal function is most likely to occur. This position is described as: (1) slight wrist extension, (2) slight ulnar deviation, (3) fingers flexed at the MCP, PIP, and DIP joints, and (4) thumb (1st digit) slightly abducted.
+
+**Incorrect Answers:**
+- **B.** The fingers should be flexed, not extended, at the MCP, PIP, and DIP joints in order to promote a functional position.
+- **C.** The fingers should be flexed, not extended, and the thumb (1st digit) should be abducted, not adducted, in order to promote a functional position for the hand.
+- **D.** The thumb (1st digit) should be abducted, not adducted, in order to promote a functional position for the hand.
+
+---
+
+**Q38.** A patient who is being taught a new motor task is **MOST** likely to require full attention to the task and extrinsic feedback during which phase of motor learning?
+
+A. Cognitive
+B. Associative
+C. Autonomous
+D. Expert
+
+**Correct Answer:**
+- **A.** Learning in the first phase of motor learning (the cognitive phase) requires full attention to the task and extrinsic feedback (O'Sullivan, p. 397).
+
+**Incorrect Answers:**
+- **B.** As the task is learned and the patient transitions into the associative phase of learning, feedback can become more intrinsic and less attention to task is required (O'Sullivan, p. 398).
+- **C.** As the task is mastered and the patient transitions into the autonomous phase of learning, feedback is more intrinsic and performance is more automatic (O'Sullivan, pp. 398-399).
+- **D.** The expert stage is the final stage of motor learning in which the body is capable of reacting to all of the internal and external mechanisms that may act on it and less attention to the task is required (Umphred, p. 80).
+
+---
+
+**Q39.** [Video still: a young child stands with feet together on a straight line taped to a carpeted floor, arms at sides, face blurred, appearing to perform a standing balance test.] Which of the following neural structures is **MOST** likely being assessed in the video?
+
+A. Cerebellum
+B. Basal ganglia
+C. Primary motor cortex
+D. Supplementary motor area
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.A Answers copy/Section 1/Q39.mov`.
+
+**Correct Answer:**
+- **A.** Part of the Romberg Test, shown in the video, measures balance which is a primary function of the cerebellum. Ataxia and loss of balance are the most common terms used to describe motor impairments of cerebellar origin (p. 193)
+
+**Incorrect Answers:**
+- **B.** Basal ganglia pathology typically demonstrate several characteristic motor deficits. These include poverty and slowness of movement; involuntary, extraneous movement; and alterations in posture and muscle tone. The Romberg Test measures balance and is not the best test for this neural structure. (p. 195)
+- **C.** The primary motor cortex is the most specific cortical motor area containing the largest concentration of corticospinal neurons that controls contralateral voluntary movements. The Romberg Test measures balance and is not the best test for this neural structure. (p. 190)
+- **D.** The supplementary motor area is located in the frontal lobe and gives rise to axons that directly innervate motor units involved in initiation of movement, simultaneous bilateral grasping movements, sequential tasks, and orientation of the eyes and head. The Romberg Test measures balance and is not the best test for this neural structure. (p. 190)
+
+---
+
+**Q40.** An exercise program following recent closed reduction of an anterior dislocation of the shoulder should **AVOID** which of the following motions?
+
+A. Adduction and medial (internal) rotation
+B. Hyperextension and lateral (external) rotation
+C. Abduction and flexion
+D. Extension and medial (internal) rotation
+
+**Correct Answer:**
+- **B.** With hyperextension and lateral (external) rotation, the humeral head must glide anteriorly due to the convex-concave rule. Both of these motions put additional stress on the anterior capsule via the position of the humeral head during exercise and should be avoided.
+
+**Incorrect Answers:**
+- **A.** Adduction and medial (internal) rotation are acceptable. The patient should avoid combined motions that recreate the mechanism of injury or cause the humeral head to glide anteriorly. With adduction, the humeral head glides superiorly due to the convex-concave rule. With medial (internal) rotation, the humeral head glides posteriorly.
+- **C.** Abduction and flexion are acceptable. The patient should avoid motions that recreate the mechanism of injury or cause the humeral head to glide anteriorly. With abduction, the humeral head glides inferiorly due to the convex-concave rule. With flexion, the humeral head glides posteriorly.
+- **D.** Extension and medial (internal) rotation are acceptable. The patient should avoid motions that recreate the mechanism of injury or cause the humeral head to glide anteriorly. With combined extension and medial (internal) rotation the anterior glide associated with extension will be moderated by the posterior glide associated with medial (internal) rotation.
+
+---
+
+**Q41.** When performing manual lymphatic drainage, which of the following techniques is **MOST** appropriate to use?
+
+A. Decongest the distal segments before progressing to the proximal segments.
+B. Decongest the involved trunk quadrant before decongesting the involved limb.
+C. Decongest proximal segments before decongesting the involved trunk quadrant.
+D. Decongest distal portions of the involved limb before decongesting the involved trunk quadrant.
+
+**Correct Answer:**
+- **B.** When performing manual lymphatic drainage, the therapist must decongest the involved trunk quadrant before decongesting the involved limb from proximal to distal locations. This is done to direct the flow of the lymphatics centrally toward the lymphatic ducts.
+
+**Incorrect Answers:**
+- **A.** The goal of manual lymphatic drainage is to direct the lymphatics centrally. The progression is trunk quadrant first, followed by proximal to distal segments.
+- **C.** Lymphatic drainage is performed with the goal of directing the lymphatics centrally. If the therapist does not first decongest the trunk quadrants, the lymphatics will remain blocked.
+- **D.** Lymphatic drainage is performed with the goal of directing the lymphatics centrally. If the therapist does not first decongest the trunk quadrants, the lymphatics will remain blocked.
+
+---
+
+**Q42.** A patient has a history of a mild stroke, type 2 diabetes, hypertension, and impaired balance. During examination, the patient performs the Clinical Tests for Sensory Integration and Balance. The patient demonstrates increased sway and difficulty maintaining balance when wearing a dome while standing on a firm surface and when wearing a dome while standing on a foam surface. Based on the findings, which of the following systems or system interactions is the patient **MOST** dependent upon for balance?
+
+A. Visual
+B. Vestibular
+C. Somatosensory
+D. Sensory selection
+
+**Correct Answer:**
+- **A.** Patients who show an increased amount of sway when blindfolded and standing on a firm surface, when wearing a dome and standing on a firm surface, when blindfolded and standing on a foam surface, and when wearing a dome and standing on a foam surface, are thought to be highly dependent upon vision for balance.
+
+**Incorrect Answers:**
+- **B.** Patients who have increased sway when standing on foam while wearing a dome or blindfolded are thought to have the inability to select vestibular input for balance.
+- **C.** Patients who have increased sway during all conditions standing on foam are thought to be dependent upon somatosensory information.
+- **D.** Patients who are unable to adapt sensory information for postural control are described as having a sensory selection problem.
 
 ---
 
@@ -46,12 +784,12 @@ C. Legg-Calvé-Perthes disease
 D. Slipped capital femoral epiphysis
 
 **Correct Answer:**
-- **D.** The age, gender, body mass index, medial knee pain, hip medial (internal) range of motion deficit and antalgic gait are all consistent with slipped capital femoral epiphysis (Palisano, p. 323).
+- **D.** The age, gender, body mass index, hip medial (internal) range of motion deficit and antalgic gait are all consistent with slipped capital femoral epiphysis (Palisano p. 323).
 
 **Incorrect Answers:**
 - **A.** The age, gender, body mass index, medial knee pain, hip medial (internal) range of motion deficit and antalgic gait are all consistent with slipped capital femoral epiphysis (Palisano, p. 323). Medial knee pain makes this a plausible option, but the other signs and symptoms are inconsistent with a meniscus tear, and there are no mechanical symptoms reported such as locking and giving way, which are also consistent with a meniscus tear (Magee, p. 776).
 - **B.** The age, gender, body mass index, medial knee pain, hip medial (internal) range of motion deficit and antalgic gait are all consistent with slipped capital femoral epiphysis (Palisano, p. 323). Osgood-Schlatter disease is characterized by anterior knee pain and would not present with decreased hip medial (internal) rotation deficit (Palisano, p. 325).
-- **C.** The age, gender, body mass index, medial knee pain, hip medial (internal) range of motion deficit and antalgic gait are all consistent with slipped capital femoral epiphysis (Palisano, p. 323). Legg-Calvé-Perthes disease occurs in males between the ages of 4–8 years old (Palisano, p. 319).
+- **C.** The age, gender, body mass index, medial knee pain, hip medial (internal) range of motion deficit and antalgic gait are all consistent with slipped capital femoral epiphysis (Palisano, p. 323). Legg-Calvé-Perthes disease occurs in males between the ages of 4-8 years old (Palisano, p. 319).
 
 ---
 
@@ -88,9 +826,11 @@ D. Avascular necrosis of the femoral head
 - **C.** Avascular necrosis of the femoral head is a complication associated with slipped capital femoral epiphysis (p. 325). Osteochondritis dissecans is a separation of subchondral bone and commonly occurs in the knee, elbow, and talus and is not associated with slipped capital femoral epiphysis (p. 325).
 
 
+## Section 2 — Questions Q46–Q90
+
 ---
 
-**Q1.** A patient has an abscess on the left thoracic region just distal to the left scapula that has been surgically incised to drain the abscess. The patient has a tubular defect that travels 2.4 in (6.1 cm) transversely under the skin toward the right scapula. With the patient in left sidelying position, which of the following statements **MOST** accurately represents the correct documentation of the defect?
+**Q46.** A patient has an abscess on the left thoracic region just distal to the left scapula that has been surgically incised to drain the abscess. The patient has a tubular defect that travels 2.4 in (6.1 cm) transversely under the skin toward the right scapula. With the patient in left sidelying position, which of the following statements **MOST** accurately represents the correct documentation of the defect?
 
 A. Tunneling at 12 o'clock
 B. Undermining at 12 o'clock
@@ -107,7 +847,7 @@ D. Undermining at 3 o'clock
 
 ---
 
-**Q2.** A physical therapist is planning to use functional electrical stimulation to decrease shoulder subluxation in a patient post stroke. Which of the following techniques is **MOST** appropriate?
+**Q47.** A physical therapist is planning to use functional electrical stimulation to decrease shoulder subluxation in a patient post stroke. Which of the following techniques is **MOST** appropriate?
 
 A. Use direct current.
 B. Limit on times to less than 10 seconds.
@@ -124,7 +864,7 @@ D. Place electrodes over the posterior deltoid and supraspinatus muscles.
 
 ---
 
-**Q3.** A physical therapist examines a patient with multiple sclerosis who is in a period of exacerbation. The patient is independent with bed mobility, can sit unassisted at the edge of the bed, and requires physical assistance to stand with a walker. Which of the following interventions would have the **HIGHEST** priority?
+**Q48.** A physical therapist examines a patient with multiple sclerosis who is in a period of exacerbation. The patient is independent with bed mobility, can sit unassisted at the edge of the bed, and requires physical assistance to stand with a walker. Which of the following interventions would have the **HIGHEST** priority?
 
 A. Wheelchair propulsion up a 10-ft (3-m) ramp
 B. Wheelchair transfers
@@ -141,7 +881,7 @@ D. Tub transfers
 
 ---
 
-**Q4.** A physical therapist is preparing to teach a patient with Guillain-Barré syndrome to transfer from wheelchair to mat table. The patient weighs 150 lb (68 kg) and has Poor (2/5) strength in both of the lower extremities and Fair (3/5) strength in the left upper extremity. The right upper extremity has Normal (5/5) strength. Which of the following assisted transfers is **MOST** appropriate for the patient's initial session?
+**Q49.** A physical therapist is preparing to teach a patient with Guillain-Barré syndrome to transfer from wheelchair to mat table. The patient weighs 150 lb (68 kg) and has Poor (2/5) strength in both of the lower extremities and Fair (3/5) strength in the left upper extremity. The right upper extremity has Normal (5/5) strength. Which of the following assisted transfers is **MOST** appropriate for the patient's initial session?
 
 A. Two-person lift to the right side
 B. Sliding-board transfer to the right side
@@ -158,12 +898,14 @@ D. Full standing-pivot transfer to the right side
 
 ---
 
-**Q5.** A patient is asked to grip a card between the thumb (1st digit) and index finger (2nd digit) with both hands. The physical therapist pulls on the card in the direction of the arrow shown in the photograph. As the therapist pulls on the card the patient's right thumb (1st digit) flexes at the interphalangeal joint. The results indicate weakness in which of the following muscles?
+**Q50.** A patient is asked to grip a card between the thumb (1st digit) and index finger (2nd digit) with both hands. The physical therapist pulls on the card in the direction of the arrow shown in the photograph. As the therapist pulls on the card the patient's right thumb (1st digit) flexes at the interphalangeal joint. The results indicate weakness in which of the following muscles?
 
 A. Flexor pollicis longus
 B. Abductor pollicis brevis
 C. Adductor pollicis
 D. Extensor pollicis longus
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 2/Q5.png`.
 
 **Correct Answer:**
 - **C.** The test shown in the photograph is the Froment Test. Both thumbs (1st digits) should stay extended during the test. If the thumb (1st digit) flexes, it is indicative of weakness of the adductor pollicis with substitution by the flexor pollicis longus, which is usually due to a lesion of the ulnar nerve.
@@ -175,7 +917,7 @@ D. Extensor pollicis longus
 
 ---
 
-**Q6.** A physical therapist is working with an outpatient who had a cerebrovascular accident and currently lives in an assisted-living facility. Which of the following statements is the **MOST** appropriate functional goal for this patient?
+**Q51.** A physical therapist is working with an outpatient who had a cerebrovascular accident and currently lives in an assisted-living facility. Which of the following statements is the **MOST** appropriate functional goal for this patient?
 
 A. The patient will be able to don an ankle-foot orthosis with assistance.
 B. The patient will independently walk 165 ft (50 m) with a straight cane from the bedroom to the cafeteria.
@@ -192,7 +934,7 @@ D. The patient's balance will improve to be able to independently stand on the i
 
 ---
 
-**Q7.** A patient who sustained a mild cerebrovascular accident 3 weeks ago is being prepared by a physical therapist for discharge to home and an adult day program. To facilitate the discharge plan, the **MOST** appropriate health professional for the therapist to consult with is the:
+**Q52.** A patient who sustained a mild cerebrovascular accident 3 weeks ago is being prepared by a physical therapist for discharge to home and an adult day program. To facilitate the discharge plan, the **MOST** appropriate health professional for the therapist to consult with is the:
 
 A. skilled nursing coordinator.
 B. occupational therapist.
@@ -209,7 +951,7 @@ D. primary physician.
 
 ---
 
-**Q8.** A patient with peripheral vascular disease comes to physical therapy for evaluation of leg pain that gets worse when walking. The patient will **MOST** likely also have:
+**Q53.** A patient with peripheral vascular disease comes to physical therapy for evaluation of leg pain that gets worse when walking. The patient will **MOST** likely also have:
 
 A. relief of pain with the legs elevated.
 B. purple or brown pigmentation of the skin on the legs.
@@ -226,7 +968,7 @@ D. a positive Homans sign.
 
 ---
 
-**Q9.** A patient with which of the following diagnoses would **MOST** likely benefit from pursed-lip breathing during exercise?
+**Q54.** A patient with which of the following diagnoses would **MOST** likely benefit from pursed-lip breathing during exercise?
 
 A. Peripheral vascular disease
 B. Heart failure
@@ -243,7 +985,7 @@ D. Sarcoidosis
 
 ---
 
-**Q10.** A patient who reports double vision has ptosis, lateral strabismus, and a dilated pupil in the left eye. Which of the following cranial nerve test results is **MOST** likely to be abnormal?
+**Q55.** A patient who reports double vision has ptosis, lateral strabismus, and a dilated pupil in the left eye. Which of the following cranial nerve test results is **MOST** likely to be abnormal?
 
 A. Pupillary light reflex
 B. Facial muscle strength
@@ -260,7 +1002,7 @@ D. Pain sensation in the face
 
 ---
 
-**Q11.** A physical therapist is gait training a patient who suddenly becomes weak and falls to the floor. The patient is now unresponsive. The therapist should **FIRST**:
+**Q56.** A physical therapist is gait training a patient who suddenly becomes weak and falls to the floor. The patient is now unresponsive. The therapist should **FIRST**:
 
 A. open the patient's airway.
 B. activate the emergency response system.
@@ -277,7 +1019,7 @@ D. begin chest compressions.
 
 ---
 
-**Q12.** A 3-month-old infant has poor midline head control. During evaluation, the physical therapist notes facial asymmetry and observes that the infant holds the head in cervical rotation to the left and cervical lateral flexion to the right. The infant **MOST** likely has:
+**Q57.** A 3-month-old infant has poor midline head control. During evaluation, the physical therapist notes facial asymmetry and observes that the infant holds the head in cervical rotation to the left and cervical lateral flexion to the right. The infant **MOST** likely has:
 
 A. right congenital muscular torticollis.
 B. left congenital muscular torticollis.
@@ -294,7 +1036,7 @@ D. left cervical facet hypomobility.
 
 ---
 
-**Q13.** Which of the following examination findings is indicative of developing nerve root signs?
+**Q58.** Which of the following examination findings is indicative of developing nerve root signs?
 
 A. Upgoing Babinski sign
 B. Absent Hoffman sign
@@ -311,7 +1053,7 @@ D. Fading deep tendon reflex with repetitive tapping
 
 ---
 
-**Q14.** A patient with a complete thoracic spinal cord injury is sitting in a wheelchair on a custom-made cushion. Pressure relief activities should be performed:
+**Q59.** A patient with a complete thoracic spinal cord injury is sitting in a wheelchair on a custom-made cushion. Pressure relief activities should be performed:
 
 A. when the patient shows signs of pressure injury.
 B. every 15 to 20 minutes.
@@ -328,7 +1070,7 @@ D. if the patient does not have an appropriate cushion.
 
 ---
 
-**Q15.** After spinal joint mobilization procedures, a patient calls the physical therapist and reports a minor dull ache in the treated area of the back that lasted for 2 to 3 hours. Based on this symptom, the therapist should:
+**Q60.** After spinal joint mobilization procedures, a patient calls the physical therapist and reports a minor dull ache in the treated area of the back that lasted for 2 to 3 hours. Based on this symptom, the therapist should:
 
 A. consider a possible neurological lesion in the area.
 B. refer the patient back to the physician.
@@ -345,7 +1087,7 @@ D. add strengthening exercises to the home program.
 
 ---
 
-**Q16.** Which of the following positions is **MOST** effective to actively stretch the lumbrical muscles?
+**Q61.** Which of the following positions is **MOST** effective to actively stretch the lumbrical muscles?
 
 A. Metacarpophalangeal and interphalangeal flexion
 B. Metacarpophalangeal and interphalangeal extension
@@ -362,7 +1104,7 @@ D. Metacarpophalangeal flexion and interphalangeal extension
 
 ---
 
-**Q17.** Which of the following teaching strategies is **MOST** appropriate for an older adult patient with mild dementia?
+**Q62.** Which of the following teaching strategies is **MOST** appropriate for an older adult patient with mild dementia?
 
 A. Use auditory or visual input separately.
 B. Use metaphors to reinforce new concepts.
@@ -379,7 +1121,7 @@ D. Present one piece of new information at a time.
 
 ---
 
-**Q18.** To manually assess a patient's lower extremity circulation, a physical therapist should palpate the patient's peripheral pulse at which of the following locations?
+**Q63.** To manually assess a patient's lower extremity circulation, a physical therapist should palpate the patient's peripheral pulse at which of the following locations?
 
 A. Dorsal foot, near the base of the first metatarsal
 B. Lateral lower leg, just posterior to the fibular head
@@ -396,12 +1138,14 @@ D. Plantar foot, just medial to the medial calcaneal tuberosity
 
 ---
 
-**Q19.** A physical therapist is examining hip range of motion in a patient as shown in the photograph. Passive range of motion is applied to the patient's legs in the direction of the arrows. The photograph shows the end points of the range of motion. The **MOST** likely cause of the hip dysfunction occurring in the patient is:
+**Q64.** A physical therapist is examining hip range of motion in a patient as shown in the photograph. Passive range of motion is applied to the patient's legs in the direction of the arrows. The photograph shows the end points of the range of motion. The **MOST** likely cause of the hip dysfunction occurring in the patient is:
 
 A. hypomobility of the hip medial (internal) rotators on the left.
 B. weakness of the left hip medial (internal) rotators.
 C. laxity of the left hip capsule.
 D. tightness of the hip lateral (external) rotators on the left.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 2/Q19.png`.
 
 **Correct Answer:**
 - **D.** Medial (internal) rotation of the left hip is limited. This could be caused by hypomobility of the left hip capsule or tightness of the left lateral (external) rotators, especially the piriformis.
@@ -413,7 +1157,7 @@ D. tightness of the hip lateral (external) rotators on the left.
 
 ---
 
-**Q20.** A physical therapist is treating a patient who had knee surgery after a motor vehicle accident. The patient is suing the driver of the other vehicle and has hired an attorney. The patient is being treated in physical therapy as an outpatient 3 times/week. After the third session, a relative of the patient calls and wants to know how much weight the patient can bear on the leg. The therapist should:
+**Q65.** A physical therapist is treating a patient who had knee surgery after a motor vehicle accident. The patient is suing the driver of the other vehicle and has hired an attorney. The patient is being treated in physical therapy as an outpatient 3 times/week. After the third session, a relative of the patient calls and wants to know how much weight the patient can bear on the leg. The therapist should:
 
 A. seek clearance from the attorney before informing the patient's relative.
 B. describe the weight-bearing limits in general terms.
@@ -430,12 +1174,14 @@ D. ask the patient's relative to visit directly with the patient.
 
 ---
 
-**Q21.** The test shown in the photograph is used to identify which of the following conditions?
+**Q66.** The test shown in the photograph is used to identify which of the following conditions?
 
 A. Hip osteoarthritis
 B. Iliopectineal bursitis
 C. Acetabular labral tear
 D. Femoral shaft stress fracture
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 2/Q21.png`.
 
 **Correct Answer:**
 - **D.** The test shown in the photograph is the Fulcrum Test, which is used to detect femoral shaft stress fractures. A positive test result is indicated by the patient's report of pain or apprehension when pressure is applied.
@@ -447,7 +1193,7 @@ D. Femoral shaft stress fracture
 
 ---
 
-**Q22.** During steady rate exercise, the blood pressure in a healthy person **MOST** typically responds with:
+**Q67.** During steady rate exercise, the blood pressure in a healthy person **MOST** typically responds with:
 
 A. systolic pressure increase and no change in diastolic pressure.
 B. no change in systolic pressure and marked decrease in diastolic pressure.
@@ -464,12 +1210,14 @@ D. no change in systolic pressure until the end point of the exercise session.
 
 ---
 
-**Q23.** The work modification (standing) shown in the photograph is **MOST** appropriate for a patient with which of the following conditions?
+**Q68.** The work modification (standing) shown in the photograph is **MOST** appropriate for a patient with which of the following conditions?
 
 A. Central lumbar stenosis
 B. Deep vein thrombosis
 C. Thoracolumbar scoliosis
 D. Posterolateral lumbar disc bulge
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 2/Q23.png`.
 
 **Correct Answer:**
 - **D.** The photograph shows a standing desk/work station. Sitting increases intradiscal pressure, so standing is often preferred to sitting for patients who have a posterolateral lumbar disc bulge. (Dutton, p. 1484)
@@ -481,7 +1229,7 @@ D. Posterolateral lumbar disc bulge
 
 ---
 
-**Q24.** A female patient had a radical mastectomy with axillary node removal. Which of the following signs would indicate initial development of lymphedema in the patient?
+**Q69.** A female patient had a radical mastectomy with axillary node removal. Which of the following signs would indicate initial development of lymphedema in the patient?
 
 A. Increased blood pressure
 B. Numbness in the antecubital fossa
@@ -498,7 +1246,7 @@ D. Decreased flexibility of the digits of the hand
 
 ---
 
-**Q25.** During walking, a patient demonstrates backward leaning of the trunk at right heel strike (initial contact). The result of manual muscle testing of the weak muscle is Good minus (4-/5). Which of the following exercises **BEST** addresses this patient's muscular weakness?
+**Q70.** During walking, a patient demonstrates backward leaning of the trunk at right heel strike (initial contact). The result of manual muscle testing of the weak muscle is Good minus (4-/5). Which of the following exercises **BEST** addresses this patient's muscular weakness?
 
 A. Bridging activities progressing from double leg to single leg
 B. Single-leg stance allowing the opposite side of the pelvis to drop, then return to a level position
@@ -515,7 +1263,7 @@ D. Standing on the uninvolved leg to perform active hip extension of the involve
 
 ---
 
-**Q26.** A patient has shoulder joint impairments. The range-of-motion examination reveals restricted lateral (external) rotation and abduction of the shoulder. Based on arthrokinematic principles, which of the following mobilization procedures should be performed for the patient **FIRST**?
+**Q71.** A patient has shoulder joint impairments. The range-of-motion examination reveals restricted lateral (external) rotation and abduction of the shoulder. Based on arthrokinematic principles, which of the following mobilization procedures should be performed for the patient **FIRST**?
 
 A. Posterior glide
 B. Distraction
@@ -532,7 +1280,7 @@ D. Lateral (external) rotation
 
 ---
 
-**Q27.** A physical therapist is examining a patient with right-sided heart disease who takes diuretics. Which of the following lower extremity conditions is **MOST** likely to be present?
+**Q72.** A physical therapist is examining a patient with right-sided heart disease who takes diuretics. Which of the following lower extremity conditions is **MOST** likely to be present?
 
 A. Pallor
 B. Shiny skin
@@ -549,12 +1297,14 @@ D. Absence of hair growth
 
 ---
 
-**Q28.** A child is **MOST** likely to be able to **FIRST** perform the action shown in the video at which of the following ages?
+**Q73.** A child is **MOST** likely to be able to **FIRST** perform the action shown in the video at which of the following ages?
 
 A. Between 1 year to 2 years old
 B. Between 2 to 3 years old
 C. Between 3 to 4 years old
 D. Between 4 to 5 years old
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.A Answers copy/Section 2/Q28.mov`.
 
 **Correct Answer:**
 - **C.** This answer is correct, as a child initially begins this task (hopping on one leg) around age 3 with a single hop on the preferred leg (p. 64).
@@ -566,7 +1316,7 @@ D. Between 4 to 5 years old
 
 ---
 
-**Q29.** A physical therapist is reviewing the medical record of a patient in the intensive care unit. The patient was admitted the previous night through the emergency department after a motorcycle accident resulting in a fractured right femur. The therapist notes a physician's order for a Doppler study of the left leg. The therapist should:
+**Q74.** A physical therapist is reviewing the medical record of a patient in the intensive care unit. The patient was admitted the previous night through the emergency department after a motorcycle accident resulting in a fractured right femur. The therapist notes a physician's order for a Doppler study of the left leg. The therapist should:
 
 A. proceed with the evaluation and intervention without any restrictions.
 B. withhold physical therapy until results of the study are obtained and interpreted by the physician.
@@ -583,7 +1333,7 @@ D. obtain clearance from the nurse to provide intervention for the patient.
 
 ---
 
-**Q30.** A patient with an L₄–L₅ posterolateral herniated nucleus pulposus is **MOST** likely to have sensory deficits in which of the following locations?
+**Q75.** A patient with an L₄–L₅ posterolateral herniated nucleus pulposus is **MOST** likely to have sensory deficits in which of the following locations?
 
 A. Medial knee
 B. Over the popliteal fossa
@@ -600,7 +1350,7 @@ D. Dorsum of the great toe
 
 ---
 
-**Q31.** A patient with complete C₄ tetraplegia is working on a program to increase tolerance to upright position. While the patient is on a tilt table elevated to 60°, the patient begins to have a pounding headache and to exhibit flushing and profuse sweating. The physical therapist should **FIRST**:
+**Q76.** A patient with complete C₄ tetraplegia is working on a program to increase tolerance to upright position. While the patient is on a tilt table elevated to 60°, the patient begins to have a pounding headache and to exhibit flushing and profuse sweating. The physical therapist should **FIRST**:
 
 A. lower the tilt table to a flat position.
 B. lower the tilt table to 40°.
@@ -617,7 +1367,7 @@ D. check the patient's blood pressure.
 
 ---
 
-**Q32.** Which of the following techniques is **MOST** appropriate for treatment of a patient who has low postural tone?
+**Q77.** Which of the following techniques is **MOST** appropriate for treatment of a patient who has low postural tone?
 
 A. Slow regular rocking while sitting on a treatment bolster
 B. Continuous pressure to the skin overlying the back muscles
@@ -634,7 +1384,7 @@ D. Joint approximation applied through the shoulders to the trunk
 
 ---
 
-**Q33.** Manual muscle testing of a patient's pelvic floor muscles reveals a grade of Poor (2/5). Which of the following positions is **BEST** to begin strengthening?
+**Q78.** Manual muscle testing of a patient's pelvic floor muscles reveals a grade of Poor (2/5). Which of the following positions is **BEST** to begin strengthening?
 
 A. Supine
 B. Standing
@@ -651,7 +1401,7 @@ D. Walking
 
 ---
 
-**Q34.** A physical therapist is teaching a motor skill to a patient with chronic hemiplegia. Which of the following teaching approaches should be **MOST** emphasized?
+**Q79.** A physical therapist is teaching a motor skill to a patient with chronic hemiplegia. Which of the following teaching approaches should be **MOST** emphasized?
 
 A. Habituation
 B. Sensitization
@@ -668,7 +1418,7 @@ D. Recovery of normal movement
 
 ---
 
-**Q35.** A patient with leukemia has developed thrombocytopenia after a bone-marrow transplant. Which of the following measures is indicative of the status of the thrombocytopenia?
+**Q80.** A patient with leukemia has developed thrombocytopenia after a bone-marrow transplant. Which of the following measures is indicative of the status of the thrombocytopenia?
 
 A. T₄ lymphocyte count
 B. Red blood cell count
@@ -685,7 +1435,7 @@ D. White blood cell count
 
 ---
 
-**Q36.** During the shoulder examination of a patient, a physical therapist notes the presence of a capsular pattern without radicular pain. To help establish the cause of the capsular pattern, the therapist should **NEXT**:
+**Q81.** During the shoulder examination of a patient, a physical therapist notes the presence of a capsular pattern without radicular pain. To help establish the cause of the capsular pattern, the therapist should **NEXT**:
 
 A. perform axial compression on the cervical spine to check for nerve root compression.
 B. ask the patient if there has been any prior trauma to the shoulder joint.
@@ -702,7 +1452,7 @@ D. examine the shoulder for a rotator cuff tear.
 
 ---
 
-**Q37.** A 90-year-old patient with chronic heart failure has been nonambulatory and has resided in a nursing home for the past year. The patient was recently admitted to the hospital after an episode of dehydration. Which of the following plans for prophylactic respiratory care is **MOST** appropriate?
+**Q82.** A 90-year-old patient with chronic heart failure has been nonambulatory and has resided in a nursing home for the past year. The patient was recently admitted to the hospital after an episode of dehydration. Which of the following plans for prophylactic respiratory care is **MOST** appropriate?
 
 A. Turning, coughing, and deep breathing every 1 to 2 waking hours
 B. Vigorous percussion and vibration 4 times/day
@@ -719,7 +1469,7 @@ D. Segmental postural drainage using standard positions throughout the day
 
 ---
 
-**Q38.** A 78-year-old patient who is being treated for osteoarthritis of the knees reports centralized lower thoracic pain and epigastric pain. The pain is relieved by eating. Which of the following steps would be **MOST** important in screening for the cause of the new symptoms?
+**Q83.** A 78-year-old patient who is being treated for osteoarthritis of the knees reports centralized lower thoracic pain and epigastric pain. The pain is relieved by eating. Which of the following steps would be **MOST** important in screening for the cause of the new symptoms?
 
 A. Resist the iliopsoas muscle to screen for a psoas abscess.
 B. Ask if the patient has been constipated or has had diarrhea.
@@ -736,7 +1486,7 @@ D. Ask if the patient is taking a high dose of nonsteroidal antiinflammatory dru
 
 ---
 
-**Q39.** If a transtibial prosthesis has an excessively firm heel, the patient is **MOST** likely to walk with:
+**Q84.** If a transtibial prosthesis has an excessively firm heel, the patient is **MOST** likely to walk with:
 
 A. excessive knee flexion in foot flat (loading response).
 B. premature knee flexion in heel off (terminal stance).
@@ -753,7 +1503,7 @@ D. excessive knee flexion in heel off (terminal stance).
 
 ---
 
-**Q40.** What skin change associated with aging has the **GREATEST** effect on wound healing?
+**Q85.** What skin change associated with aging has the **GREATEST** effect on wound healing?
 
 A. Reduction in sensation
 B. Decreased elasticity of the skin
@@ -770,7 +1520,7 @@ D. Change in pigmentation
 
 ---
 
-**Q41.** Clubbing of the fingers is **MOST** associated with which of the following conditions?
+**Q86.** Clubbing of the fingers is **MOST** associated with which of the following conditions?
 
 A. Lymphedema
 B. Chronic obstructive pulmonary disease
@@ -787,7 +1537,7 @@ D. Complex regional pain syndrome
 
 ---
 
-## Scenario (applies to Q42–Q45)
+## Scenario (applies to Q87–Q90)
 
 **Setting:** Outpatient
 **Sex:** Male
@@ -824,7 +1574,7 @@ D. Complex regional pain syndrome
 
 ---
 
-**Q42.** Which of the following conditions is **MOST** likely present?
+**Q87.** Which of the following conditions is **MOST** likely present?
 
 A. Jones fracture
 B. Plantar fasciitis
@@ -841,7 +1591,7 @@ D. Tibialis posterior tendinopathy
 
 ---
 
-**Q43.** The patient is **MOST** likely to have a positive result on which of the following special tests?
+**Q88.** The patient is **MOST** likely to have a positive result on which of the following special tests?
 
 A. Slump Test
 B. Windlass Test
@@ -858,7 +1608,7 @@ D. External Rotation Stress Test
 
 ---
 
-**Q44.** The patient is **MOST** likely to have which of the following additional examination findings?
+**Q89.** The patient is **MOST** likely to have which of the following additional examination findings?
 
 A. Decreased mobility of the forefoot
 B. Decreased mobility of the midfoot
@@ -875,7 +1625,7 @@ D. Increased mobility of the midfoot
 
 ---
 
-**Q45.** Which of the following interventions is **MOST** appropriate for the patient?
+**Q90.** Which of the following interventions is **MOST** appropriate for the patient?
 
 A. Arch taping
 B. Metatarsal pad use
@@ -891,9 +1641,11 @@ D. Strengthening of the plantar flexors
 - **D.** The signs/symptoms are all indicative of plantar fasciitis (Magee, Pathology, p. 872; Magee, Assessment, p. 947). The plantar flexors commonly require lengthening, not strengthening with plantar fasciitis (Magee, Pathology, p. 872).
 
 
+## Section 3 — Questions Q91–Q135
+
 ---
 
-**Q1.** To minimize skin irritation during functional electrical nerve stimulation, a physical therapist should use:
+**Q91.** To minimize skin irritation during functional electrical nerve stimulation, a physical therapist should use:
 
 A. lower intensity, larger interelectrode distance, and larger electrodes.
 B. lower intensity, larger interelectrode distance, and smaller electrodes.
@@ -910,7 +1662,7 @@ D. lower intensity, smaller interelectrode distance, and larger electrodes.
 
 ---
 
-**Q2.** A patient who is transported to the physical therapy department in a wheelchair reports severe, bilateral lower extremity pain. A purple discoloration of both feet is observed. The pain is relieved when the patient's feet are raised just above the horizontal plane. These signs are **MOST** indicative of:
+**Q92.** A patient who is transported to the physical therapy department in a wheelchair reports severe, bilateral lower extremity pain. A purple discoloration of both feet is observed. The pain is relieved when the patient's feet are raised just above the horizontal plane. These signs are **MOST** indicative of:
 
 A. arterial insufficiency.
 B. intermittent claudication.
@@ -927,7 +1679,7 @@ D. a psychosomatic episode.
 
 ---
 
-**Q3.** Following acute knee trauma, which of the following examination findings indicates the need for referral for radiographic imaging?
+**Q93.** Following acute knee trauma, which of the following examination findings indicates the need for referral for radiographic imaging?
 
 A. Tenderness to palpation of the tibial tuberosity
 B. Active range of motion knee flexion limited to 75°
@@ -944,7 +1696,7 @@ D. Full weight-bearing gait tolerance limited to 20 ft (6.1 m)
 
 ---
 
-**Q4.** Treatment of a patient with hemophilia who has a subacute hemarthrosis of the knee should **INITIALLY** include:
+**Q94.** Treatment of a patient with hemophilia who has a subacute hemarthrosis of the knee should **INITIALLY** include:
 
 A. active assistive range-of-motion exercise to the knee.
 B. instruction of the patient for weight-bearing to tolerance.
@@ -961,7 +1713,7 @@ D. continuous immobilization of the knee in an extension splint.
 
 ---
 
-**Q5.** A patient with a mild closed head injury and bilateral femur fractures requires instruction in a lower extremity exercise program. To plan the most effective teaching methods for this patient, what is **MOST** critical to assess at the **INITIAL** visit?
+**Q95.** A patient with a mild closed head injury and bilateral femur fractures requires instruction in a lower extremity exercise program. To plan the most effective teaching methods for this patient, what is **MOST** critical to assess at the **INITIAL** visit?
 
 A. Comprehension of written, verbal, and demonstrated instructions
 B. Short-term memory capacity
@@ -978,7 +1730,7 @@ D. Any personality changes compared to the patient's premorbid status
 
 ---
 
-**Q6.** A physical therapist plans to use a tilt table for a patient who is having difficulty tolerating upright sitting position. The therapist should stop inclining the tilt table if the patient experiences which of the following signs and symptoms?
+**Q96.** A physical therapist plans to use a tilt table for a patient who is having difficulty tolerating upright sitting position. The therapist should stop inclining the tilt table if the patient experiences which of the following signs and symptoms?
 
 A. Decrease in diastolic blood pressure of 15 mm Hg
 B. Increase in systolic blood pressure of 10 mm Hg
@@ -995,7 +1747,7 @@ D. Decrease in oxygen saturation to 93%
 
 ---
 
-**Q7.** Acquired immunodeficiency syndrome is **MOST** likely present in a patient with which of the following hematologic conditions?
+**Q97.** Acquired immunodeficiency syndrome is **MOST** likely present in a patient with which of the following hematologic conditions?
 
 A. CD4 count of 150 cells/mL
 B. High antinuclear antibody titer
@@ -1012,7 +1764,7 @@ D. Neutrophil count of less than 5000 cells/mm³
 
 ---
 
-**Q8.** A physical therapist is working with a patient who has multiple medical issues and has just finished chemotherapy. Which of the following tests is **MOST** appropriate to measure changes in this patient's endurance over time?
+**Q98.** A physical therapist is working with a patient who has multiple medical issues and has just finished chemotherapy. Which of the following tests is **MOST** appropriate to measure changes in this patient's endurance over time?
 
 A. 10-meter walk for time
 B. 6-minute walk
@@ -1029,7 +1781,7 @@ D. Maximum VO₂ assessment
 
 ---
 
-**Q9.** On evaluation, a patient with dorsal column syndrome would be expected to exhibit:
+**Q99.** On evaluation, a patient with dorsal column syndrome would be expected to exhibit:
 
 A. left extremity weakness and hyperesthesia.
 B. bilateral extremity weakness and hypoesthesia.
@@ -1046,7 +1798,7 @@ D. decreased vibratory sensation and decreased proprioception.
 
 ---
 
-**Q10.** A patient with a recent ankle injury reports anterior ankle pain while walking. Pain is reproduced **ONLY** during passive rotation of the lower leg. The patient most likely sustained which of the following injuries?
+**Q100.** A patient with a recent ankle injury reports anterior ankle pain while walking. Pain is reproduced **ONLY** during passive rotation of the lower leg. The patient most likely sustained which of the following injuries?
 
 A. Syndesmosis sprain
 B. Calcaneocuboid sprain
@@ -1063,7 +1815,7 @@ D. Tibial stress fracture
 
 ---
 
-**Q11.** While a physical therapist is performing transfer training from bed to chair with a patient who had a total knee arthroplasty 2 days ago, the electrocardiograph monitor alarms and the therapist notes that premature ventricular contractions have developed. What is the therapist's **BEST** course of action at this time?
+**Q101.** While a physical therapist is performing transfer training from bed to chair with a patient who had a total knee arthroplasty 2 days ago, the electrocardiograph monitor alarms and the therapist notes that premature ventricular contractions have developed. What is the therapist's **BEST** course of action at this time?
 
 A. Position the patient on a stable surface and discontinue physical therapy for the day.
 B. Continue the transfer to the chair and monitor the patient's oxygen saturation levels.
@@ -1080,12 +1832,14 @@ D. Position the patient on a stable surface and determine the frequency of the p
 
 ---
 
-**Q12.** [The patient in the video/image shows a swan neck deformity of the hand.] The patient would benefit **MOST** from stretching of which of the following structures?
+**Q102.** [The patient in the video/image shows a swan neck deformity of the hand.] The patient would benefit **MOST** from stretching of which of the following structures?
 
 A. Intrinsic muscles
 B. Oblique reticular ligament
 C. Flexor digitorum profundus
 D. Flexor digitorum superficialis
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.A Answers copy/Section 3/Q12.mov`.
 
 **Correct Answer:**
 - **A.** The video depicts a swan neck deformity. This is a result of the strong pull of the contracted intrinsics, through the lateral bands which subsequently sublux dorsal to the axis of rotation of the PIP joint. The resultant deformity is one of hyperextension at the PIP joint and flexion at the DIP joint. Therefore the intrinsic muscles should be stretched in order to improve this condition. (p. 155)
@@ -1097,7 +1851,7 @@ D. Flexor digitorum superficialis
 
 ---
 
-**Q13.** A physical therapist is examining the integumentary system of a patient with light skin pigmentation and notices a deepening of the skin color over the left posterior aspect of the calcaneus. Which of the following findings would indicate a Stage 1 pressure injury at that site?
+**Q103.** A physical therapist is examining the integumentary system of a patient with light skin pigmentation and notices a deepening of the skin color over the left posterior aspect of the calcaneus. Which of the following findings would indicate a Stage 1 pressure injury at that site?
 
 A. Nonblanchable redness
 B. Blanching with applied pressure that returns to previous coloring within 10 seconds after the removal of pressure
@@ -1114,7 +1868,7 @@ D. Blanching with applied pressure that returns to previous coloring 1 hour afte
 
 ---
 
-**Q14.** Which of the following exercises should increase a patient's shoulder lateral (external) rotation range of motion by contraction of the tight muscle?
+**Q104.** Which of the following exercises should increase a patient's shoulder lateral (external) rotation range of motion by contraction of the tight muscle?
 
 A. Isotonic contraction of medial (internal) rotators followed by passive motion into medial (internal) rotation
 B. Isometric hold resisting medial (internal) rotation followed by passive motion into medial (internal) rotation
@@ -1131,7 +1885,7 @@ D. Isometric hold resisting medial (internal) rotation followed by passive motio
 
 ---
 
-**Q15.** Which of the following descriptions **BEST** characterizes stable angina?
+**Q105.** Which of the following descriptions **BEST** characterizes stable angina?
 
 A. Episodes of nonradiating chest pain each lasting 5-15 minutes
 B. Episodes of severe chest pain each lasting longer than 15 minutes
@@ -1148,7 +1902,7 @@ D. Chest pain accompanied by dysrhythmias
 
 ---
 
-**Q16.** A patient with Parkinson disease has just been admitted to a rehabilitation unit. The patient is dependent in all transfers and requires moderate assistance of one person to walk 30 ft (9.1 m) with a standard walker. To facilitate good carryover for activities, instruction of the family in transfers should occur:
+**Q106.** A patient with Parkinson disease has just been admitted to a rehabilitation unit. The patient is dependent in all transfers and requires moderate assistance of one person to walk 30 ft (9.1 m) with a standard walker. To facilitate good carryover for activities, instruction of the family in transfers should occur:
 
 A. during a home visit after the patient is discharged.
 B. just prior to discharging the patient.
@@ -1165,7 +1919,7 @@ D. when the family feels ready to take the patient home.
 
 ---
 
-**Q17.** A patient with a severe cerebellar lesion can sit independently, can stand with minimal assistance, and requires moderate assistance of one person to walk safely. The patient wants to transfer independently from a wheelchair to a bed. Which of the following transfer techniques is **MOST** appropriate for the patient?
+**Q107.** A patient with a severe cerebellar lesion can sit independently, can stand with minimal assistance, and requires moderate assistance of one person to walk safely. The patient wants to transfer independently from a wheelchair to a bed. Which of the following transfer techniques is **MOST** appropriate for the patient?
 
 A. Standing pivot
 B. Manual pivot
@@ -1182,7 +1936,7 @@ D. Sliding
 
 ---
 
-**Q18.** A patient with a positive Finkelstein Test reports pain over the radial aspect of the wrist that is aggravated by frequent lifting of heavy cooking pots. Which tendons are **PRIMARILY** involved?
+**Q108.** A patient with a positive Finkelstein Test reports pain over the radial aspect of the wrist that is aggravated by frequent lifting of heavy cooking pots. Which tendons are **PRIMARILY** involved?
 
 A. Extensor carpi radialis longus and adductor pollicis
 B. Flexor carpi radialis and flexor pollicis longus
@@ -1199,12 +1953,14 @@ D. Extensor pollicis longus and extensor pollicis brevis
 
 ---
 
-**Q19.** [Photographs A and B show passive knee ROM measured with hip flexed (A) and hip extended (B).] A physical therapist is measuring a patient's passive knee range of motion. The measurements obtained are shown in photographs A and B. The **MOST** likely cause of the difference in knee range of motion is:
+**Q109.** [Photographs A and B show passive knee ROM measured with hip flexed (A) and hip extended (B).] A physical therapist is measuring a patient's passive knee range of motion. The measurements obtained are shown in photographs A and B. The **MOST** likely cause of the difference in knee range of motion is:
 
 A. restriction in the knee joint capsule.
 B. tightness of the rectus femoris.
 C. weakness of the hamstrings.
 D. tightness of the vastus medialis.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 3/Q19.png`.
 
 **Correct Answer:**
 - **B.** In photograph A, there is more knee flexion present with the hip flexed. In this position, the rectus femoris is on slack across the hip joint, allowing greater range of knee flexion. In photograph B, the rectus femoris is stretched over both the knee joint and the hip joint, so tightness in the rectus femoris would restrict knee flexion. Photograph B also shows hip joint flexion. (p. 276)
@@ -1216,7 +1972,7 @@ D. tightness of the vastus medialis.
 
 ---
 
-**Q20.** A physical therapist is examining the feet of a patient with type 2 diabetes. Which of the following tests is **BEST** to determine the patient's risk for developing foot ulceration?
+**Q110.** A physical therapist is examining the feet of a patient with type 2 diabetes. Which of the following tests is **BEST** to determine the patient's risk for developing foot ulceration?
 
 A. Pain sensation
 B. Pressure threshold
@@ -1233,7 +1989,7 @@ D. Temperature awareness
 
 ---
 
-**Q21.** Which of the following mobilization techniques for the radiocarpal joint would be **MOST** appropriate for increasing limited wrist flexion range of motion?
+**Q111.** Which of the following mobilization techniques for the radiocarpal joint would be **MOST** appropriate for increasing limited wrist flexion range of motion?
 
 A. Radial glide
 B. Ulnar glide
@@ -1250,7 +2006,7 @@ D. Volar glide
 
 ---
 
-**Q22.** Following trauma at the C₅ spinal cord level, a patient was admitted to the hospital. Twenty-four hours later, the patient shows no reflexes, sensation, or voluntary motor activity below the level of injury. These findings indicate:
+**Q112.** Following trauma at the C₅ spinal cord level, a patient was admitted to the hospital. Twenty-four hours later, the patient shows no reflexes, sensation, or voluntary motor activity below the level of injury. These findings indicate:
 
 A. the presence of spasticity.
 B. decerebrate rigidity.
@@ -1267,7 +2023,7 @@ D. a lower motor neuron lesion.
 
 ---
 
-**Q23.** Which of the following instructions is **MOST** appropriate for teaching a patient with C₆ tetraplegia to transfer from a wheelchair to a mat?
+**Q113.** Which of the following instructions is **MOST** appropriate for teaching a patient with C₆ tetraplegia to transfer from a wheelchair to a mat?
 
 A. Keep fingers extended to give a broader base of support.
 B. Rotate head and shoulders in the same direction as the desired hip motion.
@@ -1284,7 +2040,7 @@ D. Keep both hands next to the knees to lock the elbows.
 
 ---
 
-**Q24.** What precautions should a physical therapist observe when working with a patient infected with methicillin-resistant *Staphylococcus aureus*?
+**Q114.** What precautions should a physical therapist observe when working with a patient infected with methicillin-resistant *Staphylococcus aureus*?
 
 A. Airborne
 B. Sterile
@@ -1301,7 +2057,7 @@ D. Contact
 
 ---
 
-**Q25.** A patient who has a chronic L₅–S₁ disc protrusion reports low back pain and weakness of the right lower extremity. Results of which of the following examination components would **MOST** likely be abnormal?
+**Q115.** A patient who has a chronic L₅–S₁ disc protrusion reports low back pain and weakness of the right lower extremity. Results of which of the following examination components would **MOST** likely be abnormal?
 
 A. Achilles reflex
 B. Babinski reflex
@@ -1318,7 +2074,7 @@ D. Ankle dorsiflexion strength
 
 ---
 
-**Q26.** Following a recent inguinal hernia repair, a patient has moderate lower extremity pitting edema and tightness not relieved by elevation of the leg. Which of the following guidelines would be **MOST** appropriate?
+**Q116.** Following a recent inguinal hernia repair, a patient has moderate lower extremity pitting edema and tightness not relieved by elevation of the leg. Which of the following guidelines would be **MOST** appropriate?
 
 A. Avoidance of compression
 B. Use of short-stretch bandages
@@ -1335,7 +2091,7 @@ D. Use of long-stretch bandages
 
 ---
 
-**Q27.** A physical therapist is interviewing a patient who awoke that day with a slight loss of taste sensation, inability to close the right eye, and dryness of the right eye. The patient has had a slight headache the last few days and some mild pain around the right ear. Which of the following questions should the therapist ask the patient to identify an additional finding that is consistent with these signs and symptoms?
+**Q117.** A physical therapist is interviewing a patient who awoke that day with a slight loss of taste sensation, inability to close the right eye, and dryness of the right eye. The patient has had a slight headache the last few days and some mild pain around the right ear. Which of the following questions should the therapist ask the patient to identify an additional finding that is consistent with these signs and symptoms?
 
 A. Are you able to smile?
 B. Do you have pain over your right jaw?
@@ -1352,7 +2108,7 @@ D. Do you have difficulty swallowing?
 
 ---
 
-**Q28.** A physical therapist is preparing to evaluate a patient who had a closed reduction with cast fixation for an ankle fracture 1 day ago and is currently restricted to non-weight-bearing status. The patient reports foot pain in the injured extremity. Based on the patient's report, which of the following tests and measures should the therapist perform?
+**Q118.** A physical therapist is preparing to evaluate a patient who had a closed reduction with cast fixation for an ankle fracture 1 day ago and is currently restricted to non-weight-bearing status. The patient reports foot pain in the injured extremity. Based on the patient's report, which of the following tests and measures should the therapist perform?
 
 A. Gait examination
 B. Transfer abilities
@@ -1369,7 +2125,7 @@ D. Blood pressure examination
 
 ---
 
-**Q29.** A male patient has been referred to physical therapy with lumbar pain that radiates around the iliac crest to the groin. Physical examination reveals pain unchanged by position, no point tenderness in the paraspinal muscles, a positive iliopsoas sign, and supraclavicular adenopathy. Which of the following actions should the physical therapist take **FIRST**?
+**Q119.** A male patient has been referred to physical therapy with lumbar pain that radiates around the iliac crest to the groin. Physical examination reveals pain unchanged by position, no point tenderness in the paraspinal muscles, a positive iliopsoas sign, and supraclavicular adenopathy. Which of the following actions should the physical therapist take **FIRST**?
 
 A. Refer the patient back to the physician for suspicion of testicular cancer.
 B. Refer the patient back to the physician for suspicion of herniated nucleus pulposus.
@@ -1386,12 +2142,14 @@ D. Administer tests of neurodynamic mobility and trunk range of motion.
 
 ---
 
-**Q30.** [Photograph shows testing of the biceps deep tendon reflex.] A physical therapist is testing the deep tendon reflex of a patient as shown in the photograph. The patient has hypothyroidism. Which of the following reflex grades is the therapist **MOST** likely to find in the patient?
+**Q120.** [Photograph shows testing of the biceps deep tendon reflex.] A physical therapist is testing the deep tendon reflex of a patient as shown in the photograph. The patient has hypothyroidism. Which of the following reflex grades is the therapist **MOST** likely to find in the patient?
 
 A. 0
 B. 1+
 C. 2+
 D. 3+
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 3/Q30.png`.
 
 **Correct Answer:**
 - **B.** Hyporeflexia (1+) is associated with hypothyroidism.
@@ -1403,7 +2161,7 @@ D. 3+
 
 ---
 
-**Q31.** Which of the following postural drainage positions is **MOST** appropriate for a patient who has aspiration pneumonia in the right middle lobe and who had a craniotomy 2 days ago?
+**Q121.** Which of the following postural drainage positions is **MOST** appropriate for a patient who has aspiration pneumonia in the right middle lobe and who had a craniotomy 2 days ago?
 
 A. Right sidelying with one-quarter turn toward supine and the bed flat
 B. Left sidelying with one-quarter turn toward supine with head of bed down approximately 20°
@@ -1420,7 +2178,7 @@ D. Left sidelying with one-quarter turn toward supine and the bed flat
 
 ---
 
-**Q32.** A physical therapist is planning a patient education program for a group of patients with chronic low back pain. The therapist should use which of the following strategies to **MOST** increase the likelihood that the patients will utilize the proper body mechanics they learn?
+**Q122.** A physical therapist is planning a patient education program for a group of patients with chronic low back pain. The therapist should use which of the following strategies to **MOST** increase the likelihood that the patients will utilize the proper body mechanics they learn?
 
 A. Ask the patients to demonstrate use of proper body mechanics.
 B. Provide a reference list of articles describing body mechanics.
@@ -1437,12 +2195,14 @@ D. Provide information on the frequency of low back injuries due to improper bod
 
 ---
 
-**Q33.** [Photographs 1 and 2 show a seated knee extension test (photo 1) and a straight-leg raise test (photo 2).] A patient has low back and leg pain, with symptoms extending to the bottom of the foot. During the physical therapy examination, the patient does not report leg pain in the first test position (photograph 1) but reports a severe increase in symptoms in the second test position (photograph 2). Which of the following conclusions is **MOST** likely?
+**Q123.** [Photographs 1 and 2 show a seated knee extension test (photo 1) and a straight-leg raise test (photo 2).] A patient has low back and leg pain, with symptoms extending to the bottom of the foot. During the physical therapy examination, the patient does not report leg pain in the first test position (photograph 1) but reports a severe increase in symptoms in the second test position (photograph 2). Which of the following conclusions is **MOST** likely?
 
 A. The pain is the result of a herniated disc.
 B. The patient may be displaying nonorganic symptoms.
 C. The symptoms are the result of an inflamed sciatic nerve.
 D. The hamstrings are in a facilitated state of contraction.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 3/Q33.png`.
 
 **Correct Answer:**
 - **B.** Because sitting knee extension and the straight-leg raise culminate in essentially identical positions, symptomatic responses to the two types of maneuvers should be similar. Taken together, the findings suggest that the patient may be displaying nonorganic symptoms.
@@ -1454,7 +2214,7 @@ D. The hamstrings are in a facilitated state of contraction.
 
 ---
 
-**Q34.** Prior to starting an exercise training program, a patient with cardiac problems who is taking beta-blocking medication should receive an explanation of the:
+**Q124.** Prior to starting an exercise training program, a patient with cardiac problems who is taking beta-blocking medication should receive an explanation of the:
 
 A. greater benefits from cardiovascular exercise to be achieved at lower rather than at higher metabolic levels.
 B. need to use measures other than heart rate to determine intensity of exercise.
@@ -1471,7 +2231,7 @@ D. need for longer warm-up periods and cool-down periods during exercise session
 
 ---
 
-**Q35.** During the initial evaluation of a patient with right upper extremity pain, the physical therapist notes that the patient's right scapula is significantly lower than the left scapula. Shortness of which of the following muscles on the right is **MOST** likely to lead to this patient's postural presentation?
+**Q125.** During the initial evaluation of a patient with right upper extremity pain, the physical therapist notes that the patient's right scapula is significantly lower than the left scapula. Shortness of which of the following muscles on the right is **MOST** likely to lead to this patient's postural presentation?
 
 A. Latissimus dorsi
 B. Upper trapezius
@@ -1488,7 +2248,7 @@ D. Teres major
 
 ---
 
-**Q36.** Which of the following nerves innervates the pelvic floor muscles?
+**Q126.** Which of the following nerves innervates the pelvic floor muscles?
 
 A. Sciatic
 B. Pudendal
@@ -1505,7 +2265,7 @@ D. Genitofemoral
 
 ---
 
-**Q37.** Which of the following findings is **MOST** likely to be observed in the early stages of chronic obstructive pulmonary disease?
+**Q127.** Which of the following findings is **MOST** likely to be observed in the early stages of chronic obstructive pulmonary disease?
 
 A. Excessive bouts of coughing
 B. Excessive sputum production
@@ -1522,7 +2282,7 @@ D. Decreased activity of the scalenes
 
 ---
 
-**Q38.** A physical therapist researcher is developing a study to compare differences in range of motion outcomes in two groups of patients who have had a total knee arthroplasty. Over an 8-week period, one group of patients receives outpatient physical therapy 1 time/week and the other group receives outpatient physical therapy 3 times/week. In this study, what is the dependent variable?
+**Q128.** A physical therapist researcher is developing a study to compare differences in range of motion outcomes in two groups of patients who have had a total knee arthroplasty. Over an 8-week period, one group of patients receives outpatient physical therapy 1 time/week and the other group receives outpatient physical therapy 3 times/week. In this study, what is the dependent variable?
 
 A. Range of motion
 B. Frequency of visits
@@ -1539,7 +2299,7 @@ D. 8 weeks
 
 ---
 
-**Q39.** A patient with a cerebellar stroke has received functional balance training for 4 weeks. Which of the following tests is **MOST** appropriate to measure the effectiveness of the physical therapy intervention?
+**Q129.** A patient with a cerebellar stroke has received functional balance training for 4 weeks. Which of the following tests is **MOST** appropriate to measure the effectiveness of the physical therapy intervention?
 
 A. Romberg Test
 B. Berg Balance Scale
@@ -1556,7 +2316,7 @@ D. Barthel Index
 
 ---
 
-**Q40.** Which of the following positions is **MOST** appropriate to mobilize the radial nerve?
+**Q130.** Which of the following positions is **MOST** appropriate to mobilize the radial nerve?
 
 A. Shoulder abduction, elbow extension, and wrist extension
 B. Shoulder flexion, elbow flexion, and wrist extension
@@ -1573,7 +2333,7 @@ D. Shoulder extension, elbow extension, and wrist flexion
 
 ---
 
-**Q41.** During the gait evaluation of a patient, a physical therapist notices that the patient laterally bends excessively toward the right side during the midstance phase on the right. For the therapist to test the suspected muscle for Normal (5/5) strength, the patient should **FIRST** be positioned:
+**Q131.** During the gait evaluation of a patient, a physical therapist notices that the patient laterally bends excessively toward the right side during the midstance phase on the right. For the therapist to test the suspected muscle for Normal (5/5) strength, the patient should **FIRST** be positioned:
 
 A. prone with the knee straight.
 B. supine with the knee bent.
@@ -1590,7 +2350,7 @@ D. sidelying on the left side.
 
 ---
 
-## Scenario (applies to Q42–Q45)
+## Scenario (applies to Q132–Q135)
 
 **Setting:** Outpatient clinic
 **Sex:** Female
@@ -1635,7 +2395,7 @@ D. sidelying on the left side.
 
 ---
 
-**Q42.** The patient is **MOST** likely to have which of the following additional postural impairments?
+**Q132.** The patient is **MOST** likely to have which of the following additional postural impairments?
 
 A. Posteriorly tilted scapulae
 B. Laterally (externally) rotated humeri
@@ -1652,7 +2412,7 @@ D. Increased retraction and elevation of the mandible
 
 ---
 
-**Q43.** When lifting her head during rising from a supine position, the patient **MOST** likely utilizes which of the following muscles?
+**Q133.** When lifting her head during rising from a supine position, the patient **MOST** likely utilizes which of the following muscles?
 
 A. Longus colli
 B. Sternocleidomastoid
@@ -1669,7 +2429,7 @@ D. Obliquus capitis superior
 
 ---
 
-**Q44.** Which of the following exercises is the **MOST** appropriate initial intervention for this patient?
+**Q134.** Which of the following exercises is the **MOST** appropriate initial intervention for this patient?
 
 A. Chin tucks in quadruped position
 B. Chin tucks with shoulder flexion in supine position
@@ -1686,7 +2446,7 @@ D. Head nods in supine position on an incline board
 
 ---
 
-**Q45.** A physical therapist decides to perform manual therapy techniques for the patient. Prior to initiation of small amplitude, high-velocity mobilizations at the limit of available motion, which of the following findings should be of **MOST** concern?
+**Q135.** A physical therapist decides to perform manual therapy techniques for the patient. Prior to initiation of small amplitude, high-velocity mobilizations at the limit of available motion, which of the following findings should be of **MOST** concern?
 
 A. Age
 B. T-score
@@ -1702,11 +2462,15 @@ D. Cervical mobility
 - **D.** Passive accessory intervertebral motion can assess whether the joint is normal, hypermobile, or hypomobile (Dutton, p. 1138). Hypermobility would be a contraindication to performing any high-velocity thrust maneuvers, not hypomobility. This patient demonstrated hypomobility according to the evaluation.
 
 
-> **Note:** Question 26 was not captured in the source files. Questions 1–25 and 27–45 are included.
+## Section 4 — Questions Q136–Q180
 
 ---
 
-**Q1.** A 50-year-old male patient reports a sudden onset of severe right great toe pain that began the morning of the current day. He reports being very tired and having chills over the past 24 hours. The patient has a 102°F (38.8°C) temperature, and his right great toe is warm and swollen. What is the **MOST** likely cause of these symptoms?
+> **Note:** This section has 44 items. Q161 (section item 26) was not captured in the source screenshots and is intentionally absent.
+
+---
+
+**Q136.** A 50-year-old male patient reports a sudden onset of severe right great toe pain that began the morning of the current day. He reports being very tired and having chills over the past 24 hours. The patient has a 102°F (38.8°C) temperature, and his right great toe is warm and swollen. What is the **MOST** likely cause of these symptoms?
 
 A. Gout
 B. Bunion
@@ -1723,7 +2487,7 @@ D. Rheumatoid arthritis
 
 ---
 
-**Q2.** A patient with early symptomatic human immunodeficiency virus infection is **MOST** likely to report which of the following symptoms?
+**Q137.** A patient with early symptomatic human immunodeficiency virus infection is **MOST** likely to report which of the following symptoms?
 
 A. Fatigue
 B. Blurred vision
@@ -1740,7 +2504,7 @@ D. Poor wound healing
 
 ---
 
-**Q3.** The physical therapy intervention for a patient with dark skin pigmentation includes superficial heat. After 5 minutes of this intervention, the physical therapist removes the heat and observes that the skin over the region being treated is blotchy with both darker and lighter areas. What is the **MOST** appropriate action for the therapist to take?
+**Q138.** The physical therapy intervention for a patient with dark skin pigmentation includes superficial heat. After 5 minutes of this intervention, the physical therapist removes the heat and observes that the skin over the region being treated is blotchy with both darker and lighter areas. What is the **MOST** appropriate action for the therapist to take?
 
 A. Discontinue superficial heat and initiate ultrasound.
 B. Continue with the use of superficial heat, because this is a normal response.
@@ -1757,7 +2521,7 @@ D. Continue with the use of superficial heat, but add more towel layers.
 
 ---
 
-**Q4.** A physical therapist should anticipate that an abnormal lymph node will feel:
+**Q139.** A physical therapist should anticipate that an abnormal lymph node will feel:
 
 A. soft and nonmobile and have an increased skin temperature.
 B. firm and nontender and have an increased skin temperature.
@@ -1774,7 +2538,7 @@ D. soft, mobile, and tender or nontender.
 
 ---
 
-**Q5.** A patient who has atrophy of the hypothenar eminence of the hand will most likely have the **GREATEST** difficulty performing which of the following tasks?
+**Q140.** A patient who has atrophy of the hypothenar eminence of the hand will most likely have the **GREATEST** difficulty performing which of the following tasks?
 
 A. Holding a cup of water and transferring the contents into another cup
 B. Writing two short sentences on a piece of paper using a fine-tipped pen
@@ -1791,7 +2555,7 @@ D. Pulling a piece of paper between the pads of the thumb (1st digit) and the in
 
 ---
 
-**Q6.** During examination of a patient, a physical therapist notes that one of the patient's feet is erythematous, swollen, and significantly warmer to the touch than the contralateral foot. The patient denies any pain or trauma. The patient has a history of diabetes, peripheral vascular disease, and chronic heart failure. The findings are **MOST** consistent with the presence of which of the following conditions?
+**Q141.** During examination of a patient, a physical therapist notes that one of the patient's feet is erythematous, swollen, and significantly warmer to the touch than the contralateral foot. The patient denies any pain or trauma. The patient has a history of diabetes, peripheral vascular disease, and chronic heart failure. The findings are **MOST** consistent with the presence of which of the following conditions?
 
 A. Grade III sprain of the talocrural ligament
 B. Fractured distal tibia
@@ -1808,7 +2572,7 @@ D. Charcot disease
 
 ---
 
-**Q7.** When considering special tests for orthopedic assessment, selection of a test with adequate validity is important because the:
+**Q142.** When considering special tests for orthopedic assessment, selection of a test with adequate validity is important because the:
 
 A. results of the test can be standardized.
 B. test measures what it is supposed to measure.
@@ -1825,7 +2589,7 @@ D. test can be accurately performed by someone else.
 
 ---
 
-**Q8.** A patient is referred for recommendations regarding purchase of a wheelchair. The measurements of the patient while sitting are 16 inches (40.6 cm) across the widest point of the hips and 18 inches (45.7 cm) from the rear of the buttocks to the popliteal crease. Which of the following wheelchair dimensions would be **BEST** suited for this patient's needs?
+**Q143.** A patient is referred for recommendations regarding purchase of a wheelchair. The measurements of the patient while sitting are 16 inches (40.6 cm) across the widest point of the hips and 18 inches (45.7 cm) from the rear of the buttocks to the popliteal crease. Which of the following wheelchair dimensions would be **BEST** suited for this patient's needs?
 
 A. Seat width and seat depth of 18 inches (45.7 cm)
 B. Seat width of 18 inches (45.7 cm) and seat depth of 16 inches (40.6 cm)
@@ -1842,12 +2606,14 @@ D. Seat width of 16 inches (40.6 cm) and seat depth of 18 inches (45.7 cm)
 
 ---
 
-**Q9.** A physical therapist is measuring a patient's ankle dorsiflexion range of motion. The measurement shown in photograph A is greater than the measurement shown in photograph B. The **MOST** likely cause of the difference in measurement is:
+**Q144.** A physical therapist is measuring a patient's ankle dorsiflexion range of motion. The measurement shown in photograph A is greater than the measurement shown in photograph B. The **MOST** likely cause of the difference in measurement is:
 
 A. talocrural joint capsule restriction.
 B. weakness of the ankle dorsiflexors.
 C. tightness of the hamstrings.
 D. tightness of the gastrocnemius.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 4/Q9.png`.
 
 **Correct Answer:**
 - **D.** In photograph A, there is more dorsiflexion present with the knee bent. In this position, the gastrocnemius is on slack across the knee joint, which allows greater range of dorsiflexion. In photograph B, the gastrocnemius is stretched over the knee joint, so tightness in the gastrocnemius would restrict ankle dorsiflexion.
@@ -1859,7 +2625,7 @@ D. tightness of the gastrocnemius.
 
 ---
 
-**Q10.** When treating a patient who has ankylosing spondylitis, which of the following muscles require the **MOST** emphasis in strengthening exercises?
+**Q145.** When treating a patient who has ankylosing spondylitis, which of the following muscles require the **MOST** emphasis in strengthening exercises?
 
 A. Pectorals
 B. Hip flexors
@@ -1876,7 +2642,7 @@ D. Abdominals
 
 ---
 
-**Q11.** A runner is referred to physical therapy with medial ankle pain. Examination shows posterior medial malleolar tenderness and a supinated hindfoot at heel strike (initial contact). Which of the following muscles is **MOST** likely responsible for these impairments?
+**Q146.** A runner is referred to physical therapy with medial ankle pain. Examination shows posterior medial malleolar tenderness and a supinated hindfoot at heel strike (initial contact). Which of the following muscles is **MOST** likely responsible for these impairments?
 
 A. Tibialis anterior
 B. Soleus
@@ -1893,7 +2659,7 @@ D. Fibularis (peroneus) longus
 
 ---
 
-**Q12.** A physical therapist is working with a child who recently learned to sit independently. Which of the following gross motor skills should be the focus of intervention **NEXT**?
+**Q147.** A physical therapist is working with a child who recently learned to sit independently. Which of the following gross motor skills should be the focus of intervention **NEXT**?
 
 A. Cruising
 B. Walking
@@ -1910,7 +2676,7 @@ D. Rolling from prone to supine position
 
 ---
 
-**Q13.** A patient with sudden onset of weakness of the facial muscles on the right side is unable to wrinkle the forehead, smile, pucker the lips, or wrinkle the nose. There is an absence of tearing in the patient's right eye and dryness of the mouth. The patient's corneal reflex is absent on the right but normal on the left, and pinprick and temperature sensation are normal on both sides of the face. This presentation is characteristic of:
+**Q148.** A patient with sudden onset of weakness of the facial muscles on the right side is unable to wrinkle the forehead, smile, pucker the lips, or wrinkle the nose. There is an absence of tearing in the patient's right eye and dryness of the mouth. The patient's corneal reflex is absent on the right but normal on the left, and pinprick and temperature sensation are normal on both sides of the face. This presentation is characteristic of:
 
 A. trigeminal neuralgia.
 B. Bell palsy.
@@ -1927,7 +2693,7 @@ D. oculomotor nerve (CN III) damage.
 
 ---
 
-**Q14.** A physical therapist is treating a 12-year-old athlete who has had lateral epicondylalgia for 3 weeks. Which of the following modalities presents the **GREATEST** concern for possible harm to this patient?
+**Q149.** A physical therapist is treating a 12-year-old athlete who has had lateral epicondylalgia for 3 weeks. Which of the following modalities presents the **GREATEST** concern for possible harm to this patient?
 
 A. Ice massage
 B. Iontophoresis
@@ -1944,12 +2710,14 @@ D. Continuous ultrasound
 
 ---
 
-**Q15.** A physical therapist examining a patient's joint play finds restriction in the direction indicated by the arrow in the photograph. To address the restriction, the therapist should include an intervention to increase which motion of the index finger (2nd digit)?
+**Q150.** A physical therapist examining a patient's joint play finds restriction in the direction indicated by the arrow in the photograph. To address the restriction, the therapist should include an intervention to increase which motion of the index finger (2nd digit)?
 
 A. Flexion
 B. Extension
 C. Abduction
 D. Rotation
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 4/Q15.png`.
 
 **Correct Answer:**
 - **A.** The therapist is shown performing a volar glide, which is the same joint motion used for finger flexion. Limited motion in this direction indicates limited ability to perform finger flexion.
@@ -1961,7 +2729,7 @@ D. Rotation
 
 ---
 
-**Q16.** Which of the following nervous system complications would indicate the poorest prognosis for a patient with acquired immunodeficiency syndrome (AIDS)?
+**Q151.** Which of the following nervous system complications would indicate the poorest prognosis for a patient with acquired immunodeficiency syndrome (AIDS)?
 
 A. Toxoplasmosis
 B. Leukoencephalopathy
@@ -1978,7 +2746,7 @@ D. Polyneuropathy
 
 ---
 
-**Q17.** A patient is referred to a physical therapist for treatment of left shoulder pain. During examination of the patient's left acromion, the therapist notes an area of skin discoloration that is 1.3 cm in diameter and lopsided in shape with irregular, poorly defined edges. The center is deep red with some shades of brown. The patient reports first noticing the discoloration about 2 months ago. The therapist should recognize these signs as characteristic of:
+**Q152.** A patient is referred to a physical therapist for treatment of left shoulder pain. During examination of the patient's left acromion, the therapist notes an area of skin discoloration that is 1.3 cm in diameter and lopsided in shape with irregular, poorly defined edges. The center is deep red with some shades of brown. The patient reports first noticing the discoloration about 2 months ago. The therapist should recognize these signs as characteristic of:
 
 A. basal cell carcinoma.
 B. squamous cell carcinoma.
@@ -1995,12 +2763,14 @@ D. a malignant melanoma.
 
 ---
 
-**Q18.** The baby in the video **MOST** likely has bilateral weakness in which of the following muscles?
+**Q153.** The baby in the video **MOST** likely has bilateral weakness in which of the following muscles?
 
 A. Rectus capitis anterior
 B. Iliopsoas
 C. Trapezius
 D. Splenius cervicis
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.A Answers copy/Section 4/Q18.mov`.
 
 **Correct Answer:**
 - **A.** The rectus capitis anterior are deep neck flexors responsible for capital flexion (chin tuck) (Avers, p. 30). The child in the video demonstrates head lag during pull to sit. Neck flexion is required for this task. (Martin p. 59)
@@ -2012,7 +2782,7 @@ D. Splenius cervicis
 
 ---
 
-**Q19.** A patient who is relearning the task of moving from sitting to standing position following traumatic brain injury is frustrated because of repeated failed attempts. To facilitate the patient's success, a physical therapist should **FIRST**:
+**Q154.** A patient who is relearning the task of moving from sitting to standing position following traumatic brain injury is frustrated because of repeated failed attempts. To facilitate the patient's success, a physical therapist should **FIRST**:
 
 A. permit the patient to rest until the next physical therapy session and reattempt the activity.
 B. encourage the patient to visualize success with the task before resuming attempts.
@@ -2029,7 +2799,7 @@ D. decrease the challenge of the task, so that the patient experiences success.
 
 ---
 
-**Q20.** Regular aerobic exercise lasting at least 30 minutes per session should be **MOST** beneficial in decreasing the symptoms associated with which of the following conditions?
+**Q155.** Regular aerobic exercise lasting at least 30 minutes per session should be **MOST** beneficial in decreasing the symptoms associated with which of the following conditions?
 
 A. Type 1 diabetes
 B. Type 2 diabetes
@@ -2046,7 +2816,7 @@ D. Amyotrophic lateral sclerosis
 
 ---
 
-**Q21.** A patient who has low back pain is placed in prone position. A physical therapist performs posteroanterior lumbar segmental mobility testing on the patient and provokes tenderness in the L3–L4 segments. The patient is then instructed to stand and bend over the end of the plinth, grab the edges of the plinth in order to stabilize the trunk, and lift both feet off the ground. Which of the following consequent scenarios will be **MOST** helpful in establishing the patient's prognosis?
+**Q156.** A patient who has low back pain is placed in prone position. A physical therapist performs posteroanterior lumbar segmental mobility testing on the patient and provokes tenderness in the L3–L4 segments. The patient is then instructed to stand and bend over the end of the plinth, grab the edges of the plinth in order to stabilize the trunk, and lift both feet off the ground. Which of the following consequent scenarios will be **MOST** helpful in establishing the patient's prognosis?
 
 A. Inability to secure the upper body on the plinth
 B. Inability to lift both lower extremities off the ground
@@ -2063,7 +2833,7 @@ D. Reduced localized back pain symptoms with the legs lifted
 
 ---
 
-**Q22.** A patient with Parkinson disease demonstrates shortness of breath with activity. Which of the following tests is **MOST** appropriate for a physical therapist to perform to help delineate a cause for the patient's shortness of breath?
+**Q157.** A patient with Parkinson disease demonstrates shortness of breath with activity. Which of the following tests is **MOST** appropriate for a physical therapist to perform to help delineate a cause for the patient's shortness of breath?
 
 A. Deep tendon reflex testing
 B. Sensory examination
@@ -2080,7 +2850,7 @@ D. Posture examination
 
 ---
 
-**Q23.** Which of the following statements **MOST** accurately describes the proper testing technique when using monofilaments?
+**Q158.** Which of the following statements **MOST** accurately describes the proper testing technique when using monofilaments?
 
 A. Place the monofilament perpendicular to the skin surface, bending the monofilament.
 B. Place the monofilament perpendicular to the skin surface without bending the monofilament.
@@ -2097,7 +2867,7 @@ D. Place the monofilament parallel to the skin surface and move it up and down.
 
 ---
 
-**Q24.** A patient who has low back pain reports a history of gastroesophageal reflux disease. Which of the following exercise modifications should be used to prevent exacerbations of the reflux disease?
+**Q159.** A patient who has low back pain reports a history of gastroesophageal reflux disease. Which of the following exercise modifications should be used to prevent exacerbations of the reflux disease?
 
 A. Position the patient in an upright posture.
 B. Place the patient in prone position.
@@ -2114,7 +2884,7 @@ D. Place the patient in supine position.
 
 ---
 
-**Q25.** A physical therapist is taking the history of a patient with low back pain. If the therapist suspects the pain is caused by an inflammatory reaction, which of the following questions is **BEST** for the therapist to ask?
+**Q160.** A physical therapist is taking the history of a patient with low back pain. If the therapist suspects the pain is caused by an inflammatory reaction, which of the following questions is **BEST** for the therapist to ask?
 
 A. Is your pain constant or intermittent?
 B. What activity bothers you the most?
@@ -2131,7 +2901,7 @@ D. Does your pain radiate down into the leg?
 
 ---
 
-**Q27.** A physical therapist observes that a patient with end-stage renal disease has significant exercise intolerance. Which of the following factors is the **MOST** likely cause of the exercise intolerance?
+**Q162.** A physical therapist observes that a patient with end-stage renal disease has significant exercise intolerance. Which of the following factors is the **MOST** likely cause of the exercise intolerance?
 
 A. Anemia
 B. Hypotension
@@ -2148,7 +2918,7 @@ D. Increased VO₂
 
 ---
 
-**Q28.** A patient has sustained a traumatic brain injury and is slow to respond to all stimuli. The patient currently verbalizes and moves away from noxious stimuli and is able to close the eyes 3 of 5 times when asked. What level on the Rancho Los Amigos levels of cognitive functioning scale **BEST** describes this patient's current status?
+**Q163.** A patient has sustained a traumatic brain injury and is slow to respond to all stimuli. The patient currently verbalizes and moves away from noxious stimuli and is able to close the eyes 3 of 5 times when asked. What level on the Rancho Los Amigos levels of cognitive functioning scale **BEST** describes this patient's current status?
 
 A. Localized response
 B. Confused-agitated
@@ -2165,7 +2935,7 @@ D. Confused-inappropriate
 
 ---
 
-**Q29.** A patient is doing active and resistive exercises on a mat table in the physical therapy department. After 15 minutes, the patient becomes short of breath, begins coughing, and expectorates pink, frothy sputum. At this point, the physical therapist should first stop the treatment, then **NEXT**:
+**Q164.** A patient is doing active and resistive exercises on a mat table in the physical therapy department. After 15 minutes, the patient becomes short of breath, begins coughing, and expectorates pink, frothy sputum. At this point, the physical therapist should first stop the treatment, then **NEXT**:
 
 A. assess vital signs, let the patient rest a few minutes with the feet elevated, and then resume with a less vigorous program.
 B. sit the patient up, assess vital signs, and call a nurse or physician for further instructions.
@@ -2182,7 +2952,7 @@ D. lay the patient down flat, call for assistance, and begin cardiopulmonary res
 
 ---
 
-**Q30.** Which of the following statements regarding the patient's right to refuse treatment is **MOST** accurate?
+**Q165.** Which of the following statements regarding the patient's right to refuse treatment is **MOST** accurate?
 
 A. The right to make health care decisions is protected by law.
 B. The court may override a competent adult's decision to refuse medical treatment.
@@ -2199,7 +2969,7 @@ D. A patient cannot refuse treatment based on fear of the procedure.
 
 ---
 
-**Q31.** A patient who had a subacute stroke is being admitted to a rehabilitation hospital. Which of the following conditions is associated with the **BEST** prognosis for improved mobility?
+**Q166.** A patient who had a subacute stroke is being admitted to a rehabilitation hospital. Which of the following conditions is associated with the **BEST** prognosis for improved mobility?
 
 A. Admission to rehabilitation at 1 month post stroke
 B. Hemispheric lesion as compared to a lacunar lesion
@@ -2216,7 +2986,7 @@ D. Ability to sit independently upon admission to rehabilitation
 
 ---
 
-**Q32.** Which of the following recommendations is **MOST** appropriate for a patient who has a diagnosis of diabetes mellitus and sensory neuropathies in both feet?
+**Q167.** Which of the following recommendations is **MOST** appropriate for a patient who has a diagnosis of diabetes mellitus and sensory neuropathies in both feet?
 
 A. Perform weekly foot examinations to check for possible skin breakdown.
 B. Frequently wash and apply lotion to the entire foot and wear soft slippers.
@@ -2233,7 +3003,7 @@ D. Ensure comfortable and proper shoe fit and break in new shoes slowly.
 
 ---
 
-**Q33.** A 15-month-old patient who has clubfoot will **MOST** likely hold the foot and ankle in which of the following positions?
+**Q168.** A 15-month-old patient who has clubfoot will **MOST** likely hold the foot and ankle in which of the following positions?
 
 A. Dorsiflexion and calcaneal varus
 B. Plantar flexion and calcaneal valgus
@@ -2250,7 +3020,7 @@ D. Plantar flexion and forefoot adduction
 
 ---
 
-**Q34.** A physical therapist is evaluating a patient who has a chest tube. The therapist accidentally knocks over the collection reservoir. After returning it to an upright position, which of the following locations is **MOST** appropriate for the collection reservoir?
+**Q169.** A physical therapist is evaluating a patient who has a chest tube. The therapist accidentally knocks over the collection reservoir. After returning it to an upright position, which of the following locations is **MOST** appropriate for the collection reservoir?
 
 A. Hang it on an intravenous pole.
 B. Place it on the patient's bedside table.
@@ -2267,7 +3037,7 @@ D. Place it on the bed near the insertion site.
 
 ---
 
-**Q35.** A 2-year-old child has spastic quadriplegic cerebral palsy, with persistence of primitive reflexes, no selective control of movement, and frequent respiratory infections. Which of the following elements is **MOST** critical to include in the physical therapist's examination?
+**Q170.** A 2-year-old child has spastic quadriplegic cerebral palsy, with persistence of primitive reflexes, no selective control of movement, and frequent respiratory infections. Which of the following elements is **MOST** critical to include in the physical therapist's examination?
 
 A. Modified Ashworth scale
 B. Auscultation of heart sounds
@@ -2284,7 +3054,7 @@ D. Assessment of anticipatory postural adjustments
 
 ---
 
-**Q36.** When a patient makes a fist, the head of the third metacarpal is level with the second and fourth metacarpals. This finding is indicative of which of the following conditions?
+**Q171.** When a patient makes a fist, the head of the third metacarpal is level with the second and fourth metacarpals. This finding is indicative of which of the following conditions?
 
 A. Lunate dislocation
 B. Capitate instability
@@ -2301,7 +3071,7 @@ D. Lunotriquetral ligament tear
 
 ---
 
-**Q37.** When held supported in standing position, a 14-month-old child with spastic diplegia is up on tiptoes with the toes curled. This position is characteristic of a:
+**Q172.** When held supported in standing position, a 14-month-old child with spastic diplegia is up on tiptoes with the toes curled. This position is characteristic of a:
 
 A. proprioceptive placing reaction.
 B. Moro reflex.
@@ -2318,7 +3088,7 @@ D. traction response.
 
 ---
 
-**Q38.** A patient who has an Osgood-Schlatter lesion is **MOST** likely to experience pain around which of the following structures and with which activity?
+**Q173.** A patient who has an Osgood-Schlatter lesion is **MOST** likely to experience pain around which of the following structures and with which activity?
 
 A. Patella after jumping
 B. Tibial tubercle after jumping
@@ -2335,7 +3105,7 @@ D. Tibial tubercle after extended sitting
 
 ---
 
-**Q39.** A physical therapist is evaluating a patient with low back pain and associated symptoms. Which of the following findings should cause the therapist to refer the patient back to the physician?
+**Q174.** A physical therapist is evaluating a patient with low back pain and associated symptoms. Which of the following findings should cause the therapist to refer the patient back to the physician?
 
 A. Atrophy of the gluteal mass
 B. Pain radiating down the back of the thigh into the posterior lower leg
@@ -2352,7 +3122,7 @@ D. Decreased perineal reflexes
 
 ---
 
-**Q40.** Excessive upward rotation of the right scapula is noted when a patient attempts to perform shoulder flexion. Which of the following exercises is **MOST** appropriate to help correct the excessive scapular rotation?
+**Q175.** Excessive upward rotation of the right scapula is noted when a patient attempts to perform shoulder flexion. Which of the following exercises is **MOST** appropriate to help correct the excessive scapular rotation?
 
 A. Right scapular protraction against resistance with the right arm at 90° of flexion
 B. Bilateral scapular elevation with the upper extremities at 180° of flexion
@@ -2369,7 +3139,7 @@ D. Bilateral scapular adduction with the upper extremities medially (internally)
 
 ---
 
-## Scenario (applies to Q41–Q45)
+## Scenario (applies to Q176–Q180)
 
 Setting: Acute inpatient rehabilitation
 Sex: Male
@@ -2395,7 +3165,7 @@ Physical Therapy Intervention(s)
 
 ---
 
-**Q41.** During lung auscultation, which of the following sounds will **MOST** likely be heard over the patient's left lower lobe?
+**Q176.** During lung auscultation, which of the following sounds will **MOST** likely be heard over the patient's left lower lobe?
 
 A. Crackles (rales)
 B. Bronchovesicular sounds
@@ -2412,7 +3182,7 @@ D. Low-pitched wheezes (rhonchi)
 
 ---
 
-**Q42.** Which of the following pulmonary interventions is **MOST** appropriate for the patient?
+**Q177.** Which of the following pulmonary interventions is **MOST** appropriate for the patient?
 
 A. Postural drainage
 B. Manual chest wall percussion
@@ -2429,7 +3199,7 @@ D. Use of a vibratory positive expiratory pressure device
 
 ---
 
-**Q43.** During a transfer from supine to seated position, the patient should **AVOID** which of the following actions?
+**Q178.** During a transfer from supine to seated position, the patient should **AVOID** which of the following actions?
 
 A. Twisting his back
 B. Rolling onto his side
@@ -2446,7 +3216,7 @@ D. Pushing through the arm
 
 ---
 
-**Q44.** Which of the following types of orthosis should the physical therapist recommend for the patient?
+**Q179.** Which of the following types of orthosis should the physical therapist recommend for the patient?
 
 A. Ankle-foot
 B. Knee-ankle-foot
@@ -2463,7 +3233,7 @@ D. Reciprocating gait
 
 ---
 
-**Q45.** The patient is **MOST** at risk of developing which of the following complications?
+**Q180.** The patient is **MOST** at risk of developing which of the following complications?
 
 A. Spinal shock
 B. Autonomic dysreflexia
@@ -2479,9 +3249,11 @@ D. Upper extremity contracture
 - **D.** This patient is less likely to develop upper extremity contracture (Martin).
 
 
+## Section 5 — Questions Q181–Q225
+
 ---
 
-**Q1.** A patient who sustained a right cerebrovascular accident exhibits a flaccid left arm. During muscle testing, the patient is able to shrug the left shoulder. Which of the following statements **MOST** accurately explains this response?
+**Q181.** A patient who sustained a right cerebrovascular accident exhibits a flaccid left arm. During muscle testing, the patient is able to shrug the left shoulder. Which of the following statements **MOST** accurately explains this response?
 
 A. The anterior lobe of the cerebellum was affected.
 B. The vagus nerve (CN X) was not affected.
@@ -2498,7 +3270,7 @@ D. The middle cerebral artery was affected.
 
 ---
 
-**Q2.** A patient is performing a Phase I (inpatient) cardiac rehabilitation exercise session. The physical therapist should terminate low-level activity if which of the following changes occurs?
+**Q182.** A patient is performing a Phase I (inpatient) cardiac rehabilitation exercise session. The physical therapist should terminate low-level activity if which of the following changes occurs?
 
 A. The diastolic blood pressure increases to 115 mm Hg.
 B. The respiratory rate increases to 20 breaths/minute.
@@ -2515,7 +3287,7 @@ D. The heart rate increases by 18 bpm.
 
 ---
 
-**Q3.** The physical therapy plan for a patient who underwent a medial meniscectomy includes exercising the quadriceps femoris against accommodating resistance. Which of the following exercises should be recommended?
+**Q183.** The physical therapy plan for a patient who underwent a medial meniscectomy includes exercising the quadriceps femoris against accommodating resistance. Which of the following exercises should be recommended?
 
 A. Knee bends through half of the range
 B. Knee extension with an ankle weight
@@ -2532,7 +3304,7 @@ D. Straight-leg raising with a sling suspension
 
 ---
 
-**Q4.** Which of the following examination findings is consistent with dehydration?
+**Q184.** Which of the following examination findings is consistent with dehydration?
 
 A. Poor turgor
 B. Dependent edema
@@ -2549,7 +3321,7 @@ D. Hypertension
 
 ---
 
-**Q5.** During an examination of elbow strength using manual muscle testing, a patient supinates the forearm when attempting elbow flexion. Which of the following muscles is **MOST** likely doing the major part of the work?
+**Q185.** During an examination of elbow strength using manual muscle testing, a patient supinates the forearm when attempting elbow flexion. Which of the following muscles is **MOST** likely doing the major part of the work?
 
 A. Biceps brachii
 B. Brachialis
@@ -2566,7 +3338,7 @@ D. Brachioradialis
 
 ---
 
-**Q6.** Which of the following findings is present in a patient who has Guillain-Barré syndrome, but is not present in a patient who has multiple sclerosis?
+**Q186.** Which of the following findings is present in a patient who has Guillain-Barré syndrome, but is not present in a patient who has multiple sclerosis?
 
 A. Clonus
 B. Positive Babinski sign
@@ -2583,7 +3355,7 @@ D. Hypoactive deep tendon reflexes
 
 ---
 
-**Q7.** A patient who has a history of receiving radiation therapy reports a sensation of fullness and tightness of the forearm, limited wrist and finger movements, and difficulty wearing a wristwatch and ring. Which of the following tests and measures is **MOST** appropriate to perform?
+**Q187.** A patient who has a history of receiving radiation therapy reports a sensation of fullness and tightness of the forearm, limited wrist and finger movements, and difficulty wearing a wristwatch and ring. Which of the following tests and measures is **MOST** appropriate to perform?
 
 A. Check for pulse.
 B. Measure limb girth.
@@ -2600,7 +3372,7 @@ D. Grasp skin on dorsum of hand.
 
 ---
 
-**Q8.** A physical therapist is educating a patient on the use of a moist hot pack for home treatment. For the patient to prevent burns and still receive the benefits of superficial heat, which of the following heat application time frames is **MOST** appropriate?
+**Q188.** A physical therapist is educating a patient on the use of a moist hot pack for home treatment. For the patient to prevent burns and still receive the benefits of superficial heat, which of the following heat application time frames is **MOST** appropriate?
 
 A. 5-10 minutes
 B. 20-30 minutes
@@ -2617,7 +3389,7 @@ D. 70-90 minutes
 
 ---
 
-**Q9.** A physical therapist plans to collect data on patients' response to a specific intervention during a clinical trial. Which of the following statements **BEST** describes the therapist's responsibility to inform patients about the clinical trial?
+**Q189.** A physical therapist plans to collect data on patients' response to a specific intervention during a clinical trial. Which of the following statements **BEST** describes the therapist's responsibility to inform patients about the clinical trial?
 
 A. The therapist is not required to inform the patients.
 B. The therapist should inform the patients at the end of their course of physical therapy.
@@ -2634,12 +3406,14 @@ D. The therapist should inform the patients before the collection of the data.
 
 ---
 
-**Q10.** [The photograph shows two-point discrimination testing being performed on the hand.] The test shown in the photograph assesses which of the following tracts?
+**Q190.** [The photograph shows two-point discrimination testing being performed on the hand.] The test shown in the photograph assesses which of the following tracts?
 
 A. Lateral spinothalamic
 B. Dorsal column-medial lemniscal
 C. Anterior spinothalamic
 D. Ventral spinocerebellar
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 5/Q10.png`.
 
 **Correct Answer:**
 - **B.** The photograph depicts two-point discrimination testing. The dorsal column-medial lemniscal tract is responsible for discriminative sensations such as two-point discrimination. (O'Sullivan, pp. 100-101)
@@ -2651,7 +3425,7 @@ D. Ventral spinocerebellar
 
 ---
 
-**Q11.** During a posture examination, the physical therapist notes that both of the patient's patellae point inward when viewed from the front of the patient. The **MOST** likely cause of this problem is excessive:
+**Q191.** During a posture examination, the physical therapist notes that both of the patient's patellae point inward when viewed from the front of the patient. The **MOST** likely cause of this problem is excessive:
 
 A. femoral anteversion.
 B. weakness of the vastus medialis.
@@ -2668,7 +3442,7 @@ D. medial tibial torsion.
 
 ---
 
-**Q12.** A patient comes to physical therapy with a diagnosis of a medial meniscus tear of the right knee. Which of the following signs and symptoms is **MOST** indicative of this diagnosis?
+**Q192.** A patient comes to physical therapy with a diagnosis of a medial meniscus tear of the right knee. Which of the following signs and symptoms is **MOST** indicative of this diagnosis?
 
 A. Mechanical locking
 B. Decreased pain with weight-bearing
@@ -2685,12 +3459,14 @@ D. Atrophy of hamstrings
 
 ---
 
-**Q13.** [The image shows an AP radiograph of the shoulder with an arrow pointing to a bony prominence.] Which of the following structures is indicated by the arrow in the radiograph?
+**Q193.** [The image shows an AP radiograph of the shoulder with an arrow pointing to a bony prominence.] Which of the following structures is indicated by the arrow in the radiograph?
 
 A. Intertubercular groove
 B. Greater tubercle
 C. Lesser tubercle
 D. Coracoid process
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.A Answers copy/Section 5/Q13.png`.
 
 **Correct Answer:**
 - **B.** The structure indicated by the arrow is the greater tubercle. The arm is medially (internally) rotated in this radiograph, as evidenced by the position of the bicipital groove.
@@ -2702,7 +3478,7 @@ D. Coracoid process
 
 ---
 
-**Q14.** A patient with chronic venous insufficiency of the lower extremities is **MOST** likely to exhibit:
+**Q194.** A patient with chronic venous insufficiency of the lower extremities is **MOST** likely to exhibit:
 
 A. normal superficial veins, no edema, ulceration, and patches of gangrene around the toes.
 B. dilation of superficial veins, edema, and stasis ulceration.
@@ -2719,7 +3495,7 @@ D. dilation of superficial veins and edema made worse during sitting or elevatio
 
 ---
 
-**Q15.** A physical therapist is treating a patient with chronic range of motion limitation due to tight hamstrings. Which of the following applications of ultrasound and stretching is **BEST** to restore normal range of motion?
+**Q195.** A physical therapist is treating a patient with chronic range of motion limitation due to tight hamstrings. Which of the following applications of ultrasound and stretching is **BEST** to restore normal range of motion?
 
 A. Pulsed ultrasound at 1 MHz with onset of stretching 10 minutes after the ultrasound treatment
 B. Pulsed ultrasound at 1 MHz with stretching for 10 minutes during and immediately after the ultrasound treatment
@@ -2736,7 +3512,7 @@ D. Continuous ultrasound at 1 MHz with stretching for 10 minutes during and imme
 
 ---
 
-**Q16.** When planning a physical therapy program for a patient who has early stage Alzheimer disease, it is **MOST** important that the daily activities:
+**Q196.** When planning a physical therapy program for a patient who has early stage Alzheimer disease, it is **MOST** important that the daily activities:
 
 A. promote involvement and interest through maximum stimulation.
 B. are changed each day to meet the need for variety.
@@ -2753,7 +3529,7 @@ D. provide frequent opportunities for decision making.
 
 ---
 
-**Q17.** A long-distance runner comes to physical therapy with insidious onset of lower leg pain. The patient's examination results reveal weakness of toe flexion and ankle inversion. The physical therapist suspects vascular compromise associated with this presentation. Palpation at which of the following locations is **MOST** likely to reveal diminished arterial pulses in the patient?
+**Q197.** A long-distance runner comes to physical therapy with insidious onset of lower leg pain. The patient's examination results reveal weakness of toe flexion and ankle inversion. The physical therapist suspects vascular compromise associated with this presentation. Palpation at which of the following locations is **MOST** likely to reveal diminished arterial pulses in the patient?
 
 A. Dorsal aspect of the foot
 B. Posterior to the lateral malleolus
@@ -2770,7 +3546,7 @@ D. Lateral aspect of the popliteal fossa
 
 ---
 
-**Q18.** In a research study, the independent t-test was used as the statistical tool. How would statistically significant results be presented if alpha was set at .05?
+**Q198.** In a research study, the independent t-test was used as the statistical tool. How would statistically significant results be presented if alpha was set at .05?
 
 A. p <.05
 B. p >.05
@@ -2787,7 +3563,7 @@ D. r² <.05
 
 ---
 
-**Q19.** Which of the following ankle-brachial index values would indicate an absolute **CONTRAINDICATION** to compression therapy?
+**Q199.** Which of the following ankle-brachial index values would indicate an absolute **CONTRAINDICATION** to compression therapy?
 
 A. 1.3
 B. 1.0
@@ -2804,7 +3580,7 @@ D. 0.5
 
 ---
 
-**Q20.** A patient reports pain in the lateral aspect of the proximal forearm. The pain is reproduced with shoulder girdle depression, elbow extension, shoulder medial (internal) rotation, and wrist flexion. The patient's symptoms are relieved when the physical therapist removes the shoulder girdle depression component. Which of the following syndromes is the **MOST** appropriate clinical interpretation of these findings?
+**Q200.** A patient reports pain in the lateral aspect of the proximal forearm. The pain is reproduced with shoulder girdle depression, elbow extension, shoulder medial (internal) rotation, and wrist flexion. The patient's symptoms are relieved when the physical therapist removes the shoulder girdle depression component. Which of the following syndromes is the **MOST** appropriate clinical interpretation of these findings?
 
 A. Cubital tunnel
 B. Pronator teres
@@ -2821,12 +3597,14 @@ D. Anterior interosseous
 
 ---
 
-**Q21.** [The image shows a Talar Tilt Test being performed on a patient's ankle.] The test in the video **BEST** assesses which of the following structures?
+**Q201.** [The image shows a Talar Tilt Test being performed on a patient's ankle.] The test in the video **BEST** assesses which of the following structures?
 
 A. Syndesmosis
 B. Deltoid ligament
 C. Plantar fascia
 D. Calcaneofibular ligament
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.A Answers copy/Section 5/Q21.mov`.
 
 **Correct Answer:**
 - **D.** The test pictured is the Talar Tilt Test which best assesses the calcaneofibular ligament (pp. 936-937).
@@ -2838,7 +3616,7 @@ D. Calcaneofibular ligament
 
 ---
 
-**Q22.** A patient who had a radial shaft fracture 8 weeks ago just had the cast removed. The patient has limited range of motion in all directions and limited strength of the wrist and finger joints. Which of the following interventions would be **MOST** appropriate to begin developing range and motor control of the patient's wrist and hand?
+**Q202.** A patient who had a radial shaft fracture 8 weeks ago just had the cast removed. The patient has limited range of motion in all directions and limited strength of the wrist and finger joints. Which of the following interventions would be **MOST** appropriate to begin developing range and motor control of the patient's wrist and hand?
 
 A. Closed-chain concentric wrist strengthening
 B. Throwing and catching a ball with the affected hand
@@ -2855,7 +3633,7 @@ D. Eccentric strengthening exercises of the wrist flexors and extensors
 
 ---
 
-**Q23.** A patient is lying supine with hips and knees extended and hands behind the head. The patient is able to raise the head, shoulders, and thorax from the treatment table but is unable to come to a complete long-sitting position. What muscle should the physical therapist target for a strengthening program?
+**Q203.** A patient is lying supine with hips and knees extended and hands behind the head. The patient is able to raise the head, shoulders, and thorax from the treatment table but is unable to come to a complete long-sitting position. What muscle should the physical therapist target for a strengthening program?
 
 A. Iliopsoas
 B. External abdominal oblique
@@ -2872,7 +3650,7 @@ D. Upper rectus abdominis
 
 ---
 
-**Q24.** During the gait evaluation of a patient who has a transfemoral prosthesis, a physical therapist notices that the patient laterally bends excessively toward the prosthetic side during midstance phase. Which of the following factors is **MOST** likely to cause this gait deviation?
+**Q204.** During the gait evaluation of a patient who has a transfemoral prosthesis, a physical therapist notices that the patient laterally bends excessively toward the prosthetic side during midstance phase. Which of the following factors is **MOST** likely to cause this gait deviation?
 
 A. A prosthesis that is too short
 B. A prosthetic socket that is too small
@@ -2889,7 +3667,7 @@ D. A locked knee unit
 
 ---
 
-**Q25.** The **MOST** appropriate short-term goal for a patient with lateral epicondylalgia would be pain-free isometric contraction of which muscle group?
+**Q205.** The **MOST** appropriate short-term goal for a patient with lateral epicondylalgia would be pain-free isometric contraction of which muscle group?
 
 A. Forearm supinators
 B. Wrist flexors
@@ -2906,7 +3684,7 @@ D. Forearm pronators
 
 ---
 
-**Q26.** A 39-year-old male patient with a 20-year history of smoking reports cramping pain of the buttock, thigh, and calf that is worse when walking. Which of the following findings is **MOST** likely present?
+**Q206.** A 39-year-old male patient with a 20-year history of smoking reports cramping pain of the buttock, thigh, and calf that is worse when walking. Which of the following findings is **MOST** likely present?
 
 A. Forward stooping while walking
 B. Pain in the calf with abrupt dorsiflexion
@@ -2923,7 +3701,7 @@ D. Blood pressure that is greater in the arm than in the leg
 
 ---
 
-**Q27.** The **PRIMARY** purpose of pursed-lip breathing is to:
+**Q207.** The **PRIMARY** purpose of pursed-lip breathing is to:
 
 A. help prevent the collapse of pulmonary airways during exhalation.
 B. decrease the removal of carbon dioxide during ventilation.
@@ -2940,7 +3718,7 @@ D. stimulate further mobilization of mucous secretions to higher air passages wh
 
 ---
 
-**Q28.** While bending over in standing position with the knees extended, a patient exhibits decreased spinal flexion and decreased hip flexion. The findings **MOST** likely are associated with limitation in which of the following measures?
+**Q208.** While bending over in standing position with the knees extended, a patient exhibits decreased spinal flexion and decreased hip flexion. The findings **MOST** likely are associated with limitation in which of the following measures?
 
 A. Hamstring flexibility
 B. Gluteal muscle strength
@@ -2957,7 +3735,7 @@ D. Hip flexor flexibility
 
 ---
 
-**Q29.** Which of the following descriptions is **MOST** appropriate for a healed wound with thick fibrous tissue that remains within the original wound border?
+**Q209.** Which of the following descriptions is **MOST** appropriate for a healed wound with thick fibrous tissue that remains within the original wound border?
 
 A. Epibole
 B. Keloid scarring
@@ -2974,7 +3752,7 @@ D. Hypertrophic scarring
 
 ---
 
-**Q30.** A physical therapist is treating a patient with moderately controlled type 2 diabetes. One of the goals is to help the patient regulate insulin dosage through exercise. In establishing an exercise program, the therapist should be aware that regular exercise will generally:
+**Q210.** A physical therapist is treating a patient with moderately controlled type 2 diabetes. One of the goals is to help the patient regulate insulin dosage through exercise. In establishing an exercise program, the therapist should be aware that regular exercise will generally:
 
 A. lower blood glucose levels and decrease the amount of insulin required.
 B. lower blood glucose levels and increase the amount of insulin required.
@@ -2991,7 +3769,7 @@ D. raise blood glucose levels and increase the amount of insulin required.
 
 ---
 
-**Q31.** A patient who has rheumatoid arthritis comes to physical therapy with signs of muscle atrophy, ecchymosis, puffy cheeks, and a diagnosis of osteoporosis. Which of the following medications is the patient **MOST** likely taking?
+**Q211.** A patient who has rheumatoid arthritis comes to physical therapy with signs of muscle atrophy, ecchymosis, puffy cheeks, and a diagnosis of osteoporosis. Which of the following medications is the patient **MOST** likely taking?
 
 A. Penicillin (Ampicillin)
 B. Prednisone (Deltasone)
@@ -3008,7 +3786,7 @@ D. Gold salts
 
 ---
 
-**Q32.** While working in a private practice clinic, a physical therapist observes a patient fall in the parking lot outside the office. The patient sustains a severe laceration to the forearm. The therapist secures a pressure dressing to the wound site but notes that blood is soaking through the dressing and the bandage. Which of the following actions should the therapist perform **NEXT**?
+**Q212.** While working in a private practice clinic, a physical therapist observes a patient fall in the parking lot outside the office. The patient sustains a severe laceration to the forearm. The therapist secures a pressure dressing to the wound site but notes that blood is soaking through the dressing and the bandage. Which of the following actions should the therapist perform **NEXT**?
 
 A. Elevate the limb and apply pressure to the wound.
 B. Remove the dressing and bandage and start over with a tighter bandage.
@@ -3025,7 +3803,7 @@ D. Call the patient's physician and arrange transportation for medical care.
 
 ---
 
-**Q33.** A patient with chronic knee pain and several episodes of patellar subluxation has been found to have excessive lateral patellar tracking. This tracking pattern is **MOST** likely due to:
+**Q213.** A patient with chronic knee pain and several episodes of patellar subluxation has been found to have excessive lateral patellar tracking. This tracking pattern is **MOST** likely due to:
 
 A. a medial meniscus tear.
 B. vastus lateralis weakness.
@@ -3042,7 +3820,7 @@ D. a medial collateral ligament tear.
 
 ---
 
-**Q34.** A patient exhibits weakness throughout the right lower extremity with normal strength on the left side. Sensory testing shows a loss of pressure sensation over the right thigh and leg and a loss of pain and temperature sensation over the left thigh and leg. The patient has a positive Babinski sign on the right. Which of the following associated findings is **MOST** likely to be found during further examination of this patient?
+**Q214.** A patient exhibits weakness throughout the right lower extremity with normal strength on the left side. Sensory testing shows a loss of pressure sensation over the right thigh and leg and a loss of pain and temperature sensation over the left thigh and leg. The patient has a positive Babinski sign on the right. Which of the following associated findings is **MOST** likely to be found during further examination of this patient?
 
 A. Presence of clonus in the left ankle
 B. Marked atrophy of the right lower extremity muscles
@@ -3059,7 +3837,7 @@ D. Increased deep tendon reflexes on the right side
 
 ---
 
-**Q35.** An older adult patient had a total hip arthroplasty following a hip fracture from a fall in his home. The patient lived alone and was previously able to perform all activities of daily living independently. He has been admitted to a skilled nursing facility for rehabilitation. The patient's goal is to return home. His family believes he should be admitted to a long-term care facility for his own safety after acute rehabilitation is completed. Which of the following actions would be **MOST** appropriate to initiate **FIRST**?
+**Q215.** An older adult patient had a total hip arthroplasty following a hip fracture from a fall in his home. The patient lived alone and was previously able to perform all activities of daily living independently. He has been admitted to a skilled nursing facility for rehabilitation. The patient's goal is to return home. His family believes he should be admitted to a long-term care facility for his own safety after acute rehabilitation is completed. Which of the following actions would be **MOST** appropriate to initiate **FIRST**?
 
 A. Advise the family that the patient should determine his own discharge environment.
 B. Recommend a team conference with the patient and his family to discuss discharge plans.
@@ -3076,7 +3854,7 @@ D. Implement a treatment plan with a long-term goal of discharge to home.
 
 ---
 
-**Q36.** A physical therapist places a patient on a strength training program for the lower extremities. The mode of exercise is a double-leg press unit. After 1 week, the patient shows a 10-lb (4.5-kg) increase in the amount of weight the patient is able to lift. What is the **MOST** likely cause of the patient's increase in strength?
+**Q216.** A physical therapist places a patient on a strength training program for the lower extremities. The mode of exercise is a double-leg press unit. After 1 week, the patient shows a 10-lb (4.5-kg) increase in the amount of weight the patient is able to lift. What is the **MOST** likely cause of the patient's increase in strength?
 
 A. Muscle fiber hypertrophy
 B. Neurological adaptation
@@ -3093,7 +3871,7 @@ D. Increase in the amount of actin and myosin
 
 ---
 
-**Q37.** During evaluation of a patient's gait, a physical therapist observes that the patient leans forward shortly after heel strike (initial contact). The patient's forward bending is **MOST** likely a compensation for weakness in the:
+**Q217.** During evaluation of a patient's gait, a physical therapist observes that the patient leans forward shortly after heel strike (initial contact). The patient's forward bending is **MOST** likely a compensation for weakness in the:
 
 A. quadriceps.
 B. hamstrings.
@@ -3110,7 +3888,7 @@ D. tibialis anterior.
 
 ---
 
-**Q38.** A 20-year-old female athlete underwent anterior cruciate ligament reconstruction 3 days ago. Which of the following exercises is **LEAST** indicated at this time?
+**Q218.** A 20-year-old female athlete underwent anterior cruciate ligament reconstruction 3 days ago. Which of the following exercises is **LEAST** indicated at this time?
 
 A. Performing active knee flexion to 90° in prone position
 B. Kicking a large air-filled ball from a short-sitting position
@@ -3127,7 +3905,7 @@ D. Hip abduction with a 1-lb (0.5-kg) weight at the ankle in sidelying position
 
 ---
 
-**Q39.** A patient with type 2 diabetes is evaluated by a physical therapist and found to be alert and oriented to person, place, and time. When continuing the evaluation, the therapist should give the **HIGHEST** priority to which of the following systems?
+**Q219.** A patient with type 2 diabetes is evaluated by a physical therapist and found to be alert and oriented to person, place, and time. When continuing the evaluation, the therapist should give the **HIGHEST** priority to which of the following systems?
 
 A. Cognitive
 B. Sensory
@@ -3144,7 +3922,7 @@ D. Musculoskeletal
 
 ---
 
-**Q40.** A physical therapist is measuring the shoulder passive joint range of motion of a patient who has acute bursitis. What type of joint end-feel is **MOST** likely to occur?
+**Q220.** A physical therapist is measuring the shoulder passive joint range of motion of a patient who has acute bursitis. What type of joint end-feel is **MOST** likely to occur?
 
 A. Firm
 B. Hard
@@ -3161,7 +3939,7 @@ D. Boggy
 
 ---
 
-**Q41.** To stretch the neck muscles in a patient with an acute, right-sided torticollis, the **MOST** appropriate therapeutic exercise is:
+**Q221.** To stretch the neck muscles in a patient with an acute, right-sided torticollis, the **MOST** appropriate therapeutic exercise is:
 
 A. right rotation and right lateral flexion.
 B. left rotation and right lateral flexion.
@@ -3178,7 +3956,7 @@ D. right rotation and left lateral flexion.
 
 ---
 
-**Q42.** For an individual with a T₁₂ spinal cord injury to be able to walk, achievement of which of the following ranges of motion is **MOST** important?
+**Q222.** For an individual with a T₁₂ spinal cord injury to be able to walk, achievement of which of the following ranges of motion is **MOST** important?
 
 A. 30° of ankle plantar flexion
 B. Full hip extension
@@ -3195,7 +3973,7 @@ D. 110° straight-leg raise
 
 ---
 
-## Scenario (applies to Q43–Q45)
+## Scenario (applies to Q223–Q225)
 
 **Age:** 72 years
 **Presenting Problem / Current Condition:**
@@ -3233,7 +4011,7 @@ D. 110° straight-leg raise
 
 ---
 
-**Q43.** Which of the following lobes of the brain are **MOST** likely affected?
+**Q223.** Which of the following lobes of the brain are **MOST** likely affected?
 
 A. Frontal and parietal
 B. Frontal and occipital
@@ -3250,7 +4028,7 @@ D. Temporal and occipital
 
 ---
 
-**Q44.** Which of the following arteries is **MOST** likely affected?
+**Q224.** Which of the following arteries is **MOST** likely affected?
 
 A. Left middle cerebral artery
 B. Left anterior cerebral artery
@@ -3267,7 +4045,7 @@ D. Right anterior cerebral artery
 
 ---
 
-**Q45.** Which of the following recommendations would be **MOST** appropriate during an on-site home examination by a physical therapist?
+**Q225.** Which of the following recommendations would be **MOST** appropriate during an on-site home examination by a physical therapist?
 
 A. The steps on the stairs should have nonabrasive strips of a uniform color.
 B. The steps on the stairs should have abrasive strips of a contrasting color.
@@ -3281,3 +4059,4 @@ D. A wheelchair ramp should have 1 inch (2.5 cm) of height for every 32 inches (
 - **A.** The patient has a deficit of depth perception. The steps on the stairs should have abrasive strips of a contrasting color to improve traction and depth perception.
 - **C.** The minimum ramp grade (incline or slope) for a wheelchair ramp is that for every 1 inch (2.5 cm) of height there is a corresponding 12 inches (33 cm) of ramp length, which is a running slope of 1:12, not 1:16.
 - **D.** The minimum ramp grade (incline or slope) for a wheelchair ramp is that for every 1 inch (2.5 cm) of height there is a corresponding 12 inches (33 cm) of ramp length, which is a running slope of 1:12, not 1:32.
+

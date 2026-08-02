@@ -1,8 +1,23 @@
-# Mock Exam B – Complete
+# NPTE Series 3 — Form B: Complete Question Bank
+
+**Retired Form B study guide — all 5 sections, 225 items.**
+Questions are numbered continuously, Q1–Q225, matching the Form A bank.
+
+Options are lettered A–D. The source software numbers them 1–4; the mapping is 1→A, 2→B, 3→C, 4→D.
+Every answer key in this document has been verified item-by-item against the original
+`Series 3.B Answers copy` screenshots.
+
+| Section | Questions | Items |
+|---|---|---|
+| 1 | Q1–Q45 | 45 |
+| 2 | Q46–Q90 | 45 |
+| 3 | Q91–Q135 | 45 |
+| 4 | Q136–Q180 | 45 |
+| 5 | Q181–Q225 | 45 |
 
 ---
 
-## Section 1 – Questions 1–45
+## Section 1 — Questions Q1–Q45
 
 ---
 
@@ -149,6 +164,8 @@ B. flexion.
 C. internal rotation.
 D. adduction.
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 1/Q9.png`.
+
 **Correct Answer:**
 - **B.** The photograph shows an inferior glide, which is used to increase hip flexion.
 
@@ -285,6 +302,8 @@ B. Gluteus medius
 C. Gluteus minimus
 D. Tensor fasciae latae
 
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 1/Q17.mov`.
+
 **Correct Answer:**
 - **B.** The individual in the video exhibits a dynamic valgus collapse. A dynamic valgus collapse is associated with weakness in the hip abductors, lateral (external) rotators, and/or extensors and quadriceps. (Kisner, p. 794) The gluteus medius is the largest hip abductor. (Dutton, p. 834)
 
@@ -301,6 +320,8 @@ A. Sternocleidomastoids
 B. Upper thoracic extensors
 C. Lower and middle trapezii
 D. Rhomboids major and minor
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 1/Q18.png`.
 
 **Correct Answer:**
 - **A.** The sternocleidomastoids are correct because the neck must extend on the thorax and the head must forwardly rotate on the neck to move from A to B. This is opposite the anatomical action of sternocleidomastoids and would require an increase in the distance between their attachments.
@@ -438,6 +459,8 @@ B. continue passive range of motion of lower extremities only.
 C. stop the treatment and monitor electrocardiogram for 5 minutes.
 D. activate the emergency system.
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 1/Q26.png`.
+
 **Correct Answer:**
 - **D.** The electrocardiogram shows ventricular fibrillation, which is a medical emergency.
 
@@ -505,6 +528,8 @@ A. Valgum, abduction, and inversion
 B. Varum, adduction, and eversion
 C. Valgum, abduction, and eversion
 D. Varum, abduction, and inversion
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 1/Q30.png`.
 
 **Correct Answer:**
 - **C.** The picture demonstrates a pes planus with foot pronation. The subtalar joint's main components with this are eversion and abduction (Neumann, p. 609). The midtarsal joint (the transverse tarsal joints) also everts (Neumann, p. 614). In stance, the calcaneus is excessively everted from midline, which is a valgus position (Neumann, p. 619). With pronation there is also associated abduction of the forefoot (Magee, p. 896).
@@ -808,7 +833,7 @@ D. After 24-48 hours of limited activity, return to noncontact practice, includi
 
 ---
 
-## Section 2 – Questions 46–90
+## Section 2 — Questions Q46–Q90
 
 ---
 
@@ -1057,6 +1082,8 @@ B. Capsular tightness in the hip joint
 C. Active insufficiency of the hamstrings
 D. Tightness in the hip flexor muscles
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 2/Q15.png`.
+
 **Correct Answer:**
 - **A.** With the straight leg raise, the hamstrings are stretched across both joints at the same time. Because no limitation is noted in the hip or knee joints, the limitation would be due to the hamstrings. (p. 918)
 
@@ -1294,6 +1321,8 @@ A. Radiculopathy
 B. Peripheral neuropathy
 C. Guillain-Barré syndrome
 D. Cerebrovascular accident
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 2/Q29.mov`.
 
 **Correct Answer:**
 - **D.** The Babinski sign is demonstrated in the video. To test this reflex, a blunt object is used to stroke the lateral aspect of the sole, moving from the heel to the ball of the foot, curving medially on the ball of the foot (O'Sullivan, p. 148). The Babinski sign is normal in infants up to age 2 years, but a positive sign in an adult is indicative damage to the corticospinal tract (Martin). Patients with upper motor neuron syndrome will present with hyperreflexia, clonus, associated reactions, and a positive Babinski sign (O'Sullivan, p. 143). An example of an upper motor neuron syndrome is cerebrovascular accident (O'Sullivan, p. 158).
@@ -1611,7 +1640,7 @@ D. Low-intensity continuous ultrasound
 
 ---
 
-## Section 3 – Questions 91–135
+## Section 3 — Questions Q91–Q135
 
 ---
 
@@ -1621,6 +1650,8 @@ A. Carpometacarpal osteoarthritis
 B. Scaphoid fracture
 C. Tear of the ulnar collateral ligament of the first metacarpophalangeal joint
 D. First dorsal compartment tenosynovitis
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 3/Q1.png`.
 
 **Correct Answer:**
 - **D.** The Finkelstein Test, which is shown in the photograph, is used for evaluation for de Quervain disease (first dorsal compartment tenosynovitis) (p. 824)
@@ -1673,6 +1704,8 @@ B. Carpal tunnel syndrome
 C. Complex regional pain syndrome
 D. C₆ radiculopathy
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 3/Q4.png`.
+
 **Correct Answer:**
 - **B.** The photograph shows the Phalen Test. Symptoms triggered by this test indicate carpal tunnel syndrome.
 
@@ -1723,6 +1756,8 @@ A. Tibial
 B. Deep fibular (peroneal)
 C. Sural
 D. Superficial fibular (peroneal)
+
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 3/Q7.mov`.
 
 **Correct Answer:**
 - **B.** The muscle being tested is the extensor hallucis longus which is innervated by the deep fibular nerve which branches off of the common fibular nerve.
@@ -1842,6 +1877,8 @@ A. Left gluteus medius and minimus
 B. Right gluteus medius and minimus
 C. Left internal oblique and external oblique
 D. Right internal oblique and external oblique
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 3/Q14.png`.
 
 **Correct Answer:**
 - **B.** A positive Trendelenburg sign occurs when the iliac crest drops on the side of the lower extremity that is lifted. This indicates gluteus medius and minimus weakness on the lower extremity that the patient is standing on.
@@ -2013,6 +2050,8 @@ B. Neuropathic
 C. Arterial insufficiency
 D. Venous insufficiency
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 3/Q24.png`.
+
 **Correct Answer:**
 - **B.** The ulcer is located on the plantar surface of the foot. It has a thick callus border. The patient has decreased protective sensation, which is associated with peripheral neuropathies. Based on these findings, the wound is a neuropathic ulcer. (pp. 304-306)
 
@@ -2063,6 +2102,8 @@ A. transferring independently and walking on level surfaces using an assistive d
 B. community walking with an assistive device.
 C. traversing curbs, stairs, and uneven surfaces without an assistive device.
 D. walking on uneven surfaces and participation in high-impact leisure activities.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 3/Q27.png`.
 
 **Correct Answer:**
 - **D.** A young, healthy, active person with traumatic transtibial amputation is likely to achieve a relatively high level of function in a short time. Sports and high-level leisure activities are attainable.
@@ -2417,7 +2458,7 @@ D. Altered light touch sensation in the lower extremities
 
 ---
 
-## Section 4 – Questions 136–180
+## Section 4 — Questions Q136–Q180
 
 ---
 
@@ -2427,6 +2468,8 @@ A. chondromalacia patellae.
 B. rheumatoid arthritis.
 C. osteomalacia.
 D. Osgood–Schlatter disease.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 4/Q1.png`.
 
 **Correct Answer:**
 - **A.** Chondromalacia patellae is characterized by retropatellar knee pain and softening of the cartilage on the posterior aspect of the patella (pp. 846, 1044).
@@ -2478,6 +2521,8 @@ A. a frayed medial meniscus and a medially displaced lateral meniscus.
 B. calcification of the superior attachment of the medial collateral ligament.
 C. a diminished space in the medial compartment with marginal osteophyte formation.
 D. the patella displaced medially and superiorly.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 4/Q4.png`.
 
 **Correct Answer:**
 - **C.** Genu varum can contribute to early degeneration of the knee and is often associated with advanced degenerative joint disease in the medial compartment of the knee. This would be seen on a radiograph as diminished space and osteophyte formation. (p. 980)
@@ -2683,6 +2728,8 @@ B. Don a gait belt prior to walking.
 C. Use a firm surface for upper extremity support while walking.
 D. Hold the hand of a family member while walking.
 
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 4/Q16.mov`.
+
 **Correct Answer:**
 - **C.** For patients who demonstrate a balance impairment, as demonstrated by the increased sway with tandem walking in the video, it is recommended that exercise be performed with light touch on a firm surface for support to increase patient safety. (Kisner)
 
@@ -2802,6 +2849,8 @@ B. Strengthening of the upper trapezius
 C. Stretching of the hamstrings
 D. Strengthening of the quadriceps
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 4/Q23.png`.
+
 **Correct Answer:**
 - **C.** In the photograph, the pelvis is posteriorly rotated and the knees are flexed, indicating that the hamstrings are shortened.
 
@@ -2818,6 +2867,8 @@ A. Axillary
 B. Thoracodorsal
 C. Long thoracic
 D. Suprascapular
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 4/Q24.png`.
 
 **Correct Answer:**
 - **C.** Push-ups with a "plus" (as shown in the pictures) is an exercise to strengthen scapular protraction. The illustrated exercise can be used to strengthen the serratus anterior. The serratus anterior is supplied by the long thoracic nerve. Thus the illustrated exercise can be used to strengthen a weakened muscle (serratus anterior) caused by a lesion of the long thoracic nerve.
@@ -3057,6 +3108,8 @@ B. Olecranon fracture
 C. C₇ nerve root impingement
 D. Ulnar nerve palsy
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 4/Q38.png`.
+
 **Correct Answer:**
 - **C.** Deep tendon reflexes test nerve root integrity. The triceps is innervated by the C₇–C₈ nerve roots, and, therefore, C₇ nerve root impingement may result in a positive result (diminished) in testing of the triceps reflex.
 
@@ -3230,7 +3283,7 @@ D. Increase the speed of the treadmill.
 
 ---
 
-## Section 5 – Questions 181–225
+## Section 5 — Questions Q181–Q225
 
 ---
 
@@ -3274,6 +3327,8 @@ A. Foot flat (loading response)
 B. Heel strike (initial contact)
 C. Midstance
 D. Heel off (terminal stance)
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 5/Q3.png`.
 
 **Correct Answer:**
 - **D.** The photograph depicts a patient performing the Thomas Test for restriction of the hip flexors. A positive test is observed when the patient is not able to lay the extended lower extremity onto the treatment table. A positive test with the knee in extension is indicative of iliopsoas or hip flexor tightness (pp. 916-917). The iliopsoas is elongated during the heel off (terminal stance) and toe off (preswing) phases of the gait cycle as the hip moves toward maximum extension. Therefore, the physical therapist should assess the heel off (terminal stance) phase of walking to determine intervention effectiveness (p. 294).
@@ -3325,6 +3380,8 @@ A. Thoracic outlet compression
 B. Myofascial tightness in posterior cervical musculature
 C. Myofascial tightness in the pectoralis muscles
 D. Myofascial tightness in the anterior cervical spine muscles
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 5/Q6.png`.
 
 **Correct Answer:**
 - **B.** Head forward posture places the upper cervical spine in extension, shortening the suboccipital muscles. Tightness of these muscles can compress the suboccipital nerves and is frequently associated with headaches. (pp. 1311-1312)
@@ -3445,6 +3502,8 @@ B. Temperature appreciation is also impaired.
 C. Two-point discrimination is intact.
 D. Deep pressure sensation is intact.
 
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 5/Q13.png`.
+
 **Correct Answer:**
 - **A.** Proprioception and light touch are carried through the posterior column to the medial lemniscus and thus both are likely to be impaired.
 
@@ -3529,6 +3588,8 @@ A. The posterior cruciate ligament can prevent anterior glide of the tibia durin
 B. The therapist has a better mechanical advantage in test B.
 C. The quadriceps are more relaxed in test B.
 D. The hamstrings are more capable of stabilizing the knee during test A.
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 5/Q18.png`.
 
 **Correct Answer:**
 - **D.** Hamstrings that are not relaxed or a meniscal tear can create a false negative test with the knee in the flexed position. Test B is the modified Lachman test, which allows the clinician to minimize the factors contributing to false-negatives, including hamstring activity.
@@ -3802,6 +3863,8 @@ B. Midbrain
 C. Brainstem
 D. Spinal cord
 
+> **Media item.** This question refers to a video that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 5/Q34.mov`.
+
 **Correct Answer:**
 - **D.** Spinal level reflexes occur at the spinal cord level and result in overt movement of a limb. The startle reflex, which is demonstrated by the infant in the video, falls in this category. (p. 308)
 
@@ -3818,6 +3881,8 @@ A. Anterior shoulder pain after falling down the stairs, with an attempt to brea
 B. Insidious onset of interrupted sleep patterns due to aching discomfort in the shoulder
 C. Gradual onset of pain in the shoulder and difficulty with dressing, especially donning and doffing a coat
 D. Difficulty washing the opposite axilla due to superior shoulder pain after painting the house
+
+> **Media item.** This question refers to a photograph or image that is not reproduced here. View `Series 3.B Answers copy/Series 3.B Section 5/Q35.png`.
 
 **Correct Answer:**
 - **A.** This mechanism of injury suggests a forceful hyperextension and lateral (external) rotation force to the affected limb. The Apprehension Test, shown in the photograph, is used to assess anterior instability of the glenohumeral joint. (Magee, p. 303; Dutton, p. 645)
