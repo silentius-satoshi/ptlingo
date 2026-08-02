@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useSessionStore } from '../store/sessionStore'
@@ -29,9 +29,42 @@ import MobilePanelSheet from '../components/exam/MobilePanelSheet'
 import PostSessionFlow from '../components/exam/PostSessionFlow'
 import ProfileGate from '../components/exam/ProfileGate'
 import { calculateNextReview } from '../lib/spacedRepetition'
+import { deadlineFromSeconds, secondsFromDeadline } from '../hooks/useTimer'
 
-// 0-indexed last-question indices for each of the 5 sections in a 225-question exam
-const SECTION_END = new Set([44, 89, 134, 179])
+// Fallback only: 0-indexed last question of sections 1-4 on a canonical 225-item form.
+const SECTION_END_225 = new Set([44, 89, 134, 179])
+
+// Derive the 0-indexed last-question position of each section from the questions
+// themselves. A real form is almost never exactly 225 items after quarantine, so
+// keying breaks off index arithmetic silently disables every break on the forms
+// we actually sit. Read the boundary off the data; fall back to arithmetic only
+// when the section field is missing entirely.
+function deriveSectionEnds(questions) {
+  if (!questions || questions.length === 0) return new Set()
+  const hasSection = questions.every((q) => q && q.section != null)
+  if (!hasSection) return questions.length === 225 ? SECTION_END_225 : new Set()
+  const ends = new Set()
+  for (let i = 0; i < questions.length - 1; i++) {
+    if (Number(questions[i].section) !== Number(questions[i + 1].section)) ends.add(i)
+  }
+  return ends
+}
+
+// The answer-change log's system of record is sessions.answer_changes in
+// Supabase. localStorage is kept as a redundant local mirror — it costs one
+// synchronous write per change and it is the only copy that survives a network
+// failure, so on load we take whichever log is longer.
+const changeLogKey = (sessionId) => `ptlingo_answer_changes_${sessionId}`
+
+function readAnswerChangeLog(sessionId) {
+  try {
+    const raw = localStorage.getItem(changeLogKey(sessionId))
+    const parsed = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
 
 function getMotivationBreak({
   consecutiveCorrect, prevMaxWrong, correctCount, answerHistory, shownBreaks,
@@ -210,7 +243,12 @@ export default function ExamPage() {
     correctStreak,
     incrementStreak,
     resetStreak,
+    answerChanges,
+    logAnswerChange,
   } = useSessionStore()
+
+  // Section boundaries come from the loaded form, not from index arithmetic.
+  const sectionEnds = useMemo(() => deriveSectionEnds(questions), [questions])
 
   const quizMode = localStorage.getItem('ptlingo_quiz_mode') ?? 'standard'
   const isCasual = quizMode === 'ptlingo' && type === 'quiz' && !readOnly
@@ -274,6 +312,25 @@ export default function ExamPage() {
           }
         }
 
+        // Prefer the persisted absolute deadline over the last-saved remaining
+        // seconds. time_remaining is only ever as fresh as the last autosave,
+        // so a crash or a reload mid-section would otherwise refund every
+        // second since that save. A deadline already in the past is a real
+        // zero — the block expired while the tab was shut — not a reason to
+        // fall back to a stale count. deadline_at is null whenever the clock is
+        // legitimately stopped (paused session, mandatory break, submitted),
+        // and that is exactly when time_remaining is the right answer.
+        const fromDeadline   = readOnly ? null : secondsFromDeadline(session.deadline_at)
+        const resumedSeconds = fromDeadline ?? (session.time_remaining ?? 0)
+
+        // Supabase is the system of record for the change log. The local mirror
+        // only wins when it holds more entries than the server does, which is
+        // what a lost network write looks like. Taking the longer log can drop
+        // a change only if the server somehow has entries the client never saw,
+        // which cannot happen for an append-only client-authored log.
+        const serverLog = Array.isArray(session.answer_changes) ? session.answer_changes : []
+        const localLog  = readAnswerChangeLog(sessionId)
+
         setSession({
           sessionId:       session.id,
           type:            session.type,
@@ -286,8 +343,9 @@ export default function ExamPage() {
           highlights:      session.highlights         ?? {},
           notes:           mergedNotes,
           timePerQuestion: session.time_per_question  ?? {},
-          timeRemaining:   session.time_remaining     ?? 0,
+          timeRemaining:   resumedSeconds,
           status:          'in_progress',
+          answerChanges:   localLog.length > serverLog.length ? localLog : serverLog,
         })
       } catch (err) {
         setError(err.message)
@@ -305,28 +363,47 @@ export default function ExamPage() {
     }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Whether the exam clock is currently running. Held in a ref rather than read
+  // from state so that examSnapshot keeps a stable identity and does not
+  // perturb the dependency arrays of every handler that persists.
+  const clockPausedRef = useRef(false)
+  useEffect(() => {
+    clockPausedRef.current = breakState === 'mandatory' || readOnly
+  }, [breakState, readOnly])
+
+  // ── One payload shape for every persistence point ──────────────────────────
+  // Six call sites used to build this object by hand. That is precisely how a
+  // column goes missing from one of them and a whole measure quietly stops
+  // being recorded. `extra` is spread last so a caller can override any field —
+  // notably deadline_at, which must be null wherever the clock stops.
+  const examSnapshot = useCallback((extra = {}) => {
+    const s = useSessionStore.getState()
+    return {
+      answers:           s.answers,
+      marked:            s.marked,
+      eliminated:        s.eliminated,
+      notes:             s.notes,
+      highlights:        s.highlights,
+      time_per_question: s.timePerQuestion,
+      time_remaining:    s.timeRemaining,
+      current_index:     s.currentIndex,
+      answer_changes:    s.answerChanges ?? [],
+      deadline_at:       clockPausedRef.current ? null : deadlineFromSeconds(s.timeRemaining),
+      ...extra,
+    }
+  }, [])
+
   // ── Debounced save ─────────────────────────────────────────────────────────
   const scheduleSave = useCallback((patch = {}) => {
     if (!sessionId) return
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
     saveTimeoutRef.current = setTimeout(async () => {
-      const s = useSessionStore.getState()
       await supabase
         .from('sessions')
-        .update({
-          answers:           s.answers,
-          marked:            s.marked,
-          eliminated:        s.eliminated,
-          notes:             s.notes,
-          highlights:        s.highlights,
-          time_per_question: s.timePerQuestion,
-          time_remaining:    s.timeRemaining,
-          current_index:     s.currentIndex,
-          ...patch,
-        })
+        .update(examSnapshot(patch))
         .eq('id', sessionId)
     }, 1500)
-  }, [sessionId])
+  }, [sessionId, examSnapshot])
 
   // ── Debounced notes-table upsert ───────────────────────────────────────────
   const scheduleNoteSave = useCallback((questionId, text) => {
@@ -389,6 +466,26 @@ export default function ExamPage() {
     if (!currentQuestionId) return
     if (readOnly) return
     if (type === 'quiz' && selectedAnswer !== null) return  // locked after first pick
+
+    // Answer-change log. Fires automatically on every genuine change of mind —
+    // a first pick is not a change, and re-clicking the same choice is not a
+    // change. Nothing here is ever hand-recorded.
+    if (selectedAnswer !== null && selectedAnswer !== i) {
+      const LET = ['A', 'B', 'C', 'D']
+      const s0  = useSessionStore.getState()
+      logAnswerChange({
+        qid:           currentQuestionId,
+        idx:           currentIndex,
+        sec:           Number(currentQuestion?.section) || null,
+        from:          LET[selectedAnswer] ?? String(selectedAnswer),
+        to:            LET[i] ?? String(i),
+        correct_index: currentQuestion?.correct_index ?? null,
+        t:             new Date().toISOString(),
+        into:          questionStartRef.current ? Date.now() - questionStartRef.current : null,
+        onitem:        (s0.timePerQuestion[currentQuestionId] || 0) * 1000,
+      })
+    }
+
     setAnswer(currentQuestionId, i)
     // In quiz mode: snapshot elapsed time immediately so the rationale panel
     // can show "time spent" without waiting for navigation away.
@@ -427,7 +524,18 @@ export default function ExamPage() {
       }
     }
     scheduleSave()
-  }, [currentQuestionId, type, selectedAnswer, setAnswer, scheduleSave, questions, awardXP, advanceMission, deductEnergy, incrementStreak, resetStreak, upsertReview])
+  }, [currentQuestionId, currentQuestion, currentIndex, type, selectedAnswer, setAnswer, logAnswerChange, scheduleSave, questions, awardXP, advanceMission, deductEnergy, incrementStreak, resetStreak, upsertReview])
+
+  // Mirror the change log to localStorage on every append. Synchronous, so it
+  // survives a crash or an accidental refresh mid-section.
+  useEffect(() => {
+    if (!sessionId || readOnly || !answerChanges?.length) return
+    try {
+      localStorage.setItem(changeLogKey(sessionId), JSON.stringify(answerChanges))
+    } catch {
+      // Private mode or quota exceeded — the in-memory log still works.
+    }
+  }, [answerChanges, sessionId, readOnly])
 
   // Reset sheet + explain state whenever the question changes
   useEffect(() => {
@@ -493,20 +601,30 @@ export default function ExamPage() {
   const goNext = useCallback(() => {
     if (currentIndex >= questions.length - 1) return
     // Trigger section breaks only in full mock-exam mode
-    if (!readOnly && type === 'exam' && questions.length === 225 && SECTION_END.has(currentIndex)) {
-      const sec = (currentIndex + 1) / 45  // 1 | 2 | 3 | 4
+    if (!readOnly && type === 'exam' && sectionEnds.has(currentIndex)) {
+      const sec = Number(questions[currentIndex]?.section) || Math.round((currentIndex + 1) / 45)
       breakResumeIndexRef.current = currentIndex + 1
       setBreakSection(sec)
       if (sec === 2) {
         setBreakTimeLeft(15 * 60)
         setBreakState('mandatory')
+        // The scheduled break after Section 2 is the one point where the exam
+        // clock genuinely stops. Persist that stop immediately: a null
+        // deadline_at means "paused", so a reload during the break restores
+        // from time_remaining rather than charging the break to the block.
+        if (sessionId) {
+          supabase.from('sessions')
+            .update(examSnapshot({ deadline_at: null }))
+            .eq('id', sessionId)
+            .then(() => {}, () => {})
+        }
       } else {
         setBreakState('offer')
       }
       return
     }
     goTo(currentIndex + 1)
-  }, [currentIndex, questions.length, type, goTo]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIndex, questions, sectionEnds, type, goTo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const goPrev = useCallback(() => {
     if (currentIndex > 0) goTo(currentIndex - 1)
@@ -519,14 +637,50 @@ export default function ExamPage() {
     const idx = breakResumeIndexRef.current
     breakResumeIndexRef.current = null
     if (idx != null) goTo(idx)
-  }, [goTo])
+    // Re-anchor the persisted deadline the instant the clock restarts. Passed
+    // explicitly because clockPausedRef is updated by an effect and still holds
+    // its pre-resume value at this point in the handler. Harmless on an
+    // optional break, where the clock never stopped and this recomputes the
+    // same absolute instant.
+    if (sessionId) {
+      supabase.from('sessions')
+        .update(examSnapshot({
+          deadline_at: deadlineFromSeconds(useSessionStore.getState().timeRemaining),
+        }))
+        .eq('id', sessionId)
+        .then(() => {}, () => {})
+    }
+  }, [goTo, sessionId, examSnapshot])
 
-  // Tick the mandatory break countdown
+  // Tick the mandatory break countdown.
+  //
+  // Wall-clock anchored for exactly the same reason the exam clock is: a
+  // throttled or backgrounded tab delivers far fewer ticks than seconds
+  // elapsed, and a decrement-per-tick countdown would quietly stretch a
+  // 15-minute break into however long the browser felt like giving. Anchoring
+  // to an absolute end time makes every skipped tick self-correcting.
+  //
+  // breakTimeLeft is deliberately absent from the dependency array: it is read
+  // once to set the anchor, and including it would re-anchor on every tick,
+  // which is the bug this replaces.
+  const breakEndRef = useRef(null)
   useEffect(() => {
-    if (breakState !== 'mandatory') return
-    const id = setInterval(() => setBreakTimeLeft((t) => Math.max(0, t - 1)), 1000)
-    return () => clearInterval(id)
-  }, [breakState])
+    if (breakState !== 'mandatory') { breakEndRef.current = null; return }
+    breakEndRef.current = Date.now() + breakTimeLeft * 1000
+    const tick = () => {
+      if (breakEndRef.current == null) return
+      setBreakTimeLeft(Math.max(0, Math.ceil((breakEndRef.current - Date.now()) / 1000)))
+    }
+    tick()
+    const id = setInterval(tick, 250)
+    document.addEventListener('visibilitychange', tick)
+    window.addEventListener('focus', tick)
+    return () => {
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', tick)
+      window.removeEventListener('focus', tick)
+    }
+  }, [breakState]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-resume when mandatory break countdown expires
   useEffect(() => {
@@ -566,17 +720,9 @@ export default function ExamPage() {
       const s = useSessionStore.getState()
       await supabase
         .from('sessions')
-        .update({
-          status:            'paused',
-          answers:           s.answers,
-          marked:            s.marked,
-          eliminated:        s.eliminated,
-          notes:             s.notes,
-          highlights:        s.highlights,
-          time_per_question: s.timePerQuestion,
-          time_remaining:    s.timeRemaining,   // snapshot live timer value
-          current_index:     s.currentIndex,
-        })
+        // deadline_at null: a paused session must not keep burning clock while
+        // it sits in the submissions list. time_remaining is the truth here.
+        .update(examSnapshot({ status: 'paused', deadline_at: null }))
         .eq('id', sessionId)
 
       navigate('/submissions')
@@ -597,19 +743,12 @@ export default function ExamPage() {
 
       await supabase
         .from('sessions')
-        .update({
-          status:            'submitted',
+        .update(examSnapshot({
+          status:       'submitted',
           score,
-          submitted_at:      new Date().toISOString(),
-          answers:           s.answers,
-          marked:            s.marked,
-          eliminated:        s.eliminated,
-          notes:             s.notes,
-          highlights:        s.highlights,
-          time_per_question: s.timePerQuestion,
-          time_remaining:    s.timeRemaining,
-          current_index:     s.currentIndex,
-        })
+          submitted_at: new Date().toISOString(),
+          deadline_at:  null,
+        }))
         .eq('id', sessionId)
 
       // Award XP for completing session
@@ -717,17 +856,7 @@ export default function ExamPage() {
   const handleSheetExplain = useCallback(async () => {
     setShowFeedbackSheet(false)
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
-    const s = useSessionStore.getState()
-    await supabase.from('sessions').update({
-      answers:           s.answers,
-      marked:            s.marked,
-      eliminated:        s.eliminated,
-      notes:             s.notes,
-      highlights:        s.highlights,
-      time_per_question: s.timePerQuestion,
-      time_remaining:    s.timeRemaining,
-      current_index:     s.currentIndex,
-    }).eq('id', sessionId)
+    await supabase.from('sessions').update(examSnapshot()).eq('id', sessionId)
     navigate('/rationale', {
       state: {
         question:       currentQuestion,
@@ -742,17 +871,7 @@ export default function ExamPage() {
 
   const handleReviewExplanation = useCallback(async () => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
-    const s = useSessionStore.getState()
-    await supabase.from('sessions').update({
-      answers:           s.answers,
-      marked:            s.marked,
-      eliminated:        s.eliminated,
-      notes:             s.notes,
-      highlights:        s.highlights,
-      time_per_question: s.timePerQuestion,
-      time_remaining:    s.timeRemaining,
-      current_index:     s.currentIndex,
-    }).eq('id', sessionId)
+    await supabase.from('sessions').update(examSnapshot()).eq('id', sessionId)
     navigate('/rationale', {
       state: {
         question:       currentQuestion,
@@ -770,19 +889,9 @@ export default function ExamPage() {
   // ── Navigate to review screen (exam mode) — flush save first ───────────────
   const handleGoToReview = useCallback(async () => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
-    const s = useSessionStore.getState()
     await supabase
       .from('sessions')
-      .update({
-        answers:           s.answers,
-        marked:            s.marked,
-        eliminated:        s.eliminated,
-        notes:             s.notes,
-        highlights:        s.highlights,
-        time_per_question: s.timePerQuestion,
-        time_remaining:    s.timeRemaining,
-        current_index:     s.currentIndex,
-      })
+      .update(examSnapshot())
       .eq('id', sessionId)
     navigate(`/review/${sessionId}`)
   }, [sessionId, navigate])

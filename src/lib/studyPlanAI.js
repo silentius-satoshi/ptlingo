@@ -57,7 +57,7 @@ function assemblePrompt({ attempts, practiceAccuracy, config, weeksRemaining, is
     ? `Regeneration: mid-plan from week ${currentWeekNumber} of original plan`
     : 'Regeneration: first-time generation'
 
-  return `Candidate: Eric Brooks | Jurisdiction: ${config.jurisdiction || 'Texas'}
+  return `Candidate: NPTE-PT candidate | Jurisdiction: ${config.jurisdiction || 'Texas'}
 Exam date: ${fmt(config.examDate)} | Today: ${todayStr} | Weeks remaining: ${weeksRemaining}
 Daily study hours: ${config.dailyHours} | Study days/week: ${config.studyDaysPerWeek} | Working full-time: ${config.workingFullTime ? 'yes' : 'no'}
 ${regenerationLine}

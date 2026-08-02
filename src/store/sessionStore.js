@@ -17,8 +17,14 @@ export const useSessionStore = create((set, get) => ({
   timeRemaining: 0,
   status: null,         // 'in_progress' | 'submitted'
   correctStreak: 0,
+  answerChanges: [],    // [{ qid, idx, sec, from, to, t, into, onitem, correct_index }, ...]
 
   setSession: (session) => set(session),
+
+  // Append-only. Recorded automatically by ExamPage on every genuine answer
+  // change; never hand-entered, never edited after the fact.
+  logAnswerChange: (record) =>
+    set((state) => ({ answerChanges: [...state.answerChanges, record] })),
 
   incrementStreak: () => set((s) => ({ correctStreak: s.correctStreak + 1 })),
   resetStreak: () => set({ correctStreak: 0 }),
@@ -80,5 +86,6 @@ export const useSessionStore = create((set, get) => ({
       timeRemaining: 0,
       status: null,
       correctStreak: 0,
+      answerChanges: [],
     }),
 }))

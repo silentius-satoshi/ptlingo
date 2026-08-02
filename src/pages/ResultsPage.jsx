@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, Fragment, useRef } from 'react'
+import { useEffect, useState, useCallback, Fragment, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { supabase } from '../lib/supabase'
@@ -8,8 +8,15 @@ import RationalePanel from '../components/exam/RationalePanel'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
 import useGamificationStore from '../stores/gamificationStore'
 import { getSystemConfig } from '../constants/systemConfig'
+import { buildProcessReport } from '../lib/processReport'
 import confetti from 'canvas-confetti'
 import { ChevronDown } from 'lucide-react'
+
+// Mirrors EXAM_SERIES in MockExamStartPage (keyed by sessions.exam_number).
+const EXAM_SERIES_BY_NUMBER = {
+  1: 'Series 3 Form A',
+  2: 'Mock Exam B',
+}
 
 const statContainerVariants = {
   hidden: {},
@@ -67,6 +74,37 @@ function StatCard({ label, value, color }) {
   )
 }
 
+// ── Process-report presentation helpers ────────────────────────────────────────
+
+const RPT_TH = 'px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500'
+const RPT_TD = 'px-3 py-2 text-slate-600 dark:text-slate-300 tabular-nums'
+
+const rptVal = (v, suffix = '') => (v == null ? '—' : `${v}${suffix}`)
+
+function ReportFlags({ flags }) {
+  if (!flags?.length) return null
+  return (
+    <ul className="space-y-1">
+      {flags.map((f) => (
+        <li key={f} className="text-xs leading-relaxed text-amber-600 dark:text-amber-400">
+          ⚑ {f}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function ReportBlock({ title, children }) {
+  return (
+    <div className="space-y-3">
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        {title}
+      </h3>
+      {children}
+    </div>
+  )
+}
+
 function SortArrow({ field, sortField, sortDir }) {
   if (sortField !== field) return <span className="ml-0.5 opacity-25 text-[10px]">↕</span>
   return <span className="ml-0.5 text-[10px] text-teal-600 dark:text-teal-400">{sortDir === 'asc' ? '↑' : '↓'}</span>
@@ -109,6 +147,81 @@ export default function ResultsPage() {
   const [page, setPage]                   = useState(0)
   const [expandedId, setExpandedId]       = useState(null)
   const [displayScore, setDisplayScore]   = useState(0)
+  const [reportOpen, setReportOpen]       = useState(false)
+
+  // ── Answer-change log ────────────────────────────────────────────────────────
+  // Supabase (sessions.answer_changes) is the system of record; localStorage is
+  // a redundant local mirror written synchronously by ExamPage. The mirror only
+  // wins when it holds MORE entries than the server copy — which is what a lost
+  // network write looks like. For an append-only, client-authored log, taking
+  // the longer of the two can never drop a change.
+  const changeLog = useMemo(() => {
+    const serverLog = Array.isArray(session?.answer_changes) ? session.answer_changes : []
+    let localLog = []
+    try {
+      const raw = localStorage.getItem(`ptlingo_answer_changes_${sessionId}`)
+      const parsed = raw ? JSON.parse(raw) : []
+      if (Array.isArray(parsed)) localLog = parsed
+    } catch {
+      // Private mode or quota — the server copy still works.
+    }
+    return localLog.length > serverLog.length ? localLog : serverLog
+  }, [session, sessionId])
+
+  const changeStats = useMemo(() => {
+    const LET = ['A', 'B', 'C', 'D']
+    let rightWrong = 0, wrongRight = 0, wrongWrong = 0
+    changeLog.forEach((c) => {
+      if (c.correct_index == null) return
+      const key = LET[c.correct_index]
+      const wasRight = c.from === key
+      const nowRight = c.to === key
+      if (wasRight && !nowRight) rightWrong += 1
+      else if (!wasRight && nowRight) wrongRight += 1
+      else if (!wasRight && !nowRight) wrongWrong += 1
+    })
+    return { total: changeLog.length, rightWrong, wrongRight, wrongWrong, net: wrongRight - rightWrong }
+  }, [changeLog])
+
+  const downloadChangeLog = useCallback(() => {
+    const blob = new Blob(
+      [JSON.stringify({ sessionId, exportedAt: new Date().toISOString(), stats: changeStats, changes: changeLog }, null, 2)],
+      { type: 'application/json' },
+    )
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `answer-changes-${sessionId}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [sessionId, changeLog, changeStats])
+
+  // ── Process report (score · pacing · answer changes · attention) ────────────
+  // Derived entirely from persisted data; the JSON download is the deliverable.
+  const processReport = useMemo(() => {
+    if (!session || session.type !== 'exam' || !questions.length) return null
+    return buildProcessReport({
+      session,
+      questions,
+      changeLog,
+      examSeries: EXAM_SERIES_BY_NUMBER[session.exam_number] ?? null,
+    })
+  }, [session, questions, changeLog])
+
+  const downloadProcessReport = useCallback(() => {
+    if (!processReport) return
+    const blob = new Blob([JSON.stringify(processReport, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `mock-process-report-${sessionId}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, [processReport, sessionId])
 
   // ── Load ────────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -125,7 +238,7 @@ export default function ResultsPage() {
         if (sess.question_ids?.length > 0) {
           const { data: qs, error: qErr } = await supabase
             .from('questions')
-            .select('id, stem, choices, subject, difficulty, correct_index, rationale, rationale_map')
+            .select('id, stem, choices, subject, section, difficulty, correct_index, rationale, rationale_map')
             .in('id', sess.question_ids)
             .eq('quarantined', false)
           if (qErr) throw qErr
@@ -398,6 +511,233 @@ export default function ResultsPage() {
             <StatCard label="Unanswered" value={unansweredCount} color="amber" />
             <StatCard label="Marked"     value={marked.length}   color="slate" />
           </motion.div>
+
+          {/* ── Answer changes ── */}
+          {changeLog.length > 0 && (
+            <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 space-y-4">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Answer Changes
+                </span>
+                <button
+                  onClick={downloadChangeLog}
+                  className="text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                >
+                  Download log (.json)
+                </button>
+              </div>
+
+              <div className="flex gap-3 flex-wrap">
+                <StatCard label="Total changes"  value={changeStats.total}       color="slate" />
+                <StatCard label="Right → wrong"  value={changeStats.rightWrong}  color="red"   />
+                <StatCard label="Wrong → right"  value={changeStats.wrongRight}  color="green" />
+                <StatCard label="Wrong → wrong"  value={changeStats.wrongWrong}  color="amber" />
+              </div>
+
+              <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                Net effect of every change of mind:{' '}
+                <span className={`font-semibold tabular-nums ${
+                  changeStats.net > 0 ? 'text-green-600 dark:text-green-400'
+                  : changeStats.net < 0 ? 'text-red-600 dark:text-red-400'
+                  : 'text-slate-700 dark:text-slate-200'
+                }`}>
+                  {changeStats.net > 0 ? `+${changeStats.net}` : changeStats.net}
+                </span>{' '}
+                {changeStats.net === 1 || changeStats.net === -1 ? 'item' : 'items'}. Recorded
+                automatically as you answered — nothing here was entered by hand.
+              </p>
+            </section>
+          )}
+
+          {/* ── Mock process report (collapsible) ── */}
+          {processReport && (
+            <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
+              <button
+                onClick={() => setReportOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+              >
+                <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Process Report
+                </span>
+                <svg
+                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${reportOpen ? 'rotate-180' : ''}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {reportOpen && (
+                <div className="border-t border-slate-100 dark:border-slate-700 px-5 py-5 space-y-7">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400 max-w-md">
+                      Score, pacing, answer changes, and section ramp-up — derived
+                      entirely from data recorded automatically during the sitting.
+                      The JSON export contains every raw record.
+                    </p>
+                    <button
+                      onClick={downloadProcessReport}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      Download report (.json)
+                    </button>
+                  </div>
+
+                  {/* Measure 1 — score */}
+                  <ReportBlock title="1 · Score (raw)">
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      <span className="font-semibold tabular-nums">{processReport.score.correct}/{processReport.score.scorable}</span>
+                      {' '}correct ({rptVal(processReport.score.raw_pct, '%')}) ·{' '}
+                      <span className="tabular-nums">{processReport.score.unanswered}</span> unanswered
+                      {processReport.elapsed_minutes != null && (
+                        <> · <span className="tabular-nums">{processReport.elapsed_minutes}</span> min on the clock</>
+                      )}
+                    </p>
+                    <div className="rounded-lg border border-slate-100 dark:border-slate-700 overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-slate-100 dark:border-slate-700">
+                            <th className={RPT_TH}>Section</th>
+                            <th className={RPT_TH}>Items</th>
+                            <th className={RPT_TH}>Correct</th>
+                            <th className={RPT_TH}>Blank</th>
+                            <th className={RPT_TH}>Raw %</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {processReport.score.by_section.map((r) => (
+                            <tr key={r.section} className="border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+                              <td className={RPT_TD}>S{r.section}</td>
+                              <td className={RPT_TD}>{r.n}</td>
+                              <td className={RPT_TD}>{r.correct}</td>
+                              <td className={RPT_TD}>{r.unanswered}</td>
+                              <td className={RPT_TD}>{rptVal(r.raw_pct, '%')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <ReportFlags flags={processReport.score.flags} />
+                  </ReportBlock>
+
+                  {/* Measure 2 — pacing */}
+                  <ReportBlock title="2 · Pacing">
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      Median <span className="font-semibold tabular-nums">{rptVal(processReport.pacing.median_seconds, 's')}</span>/item ·{' '}
+                      <span className="tabular-nums">{processReport.pacing.over_ceiling_150s}</span> items over 2:30 ·{' '}
+                      <span className="tabular-nums">{processReport.pacing.rushed_under_30s}</span> items under 0:30
+                    </p>
+                    <div className="rounded-lg border border-slate-100 dark:border-slate-700 overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-slate-100 dark:border-slate-700">
+                            <th className={RPT_TH}>Section</th>
+                            <th className={RPT_TH}>Median</th>
+                            <th className={RPT_TH}>Compression</th>
+                            <th className={RPT_TH}>&lt; 0:30</th>
+                            <th className={RPT_TH}>&gt; 2:30</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {processReport.pacing.by_section.map((r) => (
+                            <tr key={r.section} className="border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+                              <td className={RPT_TD}>S{r.section}</td>
+                              <td className={RPT_TD}>{rptVal(r.median, 's')}</td>
+                              <td className={`${RPT_TD} ${r.compression_ratio != null && r.compression_ratio < 0.7 ? 'text-red-600 dark:text-red-400 font-semibold' : ''}`}>
+                                {rptVal(r.compression_ratio)}
+                              </td>
+                              <td className={RPT_TD}>{r.rushed_under_30s}</td>
+                              <td className={RPT_TD}>{r.over_ceiling_150s}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <ReportFlags flags={processReport.pacing.flags} />
+                  </ReportBlock>
+
+                  {/* Measure 3 — answer changes */}
+                  <ReportBlock title="3 · Answer changes">
+                    {processReport.answer_changes.total === 0 ? (
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        No answers were changed this sitting.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-xs text-slate-600 dark:text-slate-300">
+                          Net{' '}
+                          <span className={`font-semibold tabular-nums ${
+                            processReport.answer_changes.net > 0 ? 'text-green-600 dark:text-green-400'
+                            : processReport.answer_changes.net < 0 ? 'text-red-600 dark:text-red-400'
+                            : ''
+                          }`}>
+                            {processReport.answer_changes.net > 0 ? `+${processReport.answer_changes.net}` : processReport.answer_changes.net}
+                          </span>{' '}
+                          across {processReport.answer_changes.total} changes
+                          {processReport.answer_changes.median_into_ms != null && (
+                            <> · median {Math.round(processReport.answer_changes.median_into_ms / 1000)}s into the visit</>
+                          )}
+                          {' '}· {processReport.answer_changes.on_marked} on marked / {processReport.answer_changes.on_unmarked} on unmarked
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
+                          Per-section net:{' '}
+                          {processReport.answer_changes.by_section.map((r, i) => (
+                            <Fragment key={r.section}>
+                              {i > 0 && ' · '}
+                              S{r.section} {r.net > 0 ? `+${r.net}` : r.net}
+                            </Fragment>
+                          ))}
+                        </p>
+                      </>
+                    )}
+                    <ReportFlags flags={processReport.answer_changes.flags} />
+                  </ReportBlock>
+
+                  {/* Measure 4 — ramp-up / attention */}
+                  <ReportBlock title="4 · Section ramp-up">
+                    <div className="rounded-lg border border-slate-100 dark:border-slate-700 overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b border-slate-100 dark:border-slate-700">
+                            <th className={RPT_TH}>Section</th>
+                            <th className={RPT_TH}>First 5</th>
+                            <th className={RPT_TH}>Rest</th>
+                            <th className={RPT_TH}>Δ (pts)</th>
+                            <th className={RPT_TH}>First-5 time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {processReport.attention.by_section.map((r) => (
+                            <tr key={r.section} className="border-b border-slate-50 dark:border-slate-700/50 last:border-0">
+                              <td className={RPT_TD}>S{r.section}</td>
+                              <td className={RPT_TD}>{rptVal(r.opener_acc, '%')}</td>
+                              <td className={RPT_TD}>{rptVal(r.body_acc, '%')}</td>
+                              <td className={`${RPT_TD} ${r.opener_delta != null && r.opener_delta < -10 ? 'text-red-600 dark:text-red-400 font-semibold' : ''}`}>
+                                {r.opener_delta != null && r.opener_delta > 0 ? `+${r.opener_delta}` : rptVal(r.opener_delta)}
+                              </td>
+                              <td className={RPT_TD}>
+                                {rptVal(r.opener_mean_seconds, 's')}
+                                {r.time_ratio != null && ` (${r.time_ratio}× median)`}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {processReport.attention.post_break_acc != null && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Accuracy on the first 5 items after a break:{' '}
+                        <span className="tabular-nums font-semibold">{processReport.attention.post_break_acc}%</span>
+                      </p>
+                    )}
+                    <p className="text-xs leading-relaxed font-semibold text-slate-700 dark:text-slate-200">
+                      Verdict: {processReport.attention.verdict}
+                    </p>
+                  </ReportBlock>
+                </div>
+              )}
+            </section>
+          )}
 
           {/* ── Performance by subject (collapsible) ── */}
           <section className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden">
