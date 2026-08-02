@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(npm run *)",
-      "Read(//home/anonymius/Documents/NPTE\\\\ Claude\\\\ -\\\\ Github/NPTE-Claude/npte-prep/src/**)"
+      "Read(//home/anonymius/Documents/NPTE\\\\ Claude\\\\ -\\\\ Github/NPTE-Claude/npte-prep/src/**)",
+      "Bash(npm test *)"
     ]
   }
 }

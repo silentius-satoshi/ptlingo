@@ -1,5 +1,5 @@
 # PT Lingo — Project Reference
-Current state: Steps 39–40 complete + extensive UI/UX polish. Exam July 29 2026.
+Current state: Steps 39–40 + Mock-A instrumentation complete. Exam Oct 27 2026.
 Repo: silentius-satoshi/ptlingo (renamed from npte-prep)
 
 ## Stack
@@ -33,7 +33,9 @@ vite-plugin-pwa + Workbox — PWA/iOS
 38-F: Streak 5-day lap calendar ✅
 39: Anonymous sign-in + user type onboarding (4 segments) ✅
 40: Duolingo-style entry flow (LandingPage, OnboardingFlow, demo session, ProfileGate) ✅
-41–46: Nostr dual auth — spec v18 complete, NOT YET IMPLEMENTED (post July 29 gate)
+Mock-A instrumentation (Aug 2026): wall-clock timer + deadline_at, auto answer-change
+  log, process report + JSON export, exhibit media (img+video), section-locked nav ✅
+41–46: Nostr dual auth — spec v18 complete, NOT YET IMPLEMENTED
 47–50: Bitcoin/Lightning wallet — spec v1 complete, depends on 41–46
 
 ## Routes
@@ -57,13 +59,19 @@ RequireFullAuth: allows anonymous users through (they have real Supabase session
 
 ## Supabase Schema
 questions: id, stem, choices(array), correct_index(int), subject, difficulty,
-  tags, rationale, quarantined(bool DEFAULT false)
-  — 33 questions quarantined (media-dependent, no image/video attached)
+  tags, rationale, quarantined(bool DEFAULT false),
+  exam_series, section(int), question_number(int, global 1–225), image_url
   — ALL fetches must include .eq('quarantined', false)
+  — 'Series 3 Form A': 224 rows (no Q161), 6 media items (66,68,73,144,150,153; 73+153 mp4)
+  — import upsert conflict key: (exam_series, section, question_number)
+    changed key = orphan rows, not updates — delete before re-import
 sessions: id, user_id, type(exam|quiz), mode, status(in_progress|paused|submitted),
   time_multiplier, time_remaining, current_index, question_ids(uuid[]),
   answers(jsonb), marked(uuid[]), eliminated(jsonb), highlights(jsonb),
-  notes(jsonb), time_per_question(jsonb), score(float), submitted_at, started_at
+  notes(jsonb), time_per_question(jsonb), score(float), submitted_at, started_at,
+  answer_changes(jsonb DEFAULT '[]'), deadline_at(timestamptz)
+  — deadline_at NULL = clock legitimately stopped (paused / mandatory break / submitted)
+  — deadline_at written when the clock starts/stops/resumes, NEVER periodically
 notes: user_id, question_id, content
 fsbpt_attempts: id, user_id, attempt_number, exam_date, scale_score,
   section_scores(jsonb), body_system_scores(jsonb), work_activity_scores(jsonb)
@@ -80,12 +88,13 @@ user_gamification: user_id, xp, level, streak, longest_streak, last_activity_dat
 daily_missions: id, user_id, mission_type, target, progress, completed, date
 achievements: id, user_id, achievement_key, unlocked_at
 path_milestones: id, user_id, system_name, claimed_at, xp_awarded — UNIQUE(user_id,system_name)
-profiles: id(PK→auth.users), name, username, avatar_url, exam_date(def 2026-07-29),
+profiles: id(PK→auth.users), name, username, avatar_url, exam_date,
   user_type(text: 'highschool'|'prept'|'dpt'|'npte'), daily_goal(int)
   RLS: auth.uid()=id
 push_subscriptions: id, user_id(→auth.users), subscription(jsonb) — UNIQUE(user_id)
   RLS: auth.uid()=user_id
-Storage bucket: avatars (public) path:{user_id}/avatar.jpg
+Storage buckets: avatars (public) path:{user_id}/avatar.jpg
+  question-media (public) path: formA/q{question_number}.{png|mp4}
 
 ## LocalStorage Keys
 ptlingo_quiz_mode         'standard'|'ptlingo'
@@ -96,6 +105,8 @@ ptlingo_reminders_enabled 'true'|'false'
 ptlingo_push_enabled      'true'|'false'
 ptlingo_email_reminders   'true'|'false'
 ptlingo_onboarding_complete '1' — user has completed OnboardingFlow
+ptlingo_answer_changes_{sessionId} JSON — synchronous mirror of sessions.answer_changes
+  — merge rule on load: longer log wins, server wins ties (src/lib/changeLog.js)
 sessionStorage:
 ptlingo_anon_banner_dismissed — anon upgrade banner dismissed this browser session
 
@@ -198,8 +209,39 @@ ResultsPage: first wrong answer auto-expanded, chevron rotates, hint text above 
 Due for Review: handleReviewPress creates session directly from question_reviews
   — no QuestionBankPage bounce, same loading overlay as path node start
 
+## Mock Exam Fidelity
+Timing: ONE shared clock across 5 sections (FSBPT-verified). Only stop: mandatory
+  15-min break after S2. Optional breaks S1/S3/S4 do NOT stop the clock.
+  No per-section timers — do not reintroduce them.
+useTimer: wall-clock anchored (deadline − Date.now()), survives tab throttle/sleep
+  — armedRef guard prevents auto-submit on mount (store seeds async from 0) — never remove
+Section breaks: deriveSectionEnds() reads boundaries off loaded questions
+  (src/lib/sectionBounds.js) — NOT hardcoded index arithmetic
+Section-locked nav: goTo(index, {force}) — force only from break flow;
+  ProgressGrid/QuestionNav lock out-of-section items; ReviewPage (pre-submit, exam):
+  no View Rationale, Go-to-Question locked to current section
+Form order: MockExamStartPage orders section, question_number — order freezes into
+  question_ids at session creation (old sessions keep old order)
+examSnapshot(): the ONLY way to build a sessions .update() payload — add new persisted
+  fields there, never inline. PostgREST fails the WHOLE update on an unknown column.
+clockPausedRef is stale inside handlers — pass deadline_at explicitly at clock
+  start/stop call sites
+Answer-change log: automatic only (first pick ≠ change, same-click ≠ change),
+  append-only, never hand-edited — load-bearing for the mock analysis
+
+## Process Report
+src/lib/processReport.js — pure; buildProcessReport({session, questions, changeLog})
+  4 measures: score (raw only — NEVER fabricate FSBPT scale scores), pacing
+  (2:30 ceiling, compression ratio <0.70 flag), answer changes (net, into, marked
+  split), attention (opener vs body per section + explicit verdict)
+  raw.per_item carries question_number → offline join to form text for
+  work-activity classification (not derivable in-app)
+ResultsPage: collapsible Process Report + one JSON download
+  (mock-process-report-{sessionId}.json) — the JSON is the deliverable
+Tests: npm test → scripts/testProcessReport.mjs (keep green)
+
 ## Key Gotchas
-- ALL questions fetches MUST include .eq('quarantined', false) — 33 quarantined
+- ALL questions fetches MUST include .eq('quarantined', false)
 - section.mascot is a filename STEM ('sparky'), not a full path
   → use /mascots/${section.mascot}.png
 - section.emoji does NOT exist in systemConfig — use section.mascot
@@ -220,6 +262,10 @@ Due for Review: handleReviewPress creates session directly from question_reviews
 - pg_cron: daily 0 13 * * * (8am CST) → send-review-notifications Edge Function
 - Import script: needs --- before Q1 or it gets silently skipped
 - ptlingo_quiz_mode_set: clear localStorage to re-trigger quiz mode onboarding
+- Migration BEFORE code that writes new sessions columns — unknown column fails every save
+- Exhibit media: QuestionImage renders <video> for .mp4/.mov/.webm, click-to-play, no autoplay
+- ReviewPage reviewBounds keys off session.current_index — valid only because
+  handleGoToReview flushes before navigating
 
 ## Stores (Zustand)
 gamificationStore (src/stores/gamificationStore.js)
