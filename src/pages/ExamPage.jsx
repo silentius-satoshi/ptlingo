@@ -30,32 +30,13 @@ import PostSessionFlow from '../components/exam/PostSessionFlow'
 import ProfileGate from '../components/exam/ProfileGate'
 import { calculateNextReview } from '../lib/spacedRepetition'
 import { deadlineFromSeconds, secondsFromDeadline } from '../hooks/useTimer'
-
-// Fallback only: 0-indexed last question of sections 1-4 on a canonical 225-item form.
-const SECTION_END_225 = new Set([44, 89, 134, 179])
-
-// Derive the 0-indexed last-question position of each section from the questions
-// themselves. A real form is almost never exactly 225 items after quarantine, so
-// keying breaks off index arithmetic silently disables every break on the forms
-// we actually sit. Read the boundary off the data; fall back to arithmetic only
-// when the section field is missing entirely.
-function deriveSectionEnds(questions) {
-  if (!questions || questions.length === 0) return new Set()
-  const hasSection = questions.every((q) => q && q.section != null)
-  if (!hasSection) return questions.length === 225 ? SECTION_END_225 : new Set()
-  const ends = new Set()
-  for (let i = 0; i < questions.length - 1; i++) {
-    if (Number(questions[i].section) !== Number(questions[i + 1].section)) ends.add(i)
-  }
-  return ends
-}
+import { deriveSectionEnds, boundsForIndex, isOutOfBounds } from '../lib/sectionBounds'
+import { changeLogKey, mergeChangeLogs } from '../lib/changeLog'
 
 // The answer-change log's system of record is sessions.answer_changes in
 // Supabase. localStorage is kept as a redundant local mirror — it costs one
 // synchronous write per change and it is the only copy that survives a network
 // failure, so on load we take whichever log is longer.
-const changeLogKey = (sessionId) => `ptlingo_answer_changes_${sessionId}`
-
 function readAnswerChangeLog(sessionId) {
   try {
     const raw = localStorage.getItem(changeLogKey(sessionId))
@@ -276,14 +257,22 @@ export default function ExamPage() {
           return
         }
 
-        // Resuming a paused session — flip back to in_progress (skip in readOnly)
+        // Resuming a paused session — flip back to in_progress (skip in readOnly).
+        // The clock restarts NOW, so re-anchor deadline_at in the same write.
+        // Without it the row keeps the null written at pause until some user
+        // action trips the debounced save, and a reload before that action
+        // refunds every second spent reading since the resume.
         if (session.status === 'paused' && !readOnly) {
           await supabase
             .from('sessions')
-            .update({ status: 'in_progress' })
+            .update({
+              status:      'in_progress',
+              deadline_at: deadlineFromSeconds(session.time_remaining ?? 0),
+            })
             .eq('id', sessionId)
         }
 
+        let ordered = []
         if (session.question_ids?.length > 0) {
           const { data: qs, error: qErr } = await supabase
             .from('questions')
@@ -294,7 +283,7 @@ export default function ExamPage() {
           if (qErr) throw qErr
 
           const qMap = Object.fromEntries((qs || []).map((q) => [q.id, q]))
-          const ordered = session.question_ids.map((id) => qMap[id]).filter(Boolean)
+          ordered = session.question_ids.map((id) => qMap[id]).filter(Boolean)
           setQuestions(ordered)
         }
 
@@ -323,20 +312,25 @@ export default function ExamPage() {
         const fromDeadline   = readOnly ? null : secondsFromDeadline(session.deadline_at)
         const resumedSeconds = fromDeadline ?? (session.time_remaining ?? 0)
 
-        // Supabase is the system of record for the change log. The local mirror
-        // only wins when it holds more entries than the server does, which is
-        // what a lost network write looks like. Taking the longer log can drop
-        // a change only if the server somehow has entries the client never saw,
-        // which cannot happen for an append-only client-authored log.
-        const serverLog = Array.isArray(session.answer_changes) ? session.answer_changes : []
-        const localLog  = readAnswerChangeLog(sessionId)
+        // An incoming goToIndex (the in-exam Review screen's "Go to Question")
+        // writes currentIndex directly, bypassing goTo and its section guard.
+        // Clamp it to the section the candidate was actually in, so no producer
+        // of this navigation state can walk them across a boundary.
+        const savedIndex   = session.current_index ?? 0
+        const requested    = location.state?.goToIndex
+        const resumeBounds = session.type === 'exam' && !readOnly
+          ? boundsForIndex(deriveSectionEnds(ordered), savedIndex, ordered.length)
+          : null
+        const startIndex = requested == null || isOutOfBounds(resumeBounds, requested)
+          ? savedIndex
+          : requested
 
         setSession({
           sessionId:       session.id,
           type:            session.type,
           mode:            session.mode,
           timeMultiplier:  session.time_multiplier,
-          currentIndex:    location.state?.goToIndex ?? (session.current_index ?? 0),
+          currentIndex:    startIndex,
           answers:         session.answers           ?? {},
           marked:          session.marked             ?? [],
           eliminated:      session.eliminated         ?? {},
@@ -345,7 +339,7 @@ export default function ExamPage() {
           timePerQuestion: session.time_per_question  ?? {},
           timeRemaining:   resumedSeconds,
           status:          'in_progress',
-          answerChanges:   localLog.length > serverLog.length ? localLog : serverLog,
+          answerChanges:   mergeChangeLogs(readAnswerChangeLog(sessionId), session.answer_changes),
         })
       } catch (err) {
         setError(err.message)
@@ -586,20 +580,13 @@ export default function ExamPage() {
   // passes force: true.
   const sectionBoundsRef = useRef(null)
   const sectionBounds = useMemo(() => {
-    if (readOnly || type !== 'exam' || sectionEnds.size === 0) return null
-    const ends = [...sectionEnds].sort((a, b) => a - b)
-    let start = 0
-    for (const e of ends) {
-      if (currentIndex <= e) return { start, end: e }
-      start = e + 1
-    }
-    return { start, end: questions.length - 1 }
+    if (readOnly || type !== 'exam') return null
+    return boundsForIndex(sectionEnds, currentIndex, questions.length)
   }, [readOnly, type, sectionEnds, currentIndex, questions.length])
   useEffect(() => { sectionBoundsRef.current = sectionBounds }, [sectionBounds])
 
   const goTo = useCallback((index, { force = false } = {}) => {
-    const b = sectionBoundsRef.current
-    if (!force && b && (index < b.start || index > b.end)) return
+    if (!force && isOutOfBounds(sectionBoundsRef.current, index)) return
     setCurrentIndex(index)
     scheduleSave({ current_index: index })
     setFocusedChoice(null)

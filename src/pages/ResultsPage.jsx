@@ -10,6 +10,7 @@ import LoadingSpinner from '../components/shared/LoadingSpinner'
 import useGamificationStore from '../stores/gamificationStore'
 import { getSystemConfig } from '../constants/systemConfig'
 import { buildProcessReport } from '../lib/processReport'
+import { changeLogKey, mergeChangeLogs } from '../lib/changeLog'
 import confetti from 'canvas-confetti'
 import { ChevronDown } from 'lucide-react'
 
@@ -151,22 +152,18 @@ export default function ResultsPage() {
   const [reportOpen, setReportOpen]       = useState(false)
 
   // ── Answer-change log ────────────────────────────────────────────────────────
-  // Supabase (sessions.answer_changes) is the system of record; localStorage is
-  // a redundant local mirror written synchronously by ExamPage. The mirror only
-  // wins when it holds MORE entries than the server copy — which is what a lost
-  // network write looks like. For an append-only, client-authored log, taking
-  // the longer of the two can never drop a change.
+  // Merge rule and storage key both live in src/lib/changeLog.js, shared with
+  // ExamPage — see there for why the longer log wins and the server takes ties.
   const changeLog = useMemo(() => {
-    const serverLog = Array.isArray(session?.answer_changes) ? session.answer_changes : []
     let localLog = []
     try {
-      const raw = localStorage.getItem(`ptlingo_answer_changes_${sessionId}`)
+      const raw = localStorage.getItem(changeLogKey(sessionId))
       const parsed = raw ? JSON.parse(raw) : []
       if (Array.isArray(parsed)) localLog = parsed
     } catch {
       // Private mode or quota — the server copy still works.
     }
-    return localLog.length > serverLog.length ? localLog : serverLog
+    return mergeChangeLogs(localLog, session?.answer_changes)
   }, [session, sessionId])
 
   const changeStats = useMemo(() => {

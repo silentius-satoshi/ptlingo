@@ -1,5 +1,10 @@
-// Assertions for src/lib/processReport.js — run: node scripts/testProcessReport.mjs
+// Assertions for the pure mock-exam libs — run: npm test
+//   src/lib/processReport.js  — report derivation
+//   src/lib/changeLog.js      — answer-change log merge rule
+//   src/lib/sectionBounds.js  — section geometry / navigation locks
 import { buildProcessReport, median, mean } from '../src/lib/processReport.js'
+import { mergeChangeLogs, changeLogKey } from '../src/lib/changeLog.js'
+import { deriveSectionEnds, boundsForIndex, isOutOfBounds } from '../src/lib/sectionBounds.js'
 
 let n = 0
 const ok = (cond, msg) => {
@@ -150,5 +155,52 @@ const rFat = buildProcessReport({
   changeLog: [],
 })
 ok(rFat.attention.verdict.startsWith('fatigue'), `fatigue pattern detected (got: ${rFat.attention.verdict})`)
+
+// ── src/lib/changeLog.js ─────────────────────────────────────────────────────
+// The offline-survival guarantee: a local mirror that outran the server wins, so
+// changes made while the network was down are never dropped on reload.
+const L3 = [{ t: 1 }, { t: 2 }, { t: 3 }]
+const S1 = [{ t: 1 }]
+ok(mergeChangeLogs(L3, S1) === L3,        'change log: longer local mirror wins (lost network write)')
+ok(mergeChangeLogs(S1, L3) === L3,        'change log: longer server log wins')
+ok(mergeChangeLogs(L3, L3.slice()) !== L3, 'change log: equal lengths — server wins the tie')
+ok(mergeChangeLogs([], []).length === 0,  'change log: two empty logs merge to empty')
+ok(mergeChangeLogs(null, L3) === L3,      'change log: null local falls back to server')
+ok(mergeChangeLogs(L3, null) === L3,      'change log: null server falls back to local')
+ok(mergeChangeLogs(undefined, undefined).length === 0, 'change log: both missing yields empty array')
+ok(Array.isArray(mergeChangeLogs('junk', 'junk')),     'change log: non-array inputs never leak through')
+ok(changeLogKey('abc') === 'ptlingo_answer_changes_abc', 'change log: storage key format is stable')
+
+// ── src/lib/sectionBounds.js ─────────────────────────────────────────────────
+// Boundaries come off the data, because a real form is never exactly 225 items
+// after quarantine and index arithmetic would silently disable every break.
+const ends218 = deriveSectionEnds(questions)
+ok(ends218.size === 4,   'section ends: a 5-section form yields 4 boundaries')
+ok(ends218.has(44),      'section ends: S1 ends at index 44 (45 items)')
+ok(ends218.has(86),      'section ends: S2 ends at index 86 (45+42)')
+ok(!ends218.has(217),    'section ends: the final item is not a boundary')
+
+ok(deriveSectionEnds([]).size === 0,        'section ends: empty form has no boundaries')
+ok(deriveSectionEnds(null).size === 0,      'section ends: null form has no boundaries')
+const sectionless225 = Array.from({ length: 225 }, () => ({ id: 'x' }))
+ok(deriveSectionEnds(sectionless225).has(44),  'section ends: sectionless 225-item form uses the arithmetic fallback')
+const sectionless100 = Array.from({ length: 100 }, () => ({ id: 'x' }))
+ok(deriveSectionEnds(sectionless100).size === 0, 'section ends: sectionless non-225 form declines to guess')
+
+ok(boundsForIndex(ends218, 0, 218).start === 0,     'bounds: first section starts at 0')
+ok(boundsForIndex(ends218, 0, 218).end === 44,      'bounds: index 0 resolves to S1')
+ok(boundsForIndex(ends218, 44, 218).end === 44,     'bounds: the boundary index belongs to the section it closes')
+ok(boundsForIndex(ends218, 45, 218).start === 45,   'bounds: the next index opens the following section')
+ok(boundsForIndex(ends218, 100, 218).start === 87,  'bounds: a mid-form index resolves to its own section')
+ok(boundsForIndex(ends218, 217, 218).end === 217,   'bounds: the last section runs to the final item')
+ok(boundsForIndex(new Set(), 5, 218) === null,      'bounds: no boundaries means nothing is locked')
+ok(boundsForIndex(ends218, 5, 0) === null,          'bounds: an empty form locks nothing')
+
+// The lock that keeps the in-exam Review screen from walking across sections.
+const s2 = boundsForIndex(ends218, 60, 218)
+ok(isOutOfBounds(s2, 10)  === true,  'lock: an earlier-section item is out of bounds')
+ok(isOutOfBounds(s2, 200) === true,  'lock: a later-section item is out of bounds')
+ok(isOutOfBounds(s2, 60)  === false, 'lock: the current item is in bounds')
+ok(isOutOfBounds(null, 999) === false, 'lock: null bounds locks nothing (quiz mode)')
 
 console.log(`\nAll ${n} assertions passed.`)

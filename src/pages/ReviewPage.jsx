@@ -1,9 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import useGamificationStore from '../stores/gamificationStore'
 import { useSessionStore } from '../store/sessionStore'
 import { useTimer } from '../hooks/useTimer'
+import { deriveSectionEnds, boundsForIndex, isOutOfBounds } from '../lib/sectionBounds'
 import Modal from '../components/shared/Modal'
 import Button from '../components/shared/Button'
 import LoadingSpinner from '../components/shared/LoadingSpinner'
@@ -25,7 +26,7 @@ function StatPill({ label, value, warn = false }) {
   )
 }
 
-function QuestionCard({ question, questionNumber, isAnswered, onGoTo, onViewRationale }) {
+function QuestionCard({ question, questionNumber, isAnswered, onGoTo, onViewRationale, isLocked = false }) {
   return (
     <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
       {/* Number badge */}
@@ -55,16 +56,24 @@ function QuestionCard({ question, questionNumber, isAnswered, onGoTo, onViewRati
           {isAnswered ? 'Answered' : 'Unanswered'}
         </span>
         <div className="flex items-center gap-2">
+          {onViewRationale && (
+            <button
+              onClick={onViewRationale}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
+              style={{ background: '#3B82F6' }}
+            >
+              View Rationale
+            </button>
+          )}
           <button
-            onClick={onViewRationale}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
-            style={{ background: '#3B82F6' }}
-          >
-            View Rationale
-          </button>
-          <button
-            onClick={onGoTo}
-            className="flex items-center gap-1 text-xs font-semibold text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 transition-colors"
+            onClick={isLocked ? undefined : onGoTo}
+            disabled={isLocked}
+            title={isLocked ? 'Locked — outside the current section' : undefined}
+            className={`flex items-center gap-1 text-xs font-semibold transition-colors ${
+              isLocked
+                ? 'text-slate-400 dark:text-slate-500 opacity-30 cursor-not-allowed'
+                : 'text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300'
+            }`}
           >
             Go to Question
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -121,7 +130,7 @@ export default function ReviewPage() {
         if (sess.question_ids?.length > 0) {
           const { data: qs, error: qErr } = await supabase
             .from('questions')
-            .select('id, stem, choices, subject, correct_index, rationale, rationale_map')
+            .select('id, stem, choices, subject, section, correct_index, rationale, rationale_map')
             .in('id', sess.question_ids)
             .eq('quarantined', false)
           if (qErr) throw qErr
@@ -208,6 +217,39 @@ export default function ReviewPage() {
   const goToQuestion = useCallback((index) => {
     flushAndNavigate(`/exam/${sessionId}`, { state: { goToIndex: index } })
   }, [sessionId, flushAndNavigate])
+
+  // This screen lists marked and unanswered items across the WHOLE form, but a
+  // mock exam only lets the candidate move within the section they are in.
+  // Out-of-section rows stay visible — you should still see what you flagged
+  // earlier — but their jump is disabled. Quizzes have no sections, so nothing
+  // locks there.
+  const isExam = session?.type === 'exam'
+  const reviewBounds = useMemo(() => {
+    if (!isExam) return null
+    return boundsForIndex(
+      deriveSectionEnds(questions),
+      session?.current_index ?? 0,
+      questions.length,
+    )
+  }, [isExam, questions, session?.current_index])
+
+  // A mock exam is scored on what the candidate knew at the time. This screen is
+  // reachable only BEFORE submission (a submitted session redirects to /results),
+  // so exposing rationales here would hand over the correct answers with the
+  // clock still running. Quizzes are practice — they keep the affordance.
+  const viewRationaleHandler = useCallback((q) => {
+    if (isExam) return null
+    return () => navigate('/rationale', {
+      state: {
+        question:       q,
+        selectedAnswer: session?.answers?.[q.id] ?? null,
+        systemName:     q.subject,
+        sessionId,
+        currentIndex:   q.index,
+        totalQuestions: questions.length,
+      },
+    })
+  }, [isExam, navigate, session?.answers, sessionId, questions.length])
 
   // ── Loading / error states ─────────────────────────────────────────────────
   if (loading) {
@@ -318,8 +360,9 @@ export default function ReviewPage() {
                     question={q}
                     questionNumber={q.index + 1}
                     isAnswered={sessionAnswers[q.id] !== undefined}
+                    isLocked={isOutOfBounds(reviewBounds, q.index)}
                     onGoTo={() => goToQuestion(q.index)}
-                    onViewRationale={() => navigate('/rationale', { state: { question: q, selectedAnswer: session?.answers?.[q.id] ?? null, systemName: q.subject, sessionId, currentIndex: q.index, totalQuestions: questions.length } })}
+                    onViewRationale={viewRationaleHandler(q)}
                   />
                 ))}
               </div>
@@ -347,8 +390,9 @@ export default function ReviewPage() {
                     question={q}
                     questionNumber={q.index + 1}
                     isAnswered={false}
+                    isLocked={isOutOfBounds(reviewBounds, q.index)}
                     onGoTo={() => goToQuestion(q.index)}
-                    onViewRationale={() => navigate('/rationale', { state: { question: q, selectedAnswer: session?.answers?.[q.id] ?? null, systemName: q.subject, sessionId, currentIndex: q.index, totalQuestions: questions.length } })}
+                    onViewRationale={viewRationaleHandler(q)}
                   />
                 ))}
               </div>

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node scripts/testProcessReport.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.93.0",
