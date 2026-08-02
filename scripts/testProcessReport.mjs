@@ -5,6 +5,7 @@
 import { buildProcessReport, median, mean } from '../src/lib/processReport.js'
 import { mergeChangeLogs, changeLogKey } from '../src/lib/changeLog.js'
 import { deriveSectionEnds, boundsForIndex, isOutOfBounds } from '../src/lib/sectionBounds.js'
+import { mergeVisitLogs, appendVisit, closeLastVisit, visitCounts, visitLogKey } from '../src/lib/visitLog.js'
 
 let n = 0
 const ok = (cond, msg) => {
@@ -202,5 +203,34 @@ ok(isOutOfBounds(s2, 10)  === true,  'lock: an earlier-section item is out of bo
 ok(isOutOfBounds(s2, 200) === true,  'lock: a later-section item is out of bounds')
 ok(isOutOfBounds(s2, 60)  === false, 'lock: the current item is in bounds')
 ok(isOutOfBounds(null, 999) === false, 'lock: null bounds locks nothing (quiz mode)')
+
+// ── src/lib/visitLog.js ──────────────────────────────────────────────────────
+ok(visitLogKey('abc') === 'ptlingo_visit_log_abc', 'visitLogKey shape')
+ok(mergeVisitLogs([1, 2], [1]).length === 2 && mergeVisitLogs([1], [1, 2]).length === 2, 'visit merge: longer wins')
+const tieServer = [{ a: 1 }]
+ok(mergeVisitLogs([{ b: 2 }], tieServer) === tieServer, 'visit merge: server wins ties (identity)')
+ok(mergeVisitLogs(null, undefined).length === 0, 'visit merge: non-arrays degrade to empty')
+
+let vlog = appendVisit([], 0, 'q-1-0', 1000)
+ok(vlog.length === 1 && vlog[0].leave === null, 'first visit opens')
+vlog = appendVisit(vlog, 0, 'q-1-0', 1500)
+ok(vlog.length === 1, 'StrictMode guard: re-append of same open idx is a no-op')
+vlog = appendVisit(vlog, 1, 'q-1-1', 5000)
+ok(vlog.length === 2 && vlog[0].leave !== null && vlog[0].ms === 4000, 'moving on closes the prior visit with correct ms')
+vlog = appendVisit(vlog, 0, 'q-1-0', 9000)
+vlog = closeLastVisit(vlog, 12_000)
+ok(vlog.length === 3 && vlog[2].ms === 3000, 'revisit logged and closed')
+ok(closeLastVisit(vlog, 99_999) === vlog, 'closing an already-closed log is a no-op (identity)')
+ok(visitCounts(vlog).get('q-1-0') === 2 && visitCounts(vlog).get('q-1-1') === 1, 'visit counts per qid')
+
+// ── report integration: visits + version ─────────────────────────────────────
+const rv = buildProcessReport({ session, questions, changeLog: [], visitLog: vlog })
+ok(rv.report_version === '2.1', 'report carries report_version')
+ok(rv.raw.visit_log.length === 3, 'raw.visit_log passes through verbatim')
+ok(rv.raw.per_item.find((i) => i.qid === 'q-1-0').visits === 2, 'per_item.visits counts revisits')
+ok(rv.pacing.visit_log_present === true && rv.pacing.revisited_items === 1, 'pacing revisit rollup')
+const rnv = buildProcessReport({ session, questions, changeLog: [] })
+ok(rnv.pacing.visit_log_present === false && rnv.raw.visit_log.length === 0 && rnv.raw.per_item[0].visits === 0,
+  'no visit log degrades gracefully')
 
 console.log(`\nAll ${n} assertions passed.`)

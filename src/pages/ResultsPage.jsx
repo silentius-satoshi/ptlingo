@@ -11,6 +11,7 @@ import useGamificationStore from '../stores/gamificationStore'
 import { getSystemConfig } from '../constants/systemConfig'
 import { buildProcessReport } from '../lib/processReport'
 import { changeLogKey, mergeChangeLogs } from '../lib/changeLog'
+import { visitLogKey, mergeVisitLogs } from '../lib/visitLog'
 import confetti from 'canvas-confetti'
 import { ChevronDown } from 'lucide-react'
 
@@ -200,13 +201,21 @@ export default function ResultsPage() {
   // Derived entirely from persisted data; the JSON download is the deliverable.
   const processReport = useMemo(() => {
     if (!session || session.type !== 'exam' || !questions.length) return null
+    // Visit log: same server-vs-mirror merge as the change log.
+    let localVisits = []
+    try {
+      const rawV = localStorage.getItem(visitLogKey(sessionId))
+      const parsedV = rawV ? JSON.parse(rawV) : []
+      if (Array.isArray(parsedV)) localVisits = parsedV
+    } catch { /* mirror unavailable — server copy still works */ }
     return buildProcessReport({
       session,
       questions,
       changeLog,
       examSeries: EXAM_SERIES_BY_NUMBER[session.exam_number] ?? null,
+      visitLog: mergeVisitLogs(localVisits, session.visit_log),
     })
-  }, [session, questions, changeLog])
+  }, [session, questions, changeLog, sessionId])
 
   const downloadProcessReport = useCallback(() => {
     if (!processReport) return
@@ -624,6 +633,9 @@ export default function ResultsPage() {
                       Median <span className="font-semibold tabular-nums">{rptVal(processReport.pacing.median_seconds, 's')}</span>/item ·{' '}
                       <span className="tabular-nums">{processReport.pacing.over_ceiling_150s}</span> items over 2:30 ·{' '}
                       <span className="tabular-nums">{processReport.pacing.rushed_under_30s}</span> items under 0:30
+                      {processReport.pacing.visit_log_present && (
+                        <> · <span className="tabular-nums">{processReport.pacing.revisited_items}</span> items revisited</>
+                      )}
                     </p>
                     <div className="rounded-lg border border-slate-100 dark:border-slate-700 overflow-x-auto">
                       <table className="w-full text-xs">

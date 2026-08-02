@@ -8,7 +8,15 @@
 // to the tutor thread whole, raw arrays included, and re-derived there. Summary
 // numbers without the raw arrays would not be trusted, so never strip them.
 
+// Extension is required: scripts/*.mjs load this under Node ESM, which does not
+// resolve extensionless specifiers.
+import { visitCounts } from './visitLog.js'
+
 const LETTERS = ['A', 'B', 'C', 'D']
+
+// Bump when the export shape or a measure's math changes, so cross-mock
+// comparisons know which instrument produced which reading.
+export const REPORT_VERSION = '2.1'
 
 export function median(arr) {
   if (!arr.length) return null
@@ -37,8 +45,9 @@ const round2 = (x) => Math.round(x * 100) / 100
  * @param examSeries display string for the form, or null
  * @returns the report object, or null if there is nothing to report on
  */
-export function buildProcessReport({ session, questions, changeLog = [], examSeries = null }) {
+export function buildProcessReport({ session, questions, changeLog = [], examSeries = null, visitLog = [] }) {
   if (!session || !questions?.length) return null
+  const visits = visitCounts(visitLog)
 
   const answers = session.answers || {}
   const tpq = session.time_per_question || {}
@@ -63,6 +72,7 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
       seconds: tpq[q.id] || 0,
       marked: markedSet.has(q.id),
       changes: 0,
+      visits: visits.get(q.id) || 0,
     }
   })
   const byQid = new Map(perItem.map((it) => [it.qid, it]))
@@ -284,6 +294,7 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
   }
 
   return {
+    report_version: REPORT_VERSION,
     session_id: session.id,
     exam_series: examSeries,
     generated_at: new Date().toISOString(),
@@ -314,6 +325,9 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
         return { subject: j, n: t.length, median_seconds: median(t),
                  over_ceiling_150s: t.filter((x) => x > 150).length }
       }),
+      // Only meaningful when a visit log exists; 0/false otherwise.
+      visit_log_present: (visitLog?.length ?? 0) > 0,
+      revisited_items: perItem.filter((it) => it.visits > 1).length,
       flags: pacingFlags,
     },
 
@@ -341,6 +355,9 @@ export function buildProcessReport({ session, questions, changeLog = [], examSer
     raw: {
       question_ids: perItem.map((it) => it.qid),
       per_item: perItem,
+      // Every visit, verbatim — revisit behavior, first-decision latency, and
+      // exact compression all re-derive from this offline.
+      visit_log: Array.isArray(visitLog) ? visitLog : [],
     },
   }
 }

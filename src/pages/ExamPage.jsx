@@ -32,6 +32,7 @@ import { calculateNextReview } from '../lib/spacedRepetition'
 import { deadlineFromSeconds, secondsFromDeadline } from '../hooks/useTimer'
 import { deriveSectionEnds, boundsForIndex, isOutOfBounds } from '../lib/sectionBounds'
 import { changeLogKey, mergeChangeLogs } from '../lib/changeLog'
+import { visitLogKey, mergeVisitLogs, appendVisit, closeLastVisit } from '../lib/visitLog'
 
 // The answer-change log's system of record is sessions.answer_changes in
 // Supabase. localStorage is kept as a redundant local mirror — it costs one
@@ -56,7 +57,7 @@ function getMotivationBreak({
   const half       = Math.floor(questionsTotal / 2)
   const quarter    = Math.floor(questionsTotal / 4)
   const threeQ     = Math.floor(questionsTotal * 0.75)
-  const daysUntil  = Math.ceil((new Date(useAuthStore.getState().examDate ?? '2026-07-29') - new Date()) / (1000 * 60 * 60 * 24))
+  const daysUntil  = Math.ceil((new Date(useAuthStore.getState().examDate ?? '2026-10-27') - new Date()) / (1000 * 60 * 60 * 24))
   const last5      = answerHistory.slice(-5)
   const prev5      = answerHistory.slice(-10, -5)
   const last5Acc   = last5.length ? last5.filter(Boolean).length / last5.length : 0
@@ -109,7 +110,7 @@ function getMotivationBreak({
     { key: 'halfway',            mood: 'encouraging', cond: totalAnswered >= half,
       msg: 'Halfway there — stay focused.' },
     { key: 'exam_three_quarters',mood: 'encouraging', cond: totalAnswered >= threeQ,
-      msg: `July 29 is ${daysUntil} days away. Sessions like this one move the needle.` },
+      msg: `Your exam is ${daysUntil} days away. Sessions like this one move the needle.` },
     { key: 'streak_milestone',   mood: 'encouraging', cond: streak > 0 && streak % 7 === 0,
       msg: `${Math.floor(streak / 7)} week${streak >= 14 ? 's' : ''} of your streak — consistency compounds.` },
     { key: 'streak_alive',       mood: 'encouraging', cond: streak > 0 && totalAnswered === 1,
@@ -200,7 +201,12 @@ export default function ExamPage() {
   const [breakState, setBreakState]       = useState(null)
   const [breakSection, setBreakSection]   = useState(null)
   const [breakTimeLeft, setBreakTimeLeft] = useState(0)
+  // Section-close confirmation: { sec, resumeIndex } while the dialog is open.
+  const [sectionEndPrompt, setSectionEndPrompt] = useState(null)
   const breakResumeIndexRef               = useRef(null)
+  const visitsRef                         = useRef([])   // visit-level timing (src/lib/visitLog.js)
+  const visitSaveRef                      = useRef(null)  // debounce handle for the separate visit_log save
+  const accessTokenRef                    = useRef(null)  // for the keepalive flush on pagehide
 
   // ── Store ──────────────────────────────────────────────────────────────────
   const {
@@ -316,6 +322,19 @@ export default function ExamPage() {
         // writes currentIndex directly, bypassing goTo and its section guard.
         // Clamp it to the section the candidate was actually in, so no producer
         // of this navigation state can walk them across a boundary.
+        // Seed the visit log: server copy vs localStorage mirror, longer wins
+        // (same rule as the answer-change log). session.visit_log is undefined
+        // until its migration runs — mergeVisitLogs treats that as empty.
+        if (!readOnly) {
+          let localVisits = []
+          try {
+            const rawV = localStorage.getItem(visitLogKey(sessionId))
+            const parsedV = rawV ? JSON.parse(rawV) : []
+            if (Array.isArray(parsedV)) localVisits = parsedV
+          } catch { /* mirror unavailable — server copy still works */ }
+          visitsRef.current = mergeVisitLogs(localVisits, session.visit_log)
+        }
+
         const savedIndex   = session.current_index ?? 0
         const requested    = location.state?.goToIndex
         const resumeBounds = session.type === 'exam' && !readOnly
@@ -354,6 +373,9 @@ export default function ExamPage() {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
       Object.values(notesSaveRef.current).forEach(clearTimeout)
       notesSaveRef.current = {}
+      // visitSaveRef is intentionally NOT cleared — that pending write delivers
+      // the final visit-close on exit paths other than submit/pause (back-nav,
+      // quit flow). Clearing it for symmetry would orphan the last visit.
     }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -585,6 +607,95 @@ export default function ExamPage() {
   }, [readOnly, type, sectionEnds, currentIndex, questions.length])
   useEffect(() => { sectionBoundsRef.current = sectionBounds }, [sectionBounds])
 
+  // ── Visit-level timing ─────────────────────────────────────────────────────
+  // One entry per continuous stay on an item. Persisted to localStorage on
+  // every boundary and to Supabase via a SEPARATE debounced update — separate
+  // so a not-yet-migrated visit_log column degrades to localStorage-only
+  // instead of failing every save (PostgREST rejects the whole update on an
+  // unknown column). In dev, StrictMode's double-invoke can add a 0 ms phantom
+  // visit; harmless, and absent in production builds.
+  const persistVisits = useCallback((immediate = false) => {
+    if (!sessionId) return
+    try {
+      localStorage.setItem(visitLogKey(sessionId), JSON.stringify(visitsRef.current))
+    } catch { /* private mode or quota — the server copy still works */ }
+    if (visitSaveRef.current) clearTimeout(visitSaveRef.current)
+    const write = () => {
+      supabase.from('sessions')
+        .update({ visit_log: visitsRef.current })
+        .eq('id', sessionId)
+        .then(() => {}, () => {})
+    }
+    if (immediate) write()
+    else visitSaveRef.current = setTimeout(write, 3000)
+  }, [sessionId])
+
+  useEffect(() => {
+    if (loading || readOnly || !sessionId || !currentQuestionId) return
+    visitsRef.current = appendVisit(visitsRef.current, currentIndex, currentQuestionId, Date.now())
+    persistVisits()
+    return () => {
+      visitsRef.current = closeLastVisit(visitsRef.current, Date.now())
+      persistVisits()
+    }
+  }, [currentIndex, currentQuestionId, loading, readOnly, sessionId, persistVisits])
+
+  // ── Flush-on-exit ──────────────────────────────────────────────────────────
+  // The debounced save can hold up to 1.5 s of state when the tab closes.
+  // On pagehide / going hidden, PATCH a best-effort keepalive snapshot straight
+  // to PostgREST (supabase-js has no keepalive path). Two separate requests on
+  // purpose: the known-columns snapshot must never be blocked by visit_log.
+  useEffect(() => {
+    if (readOnly || !sessionId) return
+    supabase.auth.getSession().then(({ data }) => {
+      accessTokenRef.current = data?.session?.access_token ?? null
+    })
+    // ?? null, not `if (s?.access_token)`: SIGNED_OUT delivers a null session,
+    // and a stale-but-still-valid JWT left in the ref would let a later flush
+    // write after the user asked to be signed out.
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      accessTokenRef.current = s?.access_token ?? null
+    })
+    let lastFlushAt = 0
+    const flush = (e) => {
+      if (e.type === 'visibilitychange' && document.visibilityState !== 'hidden') return
+      // Closing a tab fires visibilitychange AND pagehide. The writes are
+      // idempotent, but keepalive bodies share a 64 KiB browser-wide budget and
+      // a full mock's snapshot is not small — don't spend it twice.
+      const now = Date.now()
+      if (now - lastFlushAt < 1000) return
+      lastFlushAt = now
+      const token = accessTokenRef.current
+      if (!token) return
+      try {
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/sessions?id=eq.${sessionId}`
+        const headers = {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${token}`,
+          Prefer: 'return=minimal',
+        }
+        // deadline_at is deliberately dropped here — the one payload that omits
+        // it. The deadline never moves while the clock runs, and both legitimate
+        // stops (pause, mandatory-break entry) persist null explicitly at the
+        // stop moment, so the row is always already correct. Meanwhile useTimer
+        // has no pagehide wake, so a throttled tab's timeRemaining is stale-high
+        // and deriving a deadline from it here would refund real exam time.
+        const { deadline_at, ...snap } = examSnapshot() // eslint-disable-line no-unused-vars
+        fetch(url, { method: 'PATCH', keepalive: true, headers, body: JSON.stringify(snap) }).catch(() => {})
+        const closedVisits = closeLastVisit(visitsRef.current, Date.now())
+        fetch(url, { method: 'PATCH', keepalive: true, headers, body: JSON.stringify({ visit_log: closedVisits }) }).catch(() => {})
+      } catch { /* best-effort only */ }
+    }
+    document.addEventListener('visibilitychange', flush)
+    window.addEventListener('pagehide', flush)
+    return () => {
+      sub?.subscription?.unsubscribe?.()
+      document.removeEventListener('visibilitychange', flush)
+      window.removeEventListener('pagehide', flush)
+    }
+  }, [sessionId, readOnly, examSnapshot])
+
   const goTo = useCallback((index, { force = false } = {}) => {
     if (!force && isOutOfBounds(sectionBoundsRef.current, index)) return
     setCurrentIndex(index)
@@ -611,24 +722,12 @@ export default function ExamPage() {
     // Trigger section breaks only in full mock-exam mode
     if (!readOnly && type === 'exam' && sectionEnds.has(currentIndex)) {
       const sec = Number(questions[currentIndex]?.section) || Math.round((currentIndex + 1) / 45)
-      breakResumeIndexRef.current = currentIndex + 1
-      setBreakSection(sec)
-      if (sec === 2) {
-        setBreakTimeLeft(15 * 60)
-        setBreakState('mandatory')
-        // The scheduled break after Section 2 is the one point where the exam
-        // clock genuinely stops. Persist that stop immediately: a null
-        // deadline_at means "paused", so a reload during the break restores
-        // from time_remaining rather than charging the break to the block.
-        if (sessionId) {
-          supabase.from('sessions')
-            .update(examSnapshot({ deadline_at: null }))
-            .eq('id', sessionId)
-            .then(() => {}, () => {})
-        }
-      } else {
-        setBreakState('offer')
-      }
+      // Closing a section is IRREVERSIBLE under section-locked navigation, but
+      // the trigger is a single tap of Next on the section's last item. Mirror
+      // the real exam's end-of-section warning: confirm, with unanswered and
+      // marked counts, before anything closes. confirmEndSection() holds what
+      // used to run here.
+      setSectionEndPrompt({ sec, resumeIndex: currentIndex + 1 })
       return
     }
     goTo(currentIndex + 1)
@@ -637,6 +736,48 @@ export default function ExamPage() {
   const goPrev = useCallback(() => {
     if (currentIndex > 0) goTo(currentIndex - 1)
   }, [currentIndex, goTo])
+
+  // ── End-of-section confirmation ────────────────────────────────────────────
+  // Summary of the CURRENT section for the dialog: counts + where the first
+  // unanswered item sits (so "Go to Unanswered" can jump straight to it).
+  const sectionEndSummary = useMemo(() => {
+    if (!sectionEndPrompt || !sectionBounds) return null
+    const idxs = []
+    for (let i = sectionBounds.start; i <= sectionBounds.end; i++) idxs.push(i)
+    const unanswered = idxs.filter((i) => answers[questions[i]?.id] === undefined)
+    return {
+      n: idxs.length,
+      answered: idxs.length - unanswered.length,
+      unanswered: unanswered.length,
+      marked: idxs.filter((i) => marked.includes(questions[i]?.id)).length,
+      firstUnanswered: unanswered.length ? unanswered[0] : null,
+    }
+  }, [sectionEndPrompt, sectionBounds, answers, marked, questions])
+
+  // Runs ONLY from the confirmation dialog. This is exactly what goNext used to
+  // do at a boundary: enter the break flow, and for Section 2 persist the clock
+  // stop immediately (null deadline_at = paused), so a reload during the
+  // mandatory break restores from time_remaining rather than charging the
+  // break to the block.
+  const confirmEndSection = useCallback(() => {
+    const prompt = sectionEndPrompt
+    if (!prompt) return
+    setSectionEndPrompt(null)
+    breakResumeIndexRef.current = prompt.resumeIndex
+    setBreakSection(prompt.sec)
+    if (prompt.sec === 2) {
+      setBreakTimeLeft(15 * 60)
+      setBreakState('mandatory')
+      if (sessionId) {
+        supabase.from('sessions')
+          .update(examSnapshot({ deadline_at: null }))
+          .eq('id', sessionId)
+          .then(() => {}, () => {})
+      }
+    } else {
+      setBreakState('offer')
+    }
+  }, [sectionEndPrompt, sessionId, examSnapshot])
 
   // ── Break helpers ──────────────────────────────────────────────────────────
   const resumeFromBreak = useCallback(() => {
@@ -735,12 +876,19 @@ export default function ExamPage() {
         .update(examSnapshot({ status: 'paused', deadline_at: null }))
         .eq('id', sessionId)
 
+      // Close and flush the open visit before leaving. closeLastVisit keeps the
+      // array length, so a debounced write landing after the next page has read
+      // the row would lose the tie in mergeVisitLogs and the final visit's
+      // duration would read null.
+      visitsRef.current = closeLastVisit(visitsRef.current, Date.now())
+      persistVisits(true)
+
       navigate('/submissions')
     } catch (err) {
       console.error('Pause error:', err)
       setPausing(false)
     }
-  }, [sessionId, navigate])
+  }, [sessionId, navigate, persistVisits])
 
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = useCallback(async () => {
@@ -760,6 +908,11 @@ export default function ExamPage() {
           deadline_at:  null,
         }))
         .eq('id', sessionId)
+
+      // Same as the pause path: close and flush the open visit now, so the
+      // results page reads a log whose last entry has leave/ms populated.
+      visitsRef.current = closeLastVisit(visitsRef.current, Date.now())
+      persistVisits(true)
 
       // Award XP for completing session
       const xpAmount = type === 'exam' ? 100 : 25
@@ -814,7 +967,7 @@ export default function ExamPage() {
     } finally {
       setSubmitting(false)
     }
-  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion, isPathSession, pathSubject, isDemo, isAnonymous])
+  }, [questions, sessionId, navigate, type, awardXP, refreshSubjectMastery, checkQuestionCountAchievements, advanceStreak, currentQuestion, isPathSession, pathSubject, isDemo, isAnonymous, persistVisits])
 
   const handleSheetContinue = useCallback(() => {
     if (currentIndex >= questions.length - 1) {
@@ -915,7 +1068,12 @@ export default function ExamPage() {
     onPrev:            goPrev,
     onConfirm:         goNext,
     focusedChoice,
-    disabled:          loading || breakState !== null,
+    // sectionEndPrompt must gate these too. Shortcuts bind to window, so the
+    // confirmation modal cannot swallow them: without this, 1-4 would answer
+    // the item hidden behind the dialog and append a spurious answer-change
+    // record. Before the modal existed, setBreakState fired in the same handler
+    // as the Next tap and did this job.
+    disabled:          loading || breakState !== null || !!sectionEndPrompt,
   })
 
   const answeredCount = questions.filter((q) => answers[q.id] !== undefined).length
@@ -1198,6 +1356,53 @@ export default function ExamPage() {
           >
             Continue Exam
           </Button>
+        </div>
+      </Modal>
+
+      {/* ── End-of-section confirmation — closing a section is irreversible ── */}
+      <Modal
+        open={!!sectionEndPrompt}
+        onClose={() => setSectionEndPrompt(null)}
+        title={`End Section ${sectionEndPrompt?.sec}?`}
+      >
+        {sectionEndSummary && (
+          <p className="text-sm text-slate-600 dark:text-slate-300 mb-2 tabular-nums">
+            <span className="font-semibold">{sectionEndSummary.answered}</span> of{' '}
+            {sectionEndSummary.n} answered
+            {sectionEndSummary.unanswered > 0 && (
+              <>
+                {' '}·{' '}
+                <span className="font-semibold text-amber-600 dark:text-amber-400">
+                  {sectionEndSummary.unanswered} unanswered
+                </span>
+              </>
+            )}
+            {sectionEndSummary.marked > 0 && <> · {sectionEndSummary.marked} marked</>}
+          </p>
+        )}
+        <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">
+          Once this section ends you <span className="font-semibold">cannot return</span> to it
+          {sectionEndPrompt?.sec === 2
+            ? ' — the mandatory 15-minute break follows and the exam clock stops.'
+            : ' — the exam clock keeps running through any break.'}
+        </p>
+        <div className="flex gap-3 justify-end flex-wrap">
+          <Button variant="secondary" onClick={() => setSectionEndPrompt(null)}>
+            Keep Working
+          </Button>
+          {sectionEndSummary?.firstUnanswered != null && (
+            <Button
+              variant="secondary"
+              onClick={() => {
+                const i = sectionEndSummary.firstUnanswered
+                setSectionEndPrompt(null)
+                goTo(i)
+              }}
+            >
+              Go to Unanswered
+            </Button>
+          )}
+          <Button onClick={confirmEndSection}>End Section {sectionEndPrompt?.sec}</Button>
         </div>
       </Modal>
 

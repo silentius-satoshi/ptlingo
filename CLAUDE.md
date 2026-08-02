@@ -69,7 +69,10 @@ sessions: id, user_id, type(exam|quiz), mode, status(in_progress|paused|submitte
   time_multiplier, time_remaining, current_index, question_ids(uuid[]),
   answers(jsonb), marked(uuid[]), eliminated(jsonb), highlights(jsonb),
   notes(jsonb), time_per_question(jsonb), score(float), submitted_at, started_at,
-  answer_changes(jsonb DEFAULT '[]'), deadline_at(timestamptz)
+  answer_changes(jsonb DEFAULT '[]'), deadline_at(timestamptz),
+  visit_log(jsonb DEFAULT '[]')
+  — visit_log persisted via a SEPARATE .update() so a missing column degrades to
+    localStorage-only instead of failing every save
   — deadline_at NULL = clock legitimately stopped (paused / mandatory break / submitted)
   — deadline_at written when the clock starts/stops/resumes, NEVER periodically
 notes: user_id, question_id, content
@@ -107,6 +110,8 @@ ptlingo_email_reminders   'true'|'false'
 ptlingo_onboarding_complete '1' — user has completed OnboardingFlow
 ptlingo_answer_changes_{sessionId} JSON — synchronous mirror of sessions.answer_changes
   — merge rule on load: longer log wins, server wins ties (src/lib/changeLog.js)
+ptlingo_visit_log_{sessionId} JSON — mirror of sessions.visit_log, same merge rule
+  (src/lib/visitLog.js — one entry per continuous stay on an item)
 sessionStorage:
 ptlingo_anon_banner_dismissed — anon upgrade banner dismissed this browser session
 
@@ -224,10 +229,24 @@ Form order: MockExamStartPage orders section, question_number — order freezes 
   question_ids at session creation (old sessions keep old order)
 examSnapshot(): the ONLY way to build a sessions .update() payload — add new persisted
   fields there, never inline. PostgREST fails the WHOLE update on an unknown column.
+  ONE exception: the keepalive flush-on-exit drops deadline_at from the payload
+  ({ deadline_at, ...snap }) — useTimer has no pagehide wake, so a throttled tab's
+  timeRemaining is stale-high and would refund clock. The deadline never moves while
+  running, and both stops persist null explicitly, so the row is always already right.
+Section-end dialog: S2 dwell time in the confirmation IS charged to section time —
+  the clock stop persists on confirm, not on the Next tap. Faithful: the real
+  end-of-section warning runs on the clock. Not a bug, do not "fix".
 clockPausedRef is stale inside handlers — pass deadline_at explicitly at clock
   start/stop call sites
 Answer-change log: automatic only (first pick ≠ change, same-click ≠ change),
   append-only, never hand-edited — load-bearing for the mock analysis
+Section-end confirmation: Next on a section's last item opens a modal with
+  answered/unanswered/marked counts + Go-to-Unanswered — confirmEndSection()
+  is the only entry into the break flow; closing is irreversible
+Visit log: ExamPage records {idx,qid,enter,leave,ms} per stay — StrictMode dev
+  double-invoke can add a 0ms phantom visit (harmless, dev only)
+Flush-on-exit: pagehide/hidden → keepalive PATCH straight to PostgREST
+  (examSnapshot + visit_log as TWO separate requests, deliberately)
 
 ## Process Report
 src/lib/processReport.js — pure; buildProcessReport({session, questions, changeLog})
@@ -238,6 +257,10 @@ src/lib/processReport.js — pure; buildProcessReport({session, questions, chang
   work-activity classification (not derivable in-app)
 ResultsPage: collapsible Process Report + one JSON download
   (mock-process-report-{sessionId}.json) — the JSON is the deliverable
+report_version: '2.1' stamped in every export — bump on shape/math changes so
+  cross-mock comparisons know which instrument produced which reading
+raw.visit_log + per_item.visits: revisit behavior, first-decision latency, and
+  exact compression re-derive offline from the visit log
 Tests: npm test → scripts/testProcessReport.mjs (keep green)
 
 ## Key Gotchas
