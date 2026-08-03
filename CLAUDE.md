@@ -245,6 +245,12 @@ Section-end confirmation: Next on a section's last item opens a modal with
   is the only entry into the break flow; closing is irreversible
 Visit log: ExamPage records {idx,qid,enter,leave,ms} per stay — StrictMode dev
   double-invoke can add a 0ms phantom visit (harmless, dev only)
+Item-time attribution: section overhead belongs to NO item. goNext settles + closes
+  the visit BEFORE the dialog opens, so ALL breaks are covered — including the
+  UNBOUNDED optional ones after S1/S3/S4, not just the 15-min mandatory S2 break.
+  INVARIANT: every settle path goes through settleItemTime(), which always nulls
+  questionStartRef — never inline attribution. (The keepalive flush is read-only
+  on the refs: it folds the stint into its payload without nulling them.)
 Flush-on-exit: pagehide/hidden → keepalive PATCH straight to PostgREST
   (examSnapshot + visit_log as TWO separate requests, deliberately)
 

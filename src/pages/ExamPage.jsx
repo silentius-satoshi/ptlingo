@@ -640,6 +640,38 @@ export default function ExamPage() {
     }
   }, [currentIndex, currentQuestionId, loading, readOnly, sessionId, persistVisits])
 
+  // ── Item-time attribution control ──────────────────────────────────────────
+  // The per-question tracker only settles when the question CHANGES, so any
+  // path that leaves the page (submit / pause / go-to-review) or parks on
+  // section overhead (end-of-section dialog, break screens) would otherwise
+  // lose the current stint — or worse, charge an entire 15-minute break to the
+  // boundary item, poisoning its time_per_question, the 2:30 ceiling count,
+  // and the section's compression ratio.
+  //
+  // settleItemTime(): add the in-progress stint to the current item and stop
+  // the item clock (the block clock is unaffected — overhead stays on it).
+  // resumeItemAttribution(): restart the item clock and reopen a visit, used
+  // when the section-end dialog is dismissed back onto the same item.
+  const settleItemTime = useCallback(() => {
+    if (prevQuestionIdRef.current && questionStartRef.current) {
+      const elapsed = Math.round((Date.now() - questionStartRef.current) / 1000)
+      const s = useSessionStore.getState()
+      s.setTimePerQuestion(
+        prevQuestionIdRef.current,
+        (s.timePerQuestion[prevQuestionIdRef.current] || 0) + elapsed,
+      )
+    }
+    questionStartRef.current = null
+  }, [])
+
+  const resumeItemAttribution = useCallback(() => {
+    if (!currentQuestionId) return
+    questionStartRef.current = Date.now()
+    // A dialog interrupted the stay, so this is honestly a new visit.
+    visitsRef.current = appendVisit(visitsRef.current, currentIndex, currentQuestionId, Date.now())
+    persistVisits()
+  }, [currentIndex, currentQuestionId, persistVisits])
+
   // ── Flush-on-exit ──────────────────────────────────────────────────────────
   // The debounced save can hold up to 1.5 s of state when the tab closes.
   // On pagehide / going hidden, PATCH a best-effort keepalive snapshot straight
@@ -682,6 +714,19 @@ export default function ExamPage() {
         // has no pagehide wake, so a throttled tab's timeRemaining is stale-high
         // and deriving a deadline from it here would refund real exam time.
         const { deadline_at, ...snap } = examSnapshot() // eslint-disable-line no-unused-vars
+        // Fold the in-progress stint into the payload the same way
+        // settleItemTime would — but NON-destructively. The refs must survive:
+        // a tab that merely went hidden can come back, and nulling
+        // questionStartRef here would leave attribution dead until the next
+        // navigation. Copy the map instead of mutating store state.
+        if (prevQuestionIdRef.current && questionStartRef.current) {
+          const elapsed = Math.round((now - questionStartRef.current) / 1000)
+          snap.time_per_question = {
+            ...snap.time_per_question,
+            [prevQuestionIdRef.current]:
+              (snap.time_per_question?.[prevQuestionIdRef.current] || 0) + elapsed,
+          }
+        }
         fetch(url, { method: 'PATCH', keepalive: true, headers, body: JSON.stringify(snap) }).catch(() => {})
         const closedVisits = closeLastVisit(visitsRef.current, Date.now())
         fetch(url, { method: 'PATCH', keepalive: true, headers, body: JSON.stringify({ visit_log: closedVisits }) }).catch(() => {})
@@ -727,6 +772,13 @@ export default function ExamPage() {
       // the real exam's end-of-section warning: confirm, with unanswered and
       // marked counts, before anything closes. confirmEndSection() holds what
       // used to run here.
+      //
+      // Section overhead (this dialog + any break that follows) runs on the
+      // block clock but belongs to NO item: settle the current stint and close
+      // the visit now, so break dwell can't contaminate per-item pacing.
+      settleItemTime()
+      visitsRef.current = closeLastVisit(visitsRef.current, Date.now())
+      persistVisits()
       setSectionEndPrompt({ sec, resumeIndex: currentIndex + 1 })
       return
     }
@@ -868,6 +920,8 @@ export default function ExamPage() {
     try {
       // Flush any pending debounced save immediately
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+      // Capture the current item's in-progress stint before snapshotting.
+      settleItemTime()
       const s = useSessionStore.getState()
       await supabase
         .from('sessions')
@@ -895,6 +949,9 @@ export default function ExamPage() {
     setSubmitting(true)
     try {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+      // The per-question tracker only settles on navigation — capture the
+      // final item's in-progress stint before the snapshot is built.
+      settleItemTime()
       const s = useSessionStore.getState()
       const correct = questions.filter((q) => s.answers[q.id] === q.correct_index).length
       const score   = questions.length > 0 ? correct / questions.length : 0
@@ -1052,6 +1109,9 @@ export default function ExamPage() {
   // ── Navigate to review screen (exam mode) — flush save first ───────────────
   const handleGoToReview = useCallback(async () => {
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    // Capture the current item's in-progress stint before the flush — leaving
+    // for the review screen would otherwise drop it from time_per_question.
+    settleItemTime()
     await supabase
       .from('sessions')
       .update(examSnapshot())
@@ -1387,7 +1447,14 @@ export default function ExamPage() {
             : ' — the exam clock keeps running through any break.'}
         </p>
         <div className="flex gap-3 justify-end flex-wrap">
-          <Button variant="secondary" onClick={() => setSectionEndPrompt(null)}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setSectionEndPrompt(null)
+              // Back onto the same item: restart its clock and open a fresh visit.
+              resumeItemAttribution()
+            }}
+          >
             Keep Working
           </Button>
           {sectionEndSummary?.firstUnanswered != null && (
@@ -1396,7 +1463,15 @@ export default function ExamPage() {
               onClick={() => {
                 const i = sectionEndSummary.firstUnanswered
                 setSectionEndPrompt(null)
-                goTo(i)
+                // Only the same-index case needs an explicit resume: goTo(i)
+                // there changes no dependency, so neither the tracker nor the
+                // visit effect re-fires and attribution would stay dead against
+                // the null ref left by the goNext settle. When the index does
+                // change, goTo alone is correct — resuming first would open a
+                // visit on the boundary item that the batched setCurrentIndex
+                // closes at ~0 ms, inflating its visit count.
+                if (i === currentIndex) resumeItemAttribution()
+                else goTo(i)
               }}
             >
               Go to Unanswered

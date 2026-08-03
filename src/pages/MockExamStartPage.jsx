@@ -21,7 +21,9 @@ export default function MockExamStartPage() {
   const { examId } = useParams()
   const { user } = useAuthStore()
   const navigate = useNavigate()
-  const [multiplier, setMultiplier] = useState(1)
+  // Default to 1.5× — the accommodated timing this instrument is built around.
+  // The selector still offers 1× and 2×.
+  const [multiplier, setMultiplier] = useState(1.5)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
